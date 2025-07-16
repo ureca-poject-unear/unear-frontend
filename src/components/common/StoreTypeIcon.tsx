@@ -111,3 +111,12 @@ const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
 };
 
 export default StoreTypeIcon;
+
+/*
+사용법
+            
+카테고리 = cafe, food, shopping, education, culture, bakery, beauty, convenience, activity, popup
+매장유형 = franchise, small-business, event
+
+<StoreTypeIcon category="카테고리" storeClass="매장유형" />
+*/
