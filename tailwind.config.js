@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // text-[지정명]
+        // font-[지정명]
         thin: ['LGEIHeadline-Thin', 'sans-serif'],
         light: ['LGEIHeadline-Light', 'sans-serif'],
         regular: ['LGEIHeadline-Regular', 'sans-serif'],
@@ -19,13 +19,12 @@ export default {
         black: '#333333', // 검정
         white: '#FFFFFF', // 흰색
         store: '#0F0034', // 스토리 네이비
+        storecard: '251A49', // 스토리 카드 네이비
       },
       backgroundImage: {
         // bg-[지정명]
         storeicon: 'linear-gradient(180deg, #094275 0%, #0F0034 100%)', //하단바 스토리 아이콘
       },
-
-      boxShadow: {},
 
       fontSize: {
         // text-[지정명]
