@@ -43,6 +43,12 @@ const MainPage = () => {
           <div className="flex justify-center">
             <StoreTypeIcon category="cafe" storeClass="small-business" />
             <StoreTypeIcon category="activity" storeClass="event" />
+            <StoreTypeIcon
+              category="activity"
+              storeClass="franchise"
+              mode="statistics"
+              shape="circle"
+            />
           </div>
           <p className="text-sm mt-2 text-gray-600">프랜차이즈 카페 아이콘</p>
         </div>
