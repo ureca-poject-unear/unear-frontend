@@ -1,16 +1,16 @@
 import React from 'react';
 
 // SVG 파일들을 React 컴포넌트로 import
-import CoffeeIcon from '../../assets/common/coffee.svg?react';
-import FoodIcon from '../../assets/common/food.svg?react';
-import ShoppingIcon from '../../assets/common/shopping.svg?react';
-import BookIcon from '../../assets/common/book.svg?react';
-import CultureIcon from '../../assets/common/culture.svg?react';
-import BreadIcon from '../../assets/common/bread.svg?react';
-import BeautyIcon from '../../assets/common/beauty.svg?react';
-import LifeIcon from '../../assets/common/life.svg?react';
-import ActivityIcon from '../../assets/common/activity.svg?react';
-import StoreIcon from '../../assets/common/store.svg?react';
+import CoffeeIcon from '@/assets/common/coffee.svg?react';
+import FoodIcon from '@/assets/common/food.svg?react';
+import ShoppingIcon from '@/assets/common/shopping.svg?react';
+import BookIcon from '@/assets/common/book.svg?react';
+import CultureIcon from '@/assets/common/culture.svg?react';
+import BreadIcon from '@/assets/common/bread.svg?react';
+import BeautyIcon from '@/assets/common/beauty.svg?react';
+import LifeIcon from '@/assets/common/life.svg?react';
+import ActivityIcon from '@/assets/common/activity.svg?react';
+import StoreIcon from '@/assets/common/store.svg?react';
 
 // 카테고리 타입 정의
 type CategoryType =
