@@ -26,10 +26,13 @@
     "@storybook/addon-onboarding": "^9.0.17",
     "@storybook/addon-vitest": "^9.0.17",
     "@storybook/react-vite": "^9.0.17",
+    "@storybook/test": "^9.0.0-alpha.2",
     "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
@@ -38,6 +41,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "eslint-plugin-storybook": "^9.0.17",
     "globals": "^16.2.0",
+    "playwright": "^1.54.1",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "storybook": "^9.0.17",
@@ -45,9 +49,6 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.0.0",
-    "vitest": "^3.2.4",
-    "@vitest/browser": "^3.2.4",
-    "playwright": "^1.54.1",
-    "@vitest/coverage-v8": "^3.2.4"
+    "vitest": "^3.2.4"
   }
 }
