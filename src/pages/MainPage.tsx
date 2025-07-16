@@ -41,8 +41,8 @@ const MainPage = () => {
           <h3 className="text-lg font-semibold text-black mb-6">매장유형별 아이콘 테스트</h3>
 
           <div className="flex justify-center">
-            <StoreTypeIcon category="cafe" storeClass="small-business" size={50} />
-            <StoreTypeIcon category="beauty" storeClass="small-business" size={50} />
+            <StoreTypeIcon category="cafe" storeClass="small-business" />
+            <StoreTypeIcon category="beauty" storeClass="small-business" />
           </div>
           <p className="text-sm mt-2 text-gray-600">프랜차이즈 카페 아이콘</p>
         </div>
