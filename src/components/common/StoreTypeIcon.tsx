@@ -56,54 +56,38 @@ const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
   size = 50,
   className = '',
 }) => {
-  // 정확한 색상 값
-  const getColor = (): string => {
+  // Tailwind 색상 클래스 반환
+  const getColorClass = (): string => {
     switch (storeClass) {
       case 'franchise':
-        return '#f97316'; // orange-500
+        return 'text-orange-500'; // Tailwind 기본 색상
       case 'small-business':
-        return '#3b82f6'; // blue-500
+        return 'text-blue-500'; // Tailwind 기본 색상
       case 'event':
-        return '#E6007E'; // primary pink
+        return 'text-primary'; // 이미 정의된 커스텀 색상
       default:
-        return '#333333';
+        return 'text-black'; // 이미 정의된 커스텀 색상
     }
   };
 
   const IconComponent = categoryIconMap[category];
-  const color = getColor();
+  const colorClass = getColorClass();
 
   return (
     <div
-      className={`flex items-center justify-center bg-gray-100 ${className}`}
+      className={`flex items-center justify-center bg-gray-100 rounded-lg ${className}`}
       style={{
         width: size,
         height: size,
-        borderRadius: '8px',
       }}
     >
-      <div
-        style={{
-          width: '18px',
-          height: '18px',
-          color: color,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <div className={`w-[20px] h-[20px] flex items-center justify-center ${colorClass}`}>
         <IconComponent
-          width={18}
-          height={18}
-          style={{
-            width: '100%',
-            height: '100%',
-            ...(category === 'activity' && {
-              fill: 'none',
-              stroke: 'currentColor',
-              strokeWidth: 1.2,
-            }),
-          }}
+          width={20}
+          height={20}
+          className={`w-full h-full ${
+            category === 'activity' ? 'fill-none stroke-current stroke-[1.2]' : 'fill-current'
+          }`}
         />
       </div>
     </div>
