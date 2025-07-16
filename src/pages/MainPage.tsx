@@ -1,4 +1,5 @@
 import React from 'react';
+import StoreTypeIcon from '../components/common/StoreTypeIcon';
 
 const MainPage = () => {
   return (
@@ -34,6 +35,17 @@ const MainPage = () => {
         <button className="bg-primary text-white px-6 py-2 rounded-[12px] text-lm">
           테스트 버튼
         </button>
+
+        {/* StoreTypeIcon 테스트 */}
+        <div className="mt-12">
+          <h3 className="text-lg font-semibold text-black mb-6">매장유형별 아이콘 테스트</h3>
+
+          <div className="flex justify-center">
+            <StoreTypeIcon category="cafe" storeClass="small-business" size={50} />
+            <StoreTypeIcon category="shopping" storeClass="event" size={50} />
+          </div>
+          <p className="text-sm mt-2 text-gray-600">프랜차이즈 카페 아이콘</p>
+        </div>
       </div>
     </div>
   );
