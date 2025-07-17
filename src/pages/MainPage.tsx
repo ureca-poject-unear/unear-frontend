@@ -12,6 +12,9 @@ import ConfirmButton from '../components/common/ConfirmButton';
 import MiniLocationButton from '../components/common/MiniLocationButton';
 import PhoneButtonDark from '../components/common/PhoneButtonDark';
 import StoryButton from '../components/common/StoryButton';
+import Grade from '../components/common/Grade';
+import GradeMini from '../components/common/GradeMini';
+
 const MainPage = () => {
   const handleActionClick = () => {};
 
@@ -57,6 +60,8 @@ const MainPage = () => {
       <MiniLocationButton />
       <PhoneButtonDark />
       <StoryButton text="소비 스토리 보기" />
+      <Grade grade="우수" />
+      <GradeMini grade="VIP" />
     </div>
   );
 };
