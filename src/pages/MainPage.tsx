@@ -16,6 +16,7 @@ import PhoneButtonDark from '../components/common/PhoneButtonDark';
 import StoryButton from '../components/common/StoryButton';
 import Grade from '../components/common/Grade';
 import GradeMini from '../components/common/GradeMini';
+import MembershipCard from '../components/common/MembershipCard';
 
 const MainPage = () => {
   const handleActionClick = () => {};
@@ -63,6 +64,12 @@ const MainPage = () => {
         <StoryButton text="소비 스토리 보기" />
         <Grade grade="우수" />
         <GradeMini grade="VIP" />
+        <MembershipCard
+          name="CGV"
+          description="무료 예매 3회, 1+1 예매 9회"
+          grade={['VVIP', 'VIP']}
+          imageUrl="https://i.namu.wiki/i/RI24zLR5PQGyuxm1hh027dXQGus9T8kxvF0YCDvKFtfTBesZJh69aiAMwzuVaN8slC0wqjACL7DXDt3o03F7xFgTQK_SbcO07QLYqwuZT-mg70kVpBk6LqVNu3sUPSseq1QKL_hiU_DIj4tOaLBmEg.svg" // public/images 폴더 기준 경로
+        />
       </div>
 
       {/* 스타일 테스트용 UI */}
