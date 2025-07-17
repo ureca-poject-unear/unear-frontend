@@ -1,4 +1,3 @@
-// src/stories/BookmarkStar.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import BookmarkStar from '@/components/common/BookmarkStar';
 
