@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import StoreStatus from '@/components/common/StoreStatus';
 
 const meta: Meta<typeof StoreStatus> = {
-  title: 'Components/StoreStatus',
+  title: 'Common/StoreStatus',
   component: StoreStatus,
   tags: ['autodocs'],
   argTypes: {

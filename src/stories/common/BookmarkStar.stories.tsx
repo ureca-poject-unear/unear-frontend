@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import BookmarkStar from '@/components/common/BookmarkStar';
 
 const meta: Meta<typeof BookmarkStar> = {
-  title: 'Components/BookmarkStar',
+  title: 'Common/BookmarkStar',
   component: BookmarkStar,
   tags: ['autodocs'],
   argTypes: {
