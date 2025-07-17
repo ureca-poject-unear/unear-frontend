@@ -20,13 +20,13 @@ export default defineConfig({
           '#000000': 'currentColor',
           '#333': 'currentColor',
           '#000': 'currentColor',
-          'black': 'currentColor'
+          black: 'currentColor',
         },
         svgProps: {
-          fill: 'currentColor'
-        }
+          fill: 'currentColor',
+        },
       },
-    })
+    }),
   ],
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
