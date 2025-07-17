@@ -8,18 +8,23 @@ type LocationButtonProps = {
 /**
  * 위치 보기 버튼 컴포넌트
  * 버튼을 클릭하면 위치를 보여주는 동작을 수행할 수 있도록 설정됩니다.
+ * 마우스 호버 시 배경색이 pink-50으로 변경되고 아이콘 및 텍스트 색상이 더 진한 핑크색으로 바뀝니다.
  */
 const LocationButton: React.FC<LocationButtonProps> = ({ onClick }) => {
   return (
     <button
-      className="w-[169px] h-[46px] relative flex items-center justify-center" // flex 사용
+      className="group w-[169px] h-[46px] relative flex items-center justify-center bg-white 
+                 hover:bg-pink-50 transition-colors duration-200 rounded-lg" // 배경색을 흰색으로 설정하고 호버 시 pink-50으로 변경
       onClick={onClick}
     >
       {/* 버튼 외곽 박스 */}
-      <div className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-[#e6007e]" />
+      <div
+        className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-[#e6007e]
+                   group-hover:border-pink-600 transition-colors duration-200" // 호버 시 테두리 색상 변경
+      />
 
       {/* 내부 콘텐츠: SVG 아이콘과 텍스트 */}
-      <div className="flex items-center justify-center space-x-2">
+      <div className="flex items-center justify-center space-x-2 relative z-10">
         <svg
           width={18}
           height={16}
@@ -36,10 +41,13 @@ const LocationButton: React.FC<LocationButtonProps> = ({ onClick }) => {
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="group-hover:fill-pink-600 group-hover:stroke-pink-600 transition-colors duration-200" // 호버 시 아이콘 색상 변경
           />
         </svg>
 
-        <p className="text-base font-semibold text-[#e6007e]">위치 보기</p>
+        <p className="text-base font-semibold text-[#e6007e] group-hover:text-pink-600 transition-colors duration-200">
+          위치 보기
+        </p>
       </div>
     </button>
   );

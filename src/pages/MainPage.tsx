@@ -2,16 +2,33 @@ import React from 'react';
 import ActionButton from '../components/common/ActionButton';
 import LocationButton from '../components/common/LocationButton';
 import CallButton from '../components/common/CallButton';
+import PhoneIcon from '../components/common/PhoneIcon';
+import CouponButton from '../components/common/CouponBuuton';
+import BookmarkButton from '../components/common/BookmarkButton';
+import MiniButton from '../components/common/MiniButton';
 
 const MainPage = () => {
   const handleActionClick = () => {};
 
+  const handleMiniButtonClick = () => {
+    console.log('버튼이 클릭되었습니다!');
+  };
   const handleLocationClick = () => {
     console.log('위치 보기 버튼 클릭됨!');
   };
 
   const handleCallClick = () => {
     console.log('전화 하기 버튼 클릭됨!');
+  };
+
+  const handlePhoneClick = () => {
+    console.log('전화 하기 버튼 클릭됨!');
+  };
+  const handleCouponButtonClick = () => {
+    console.log('쿠폰 버튼 클릭됨!');
+  };
+  const handleBookmarkButtonClick = () => {
+    console.log('즐겨찾기 버튼 클릭됨!');
   };
 
   return (
@@ -24,6 +41,11 @@ const MainPage = () => {
 
       {/* CallButton 컴포넌트 */}
       <CallButton onClick={handleCallClick} />
+
+      <PhoneIcon onClick={handlePhoneClick} />
+      <CouponButton onClick={handleCouponButtonClick} />
+      <BookmarkButton onClick={handleBookmarkButtonClick} />
+      <MiniButton text="룰렛 돌리기" onClick={handleMiniButtonClick} />
     </div>
   );
 };

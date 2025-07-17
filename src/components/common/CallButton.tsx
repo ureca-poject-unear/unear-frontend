@@ -5,20 +5,25 @@ type CallButtonProps = {
 };
 
 /**
- * 위치 보기 버튼 컴포넌트
- * 버튼을 클릭하면 위치를 보여주는 동작을 수행할 수 있도록 설정됩니다.
+ * 전화 걸기 버튼 컴포넌트
+ * 버튼을 클릭하면 전화 걸기 동작을 수행할 수 있도록 설정됩니다.
+ * 마우스 호버 시 배경색이 변경되고 아이콘 및 텍스트 색상이 더 진한 녹색으로 바뀝니다.
  */
 const CallButton: React.FC<CallButtonProps> = ({ onClick }) => {
   return (
     <button
-      className="w-[169px] h-[46px] relative flex items-center justify-center" // flex 사용
+      className="group w-[169px] h-[46px] relative flex items-center justify-center bg-white
+                 hover:bg-green-50 transition-colors duration-200 rounded-lg" // 호버 시 배경색 변경
       onClick={onClick}
     >
       {/* 버튼 외곽 박스 */}
-      <div className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-[#16A34A]" />
+      <div
+        className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-[#16A34A]
+                   group-hover:border-green-600 transition-colors duration-200" // 호버 시 테두리 색상 변경
+      />
 
       {/* 내부 콘텐츠: SVG 아이콘과 텍스트 */}
-      <div className="flex items-center justify-center space-x-2">
+      <div className="flex items-center justify-center space-x-2 relative z-10">
         <svg
           width={18}
           height={16}
@@ -35,10 +40,13 @@ const CallButton: React.FC<CallButtonProps> = ({ onClick }) => {
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="group-hover:fill-green-600 group-hover:stroke-green-600 transition-colors duration-200" // 호버 시 아이콘 색상 변경
           />
         </svg>
 
-        <p className="text-base font-semibold text-[#16A34A]">전화 걸기</p>
+        <p className="text-base font-semibold text-[#16A34A] group-hover:text-green-600 transition-colors duration-200">
+          전화 걸기
+        </p>
       </div>
     </button>
   );
