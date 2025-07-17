@@ -37,7 +37,7 @@ export default function MiniLocationButton({ onClick }: MiniLocationButtonProps)
             className="group-hover:fill-pink-600 group-hover:stroke-pink-600 transition-colors duration-200"
           />
         </svg>
-        <span className="text-xs font-semibold text-[#e6007e] group-hover:text-pink-600">
+        <span className="text-s font-semibold text-[#e6007e] group-hover:text-pink-600">
           위치 보기
         </span>
       </div>

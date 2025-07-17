@@ -11,7 +11,7 @@ import FilterButton from '../components/common/FilterButton';
 import ConfirmButton from '../components/common/ConfirmButton';
 import MiniLocationButton from '../components/common/MiniLocationButton';
 import PhoneButtonDark from '../components/common/PhoneButtonDark';
-
+import StoryButton from '../components/common/StoryButton';
 const MainPage = () => {
   const handleActionClick = () => {};
 
@@ -56,6 +56,7 @@ const MainPage = () => {
       <ConfirmButton text="이메일 인증" />
       <MiniLocationButton />
       <PhoneButtonDark />
+      <StoryButton text="소비 스토리 보기" />
     </div>
   );
 };
