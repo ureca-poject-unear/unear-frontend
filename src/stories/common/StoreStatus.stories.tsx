@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import StoreStatus, { type StoreStatusType } from '../../components/common/StoreStatus';
+import StoreStatus from '@/components/common/StoreStatus';
 
 const meta: Meta<typeof StoreStatus> = {
   title: 'Components/StoreStatus',
