@@ -186,18 +186,20 @@ export const AllCategories: Story = {
     <div className="space-y-6 p-4">
       <h3 className="text-lg font-semibold mb-4">모든 카테고리 아이콘</h3>
       <div className="grid grid-cols-5 gap-4">
-        {[
-          'cafe',
-          'food',
-          'shopping',
-          'education',
-          'culture',
-          'bakery',
-          'beauty',
-          'convenience',
-          'activity',
-          'popup',
-        ].map((category) => (
+        {(
+          [
+            'cafe',
+            'food',
+            'shopping',
+            'education',
+            'culture',
+            'bakery',
+            'beauty',
+            'convenience',
+            'activity',
+            'popup',
+          ] as const
+        ).map((category) => (
           <div key={category} className="text-center">
             <MapMarkerIcon category={category} storeClass="franchise" />
             <p className="text-sm mt-2 capitalize">{category}</p>
