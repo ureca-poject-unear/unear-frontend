@@ -1,17 +1,14 @@
-import React from 'react';
 import { Outlet } from 'react-router-dom';
+import BottomNavigator from '@/components/common/BottomNavigator';
 
 const Default = () => {
   return (
-    //min-h-[852px]
-    <div className="w-full max-w-[393px] min-h-screen bg-background mx-auto flex flex-col px-5">
-      {/* <Header /> */}
-
-      <main>
+    <div className="w-full max-w-[393px] min-h-screen bg-background mx-auto flex flex-col relative px-5">
+      <main className="pt-[40px] pb-[65px]">
         <Outlet />
       </main>
 
-      {/* <Nav /> */}
+      <BottomNavigator />
     </div>
   );
 };
