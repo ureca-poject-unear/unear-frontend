@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import StoreTypeIcon from '../components/common/StoreTypeIcon';
 import MapMarkerIcon from '../components/common/MapMarkerIcon';
+import SearchBar from '../components/common/SearchBar';
 
 const MainPage = () => {
   const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
@@ -43,6 +44,29 @@ const MainPage = () => {
         <button className="bg-primary text-white px-6 py-2 rounded-[12px] text-lm">
           테스트 버튼
         </button>
+
+        {/* SearchBar 테스트 */}
+        <div className="mt-12">
+          <h3 className="text-lg font-semibold text-black mb-6">검색창 컴포넌트 테스트</h3>
+
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">기본 검색창</h4>
+              <SearchBar
+                placeholder="검색어를 입력하세요"
+                onSearch={(value) => console.log('검색:', value)}
+              />
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">매장 검색창</h4>
+              <SearchBar
+                placeholder="매장명이나 카테고리를 검색하세요"
+                onSearch={(value) => alert(`"${value}" 검색 결과`)}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* StoreTypeIcon 테스트 */}
         <div className="mt-12">
