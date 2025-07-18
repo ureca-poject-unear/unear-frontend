@@ -5,6 +5,7 @@ import MapPage from '@/pages/MapPage';
 import StoryPage from '@/pages/StoryPage';
 import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
+import LoginPage from '@/pages/LoginPage';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
       { path: '/story', element: <StoryPage /> },
       { path: '/junior', element: <JuniorPage /> },
       { path: '/my', element: <MyPage /> },
+      { path: '/login', element: <LoginPage /> },
     ],
   },
 ]);

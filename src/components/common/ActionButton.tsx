@@ -18,7 +18,6 @@ export default function ActionButton({
       onClick={() => {
         if (isActive) {
           onClick();
-          alert(`${text} 되었습니다!`);
         }
       }}
       disabled={!isActive} // 비활성 시 클릭 불가
