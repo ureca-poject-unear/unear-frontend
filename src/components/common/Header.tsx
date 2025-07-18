@@ -33,3 +33,8 @@ const Header = ({
 };
 
 export default Header;
+
+/* 
+import Header from '@/components/common/Header'; 상단에 이거랑
+추천 페이지 제외 <Header title="메인페이지" /> 이거 한줄 타이틀과 함께 추가하면 됨
+*/

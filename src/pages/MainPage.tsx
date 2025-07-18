@@ -1,4 +1,5 @@
 import Header from '@/components/common/Header';
+import BottomSheetMain from '@/pages/BottomSheetMain';
 
 const MainPage = () => {
   return (
@@ -26,6 +27,8 @@ const MainPage = () => {
             테스트 버튼
           </button>
         </div>
+
+        <BottomSheetMain />
       </div>
     </>
   );
