@@ -4,7 +4,6 @@ import BottomSheetMain from '@/pages/BottomSheetMain';
 import ActionButton from '../components/common/ActionButton';
 import LocationButton from '../components/common/LocationButton';
 import CallButton from '../components/common/CallButton';
-import PhoneIcon from '../components/common/PhoneButton';
 import CouponButton from '../components/common/CouponBuuton';
 import BookmarkButton from '../components/common/BookmarkButton';
 import MiniButton from '../components/common/MiniButton';
@@ -55,7 +54,6 @@ const MainPage = () => {
 
         {/* CallButton 컴포넌트 */}
         <CallButton onClick={handleCallClick} />
-        <PhoneIcon onClick={handlePhoneClick} />
         <CouponButton onClick={handleCouponButtonClick} />
         <BookmarkButton onClick={handleBookmarkButtonClick} />
         <MiniButton text="룰렛 돌리기" onClick={handleMiniButtonClick} />
