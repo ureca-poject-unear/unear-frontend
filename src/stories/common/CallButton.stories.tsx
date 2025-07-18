@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import CallButton from '../../components/common/CallButton'; // CallButton 컴포넌트의 실제 경로를 확인해주세요.
+import CallButton from '@/components/common/CallButton';
 
 const meta: Meta<typeof CallButton> = {
-  title: 'Components/CallButton', // Storybook 사이드바에 표시될 컴포넌트의 제목입니다.
+  title: 'Common/CallButton', // Storybook 사이드바에 표시될 컴포넌트의 제목입니다.
   component: CallButton, // 스토리를 만들 컴포넌트를 지정합니다.
   tags: ['autodocs'], // 자동 문서화 활성화
   argTypes: {

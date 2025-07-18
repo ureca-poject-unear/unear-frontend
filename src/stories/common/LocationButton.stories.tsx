@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import LocationButton from '../../components/common/LocationButton'; // LocationButton 컴포넌트의 실제 경로를 확인해주세요.
+import LocationButton from '@/components/common/LocationButton';
 
 const meta: Meta<typeof LocationButton> = {
-  title: 'Components/LocationButton', // Storybook 사이드바에 표시될 컴포넌트의 제목입니다.
+  title: 'Common/LocationButton', // Storybook 사이드바에 표시될 컴포넌트의 제목입니다.
   component: LocationButton, // 스토리를 만들 컴포넌트를 지정합니다.
   tags: ['autodocs'], // 자동 문서화 활성화
   argTypes: {

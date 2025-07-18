@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import CouponButton from '../../components/common/CouponBuuton'; // 경로 맞게 수정하세요.
+import CouponButton from '@/components/common/CouponBuuton';
 
 const meta: Meta<typeof CouponButton> = {
-  title: 'Components/CouponButton',
+  title: 'Common/CouponButton',
   component: CouponButton,
   tags: ['autodocs'],
   argTypes: {
