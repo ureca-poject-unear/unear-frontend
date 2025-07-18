@@ -1,5 +1,3 @@
-import React from 'react';
-
 type ActionProps = {
   text: string; // 버튼에 표시될 텍스트
   onClick: () => void; // 클릭 시 실행할 함수

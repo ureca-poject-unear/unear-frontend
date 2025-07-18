@@ -1,6 +1,3 @@
-// src/components/LocationButton/LocationButton.tsx
-import React from 'react';
-
 type LocationButtonProps = {
   onClick?: () => void; // 버튼 클릭 시 실행할 함수
 };

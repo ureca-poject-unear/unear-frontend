@@ -1,5 +1,3 @@
-import React from 'react';
-
 type CouponButtonProps = {
   label?: string;
   onClick?: () => void;

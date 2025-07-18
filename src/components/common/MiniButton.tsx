@@ -1,5 +1,3 @@
-import React from 'react';
-
 // 버튼의 props 타입을 정의합니다.
 type MiniButtonProps = {
   text: string; // 버튼 안에 표시될 텍스트

@@ -1,6 +1,3 @@
-// GradeMini.tsx
-import React from 'react';
-
 type GradeType = 'VIP' | 'VVIP' | '우수';
 
 type GradeProps = {

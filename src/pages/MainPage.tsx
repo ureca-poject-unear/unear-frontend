@@ -1,6 +1,8 @@
 import Header from '@/components/common/Header';
 import BottomSheetMain from '@/pages/BottomSheetMain';
 
+import CouponCard from '@/components/common/CouponCard';
+
 import ActionButton from '../components/common/ActionButton';
 import LocationButton from '../components/common/LocationButton';
 import CallButton from '../components/common/CallButton';
@@ -51,6 +53,17 @@ const MainPage = () => {
       <div className="App">
         {/* 로그인/회원가입 공통 컴포넌트 */}
         <ActionButton text="로그인" onClick={handleActionClick} />
+
+        {/* CouponCard 테스트 */}
+        <div>
+          <CouponCard
+            brand="스타벅스"
+            title="스타벅스 10% 할인 쿠폰"
+            validUntil="2025.08.31"
+            category="cafe"
+            storeClass="franchise"
+          />
+        </div>
 
         {/* LocationButton 컴포넌트 */}
         <LocationButton onClick={handleLocationClick} />
