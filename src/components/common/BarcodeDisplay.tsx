@@ -33,7 +33,7 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   height = 80,
   width = 2,
   displayValue = true,
-  fontSize = 14,
+  fontSize = 18,
   background = '#ffffff',
   lineColor = '#000000',
   margin = 0,
@@ -103,7 +103,7 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
         textAlign="center"
         textPosition="bottom"
         textMargin={8}
-        font="monospace"
+        font="LGEIHeadline-Regular"
       />
     </div>
   );
