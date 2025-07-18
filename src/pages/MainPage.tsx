@@ -1,5 +1,5 @@
-import React from 'react';
 import Header from '@/components/common/Header';
+import BottomSheetMain from '@/pages/BottomSheetMain';
 
 import ActionButton from '../components/common/ActionButton';
 import LocationButton from '../components/common/LocationButton';
@@ -95,6 +95,8 @@ const MainPage = () => {
             테스트 버튼
           </button>
         </div>
+
+        <BottomSheetMain />
       </div>
     </>
   );
