@@ -13,7 +13,7 @@ import ActivityIcon from '@/assets/common/activity.svg?react';
 import StoreIcon from '@/assets/common/store.svg?react';
 
 // 카테고리 타입 정의
-type CategoryType =
+export type CategoryType =
   | 'cafe'
   | 'food'
   | 'shopping'
