@@ -16,7 +16,7 @@ export default function ToggleButton({ text, onClick }: ToggleButtonProps) {
   return (
     <div
       className={`cursor-pointer select-none w-[167px] h-[39px] bg-white rounded-xl border flex items-center justify-center ${
-        isActive ? 'border-[#e6007e] text-[#e6007e]' : 'border-zinc-400 text-zinc-400'
+        isActive ? 'border-primary text-primary' : 'border-zinc-400 text-zinc-400'
       }`}
       onClick={handleClick}
     >

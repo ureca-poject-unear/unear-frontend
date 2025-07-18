@@ -23,7 +23,7 @@ export default function FilterButton({ text, onClick }: FilterButtonProps) {
       />
       <p
         className={`w-[71.35px] absolute left-[4.32px] top-[7px] text-sm text-center ${
-          isActive ? 'text-[#e6007e]' : 'text-[#333]'
+          isActive ? 'text-[#e6007e]' : 'text-black'
         }`}
       >
         {text}
