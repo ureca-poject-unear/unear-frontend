@@ -15,7 +15,8 @@ export default function MiniLocationButton({ onClick }: MiniLocationButtonProps)
     <button
       type="button"
       onClick={onClick}
-      className="w-[252px] h-[31.6px] relative rounded border border-[#e6007e]
+      className="w-[252px] h-[31.6px] relative rounded border border-primary bg-white 
+
                  flex items-center justify-center hover:bg-pink-50 transition-colors duration-200 group"
     >
       <div className="flex items-center space-x-[4px]">
@@ -29,15 +30,13 @@ export default function MiniLocationButton({ onClick }: MiniLocationButtonProps)
         >
           <path
             d="M9.5941 15.4423L15.0146 1.17303L1.85047 7.0486L6.70186 9.3023C7.06718 9.47209 7.35829 9.78764 7.51494 10.1836L9.5941 15.4423Z"
-            fill="#E6007E"
-            stroke="#E6007E"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="group-hover:fill-pink-600 group-hover:stroke-pink-600 transition-colors duration-200"
+            className="fill-primary stroke-primary group-hover:fill-pink-600 group-hover:stroke-pink-600 transition-colors duration-200"
           />
         </svg>
-        <span className="text-s font-semibold text-[#e6007e] group-hover:text-pink-600">
+        <span className="text-s font-semibold text-primary group-hover:text-pink-600">
           위치 보기
         </span>
       </div>

@@ -12,7 +12,7 @@ export default function ActionButton({
   isActive = false, // 기본값 false (비활성)
 }: ActionProps) {
   // 활성화 상태에 따른 배경색 클래스 지정
-  const backgroundColorClass = isActive ? 'bg-[#e6007e] hover:bg-pink-500' : 'bg-[#acacb5]/80';
+  const backgroundColorClass = isActive ? 'bg-primary hover:bg-pink-500' : 'bg-gray-200';
 
   return (
     <button

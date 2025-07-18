@@ -4,7 +4,6 @@ import BottomSheetMain from '@/pages/BottomSheetMain';
 import ActionButton from '../components/common/ActionButton';
 import LocationButton from '../components/common/LocationButton';
 import CallButton from '../components/common/CallButton';
-import PhoneIcon from '../components/common/PhoneButton';
 import CouponButton from '../components/common/CouponBuuton';
 import BookmarkButton from '../components/common/BookmarkButton';
 import MiniButton from '../components/common/MiniButton';
@@ -16,6 +15,12 @@ import PhoneButtonDark from '../components/common/PhoneButtonDark';
 import StoryButton from '../components/common/StoryButton';
 import Grade from '../components/common/Grade';
 import GradeMini from '../components/common/GradeMini';
+
+import MembershipCard from '../components/common/MembershipCard';
+import PhoneButton from '../components/common/PhoneButton';
+import EmptyState from '@/components/common/EmptyState';
+import _404State from '@/components/common/404State';
+
 import BottomSheetBarcode from '../components/common/BottomSheetBarcode';
 
 const MainPage = () => {
@@ -52,7 +57,6 @@ const MainPage = () => {
 
         {/* CallButton 컴포넌트 */}
         <CallButton onClick={handleCallClick} />
-        <PhoneIcon onClick={handlePhoneClick} />
         <CouponButton onClick={handleCouponButtonClick} />
         <BookmarkButton onClick={handleBookmarkButtonClick} />
         <MiniButton text="룰렛 돌리기" onClick={handleMiniButtonClick} />
@@ -64,6 +68,17 @@ const MainPage = () => {
         <StoryButton text="소비 스토리 보기" />
         <Grade grade="우수" />
         <GradeMini grade="VIP" />
+        <MembershipCard
+          name="CGV"
+          description="무료 예매 3회, 1+1 예매 9회"
+          grade={['VVIP', 'VIP']}
+          imageUrl="https://i.namu.wiki/i/RI24zLR5PQGyuxm1hh027dXQGus9T8kxvF0YCDvKFtfTBesZJh69aiAMwzuVaN8slC0wqjACL7DXDt3o03F7xFgTQK_SbcO07QLYqwuZT-mg70kVpBk6LqVNu3sUPSseq1QKL_hiU_DIj4tOaLBmEg.svg" // public/images 폴더 기준 경로
+        />
+        <PhoneButton onClick={handlePhoneClick} />
+
+        {/* EmptyState 컴포넌트 */}
+        <EmptyState />
+        <_404State />
       </div>
 
       {/* 스타일 테스트용 UI */}
