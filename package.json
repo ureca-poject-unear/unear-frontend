@@ -13,7 +13,9 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@use-gesture/react": "^10.3.1",
     "axios": "^1.10.0",
+    "framer-motion": "^12.23.6",
     "react": "^19.1.0",
     "react-barcode": "^1.6.1",
     "react-dom": "^19.1.0",
@@ -27,8 +29,8 @@
     "@storybook/addon-onboarding": "^9.0.17",
     "@storybook/addon-vitest": "^9.0.17",
     "@storybook/react-vite": "^9.0.17",
+    "@storybook/test": "^9.0.0-alpha.2",
     "@types/node": "^24.0.10",
-    "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
     "@vitest/browser": "^3.2.4",
