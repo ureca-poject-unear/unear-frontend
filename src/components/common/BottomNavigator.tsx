@@ -28,8 +28,11 @@ const BottomNavigator = () => {
   };
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 bg-white shadow-md z-50 h-[65px]">
-      <div className="w-full max-w-[393px] mx-auto px-5 h-full relative">
+    <nav
+      className="fixed inset-x-0 bottom-0 bg-white z-30 h-[65px] max-w-[393px] mx-auto"
+      style={{ boxShadow: '0 -1px 4px rgba(0, 0, 0, 0.15)' }}
+    >
+      <div className="w-full px-5 h-full relative">
         {tabs.map(({ id, label, Icon, path }, index) => {
           const isActive = activeTab === id;
           const colorClass = isActive ? 'text-store' : 'text-gray-400';
@@ -47,7 +50,7 @@ const BottomNavigator = () => {
               <div className="flex flex-col items-center justify-center gap-1">
                 {id === 'story' ? (
                   <div className="bg-storeicon rounded-full w-14 h-14 flex flex-col items-center justify-center">
-                    <Icon className="text-white" />
+                    <Icon className={isActive ? 'text-blue-100' : 'text-white'} />
                     <span
                       className={`text-s font-semibold ${
                         isActive ? 'text-blue-100' : 'text-white'

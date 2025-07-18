@@ -8,7 +8,7 @@ import PhoneButton from '@/components/common/PhoneButton';
 import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import CouponIcon from '@/assets/common/couponIcon.svg?react';
-import DownloadIcon from '@/assets/common/dowonloadIcon.svg?react';
+import DownloadIcon from '@/assets/common/downloadIcon.svg?react';
 import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
 import ArrowUpIcon from '@/assets/common/arrowUpIcon.svg?react';
 import { Loader2 } from 'lucide-react';
@@ -32,13 +32,13 @@ interface StoreInfo {
   coupons: Coupon[];
 }
 
-interface StoreCouponCard2Props {
+interface StoreCouponCardProps {
   store: StoreInfo;
   onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
   className?: string;
 }
 
-const StoreCouponCard: React.FC<StoreCouponCard2Props> = ({
+const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
   store,
   onBookmarkToggle,
   className = '',
