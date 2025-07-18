@@ -3,8 +3,8 @@ import { useState } from 'react';
 import StoreTypeIcon, { type CategoryType } from './StoreTypeIcon';
 import BookmarkStar from './BookmarkStar';
 import StoreStatus, { type StoreStatusType } from './StoreStatus';
-import MiniLocationButton from '@/components/common/LocationButton';
-import PhoneButton from '@/components/common/PhoneIcon';
+import MiniLocationButton from '@/components/common/MiniLocationButton';
+import PhoneButton from '@/components/common/PhoneButton';
 import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import CouponIcon from '@/assets/common/couponIcon.svg?react';
@@ -111,9 +111,13 @@ const StoreCouponCard: React.FC<StoreCouponCard2Props> = ({
       <div className="absolute left-[19px] right-[15px] top-[74px] flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
           <LocationIcon />
-          <span className="font-regular text-sm text-gray-500">{store.distance}</span>
+          <span className="font-regular text-sm text-gray-500 relative top-[2px]">
+            {store.distance}
+          </span>
           <TimeIcon />
-          <span className="font-regular text-sm text-gray-500">{store.hours}</span>
+          <span className="font-regular text-sm text-gray-500 relative top-[2px]">
+            {store.hours}
+          </span>
         </div>
         <StoreStatus status={store.status} />
       </div>
@@ -150,7 +154,7 @@ const StoreCouponCard: React.FC<StoreCouponCard2Props> = ({
               </div>
               <div className="ml-8">
                 <h4 className="font-bold text-s text-black leading-[12px]">{coupon.title}</h4>
-                <p className="font-semibold text-xs text-gray-400 leading-[13px]">
+                <p className="font-regular text-xs text-gray-400 leading-[13px]">
                   {coupon.expiryDate}
                 </p>
               </div>
@@ -161,7 +165,7 @@ const StoreCouponCard: React.FC<StoreCouponCard2Props> = ({
                   disabled={downloadingCoupons.has(coupon.id)}
                 >
                   {downloadingCoupons.has(coupon.id) ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-black" /> // 로딩 스피너
+                    <Loader2 className="w-5 h-5 animate-spin text-black" />
                   ) : (
                     <DownloadIcon className="w-5 h-5 text-black" />
                   )}
