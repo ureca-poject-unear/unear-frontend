@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import BarcodeDisplay from '@/components/common/BarcodeDisplay';
 import Grade from '@/components/common/Grade';
@@ -7,26 +6,35 @@ interface BottomSheetBarcodeProps {
   userName?: string;
   userGrade?: 'VIP' | 'VVIP' | '우수';
   barcodeValue?: string;
+  isOpen?: boolean;
+  onClose?: () => void;
+  showButton?: boolean;
 }
 
 const BottomSheetBarcode = ({
   userName = '홍길동',
   userGrade = 'VVIP',
   barcodeValue = '344BA876Y89',
+  isOpen = false,
+  onClose,
+  showButton = true,
 }: BottomSheetBarcodeProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
 
   return (
     <>
-      <button
-        onClick={handleOpen}
-        className="w-full bg-primary text-white py-3 rounded-xl text-m font-semibold"
-      >
-        바코드 보기
-      </button>
+      {showButton && (
+        <button
+          onClick={() => {}}
+          className="w-full bg-primary text-white py-3 rounded-xl text-m font-semibold"
+        >
+          바코드 보기
+        </button>
+      )}
 
       <BottomSheet isOpen={isOpen} onClose={handleClose}>
         <div className="w-full flex flex-col items-center space-y-8 pb-2">
