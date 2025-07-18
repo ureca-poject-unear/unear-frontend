@@ -1,5 +1,3 @@
-import React from 'react';
-
 type StoryButtonProps = {
   text: string;
   onClick?: () => void;

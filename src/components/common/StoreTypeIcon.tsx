@@ -1,5 +1,3 @@
-import React from 'react';
-
 // SVG 파일들을 React 컴포넌트로 import
 import CoffeeIcon from '@/assets/common/coffee.svg?react';
 import FoodIcon from '@/assets/common/food.svg?react';

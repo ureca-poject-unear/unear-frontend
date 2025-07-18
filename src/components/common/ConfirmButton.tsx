@@ -1,5 +1,3 @@
-import React from 'react';
-
 type ConfirmButtonProps = {
   text: string;
   onClick?: () => void;

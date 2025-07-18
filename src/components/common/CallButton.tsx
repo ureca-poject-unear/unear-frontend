@@ -1,5 +1,3 @@
-import React from 'react';
-
 type CallButtonProps = {
   onClick?: () => void; // 버튼 클릭 시 실행할 함수
 };

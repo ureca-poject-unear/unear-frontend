@@ -1,4 +1,3 @@
-// BookmarkButton.tsx
 import React from 'react';
 
 type BookmarkButtonProps = {
