@@ -19,7 +19,7 @@ const LocationButton: React.FC<LocationButtonProps> = ({ onClick }) => {
     >
       {/* 버튼 외곽 박스 */}
       <div
-        className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-[#e6007e]
+        className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-primary
                    group-hover:border-pink-600 transition-colors duration-200" // 호버 시 테두리 색상 변경
       />
 
@@ -36,16 +36,14 @@ const LocationButton: React.FC<LocationButtonProps> = ({ onClick }) => {
         >
           <path
             d="M9.91267 15L16.1516 1L0.999887 6.76471L6.58374 8.97588C7.00423 9.14247 7.33929 9.45207 7.51958 9.84059L9.91267 15Z"
-            fill="#E6007E"
-            stroke="#E6007E"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="group-hover:fill-pink-600 group-hover:stroke-pink-600 transition-colors duration-200" // 호버 시 아이콘 색상 변경
+            className="fill-primary stroke-primary group-hover:fill-pink-600 group-hover:stroke-pink-600 transition-colors duration-200" // 호버 시 아이콘 색상 변경
           />
         </svg>
 
-        <p className="text-base font-semibold text-[#e6007e] group-hover:text-pink-600 transition-colors duration-200">
+        <p className="text-base font-semibold text-primary group-hover:text-pink-600 transition-colors duration-200">
           위치 보기
         </p>
       </div>
