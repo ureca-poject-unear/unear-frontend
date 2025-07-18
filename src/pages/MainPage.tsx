@@ -58,7 +58,7 @@ const MainPage = () => {
         <div>
           <CouponCard
             brand="스타벅스"
-            title="아메리카노 1+1 쿠폰"
+            title="스타벅스 10% 할인 쿠폰"
             validUntil="2025.08.31"
             category="cafe"
             storeClass="franchise"
