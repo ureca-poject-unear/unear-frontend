@@ -43,14 +43,15 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ status, className = '' }) => 
   return (
     <div
       className={`
+        w-[58px]
+        h-[20px]
+        rounded-[12px]
+        text-s
+        leading-[16px]
+        font-semibold
         inline-flex
         items-center
         justify-center
-        px-3
-        py-1
-        rounded-xl
-        font-semibold
-        text-s
         ${styles.background}
         ${styles.text}
         ${className}
