@@ -19,7 +19,7 @@ interface BarcodeDisplayProps {
   background?: string;
   /** 바코드 선 색상 (기본값: black) */
   lineColor?: string;
-  /** 여백 (기본값: 10) */
+  /** 여백 (기본값: 0) */
   margin?: number;
   /** 추가 CSS 클래스 */
   className?: string;
@@ -36,12 +36,11 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   fontSize = 14,
   background = '#ffffff',
   lineColor = '#000000',
-  margin = 10,
+  margin = 0,
   className = '',
   onError,
 }) => {
   const [barcodeError, setBarcodeError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   // 바코드 유효성 검사
   const validateBarcodeCode = (code: string): boolean => {
@@ -80,62 +79,32 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   // 바코드 에러가 있는 경우
   if (barcodeError) {
     return (
-      <div className={`bg-white rounded-[16px] p-6 shadow-sm ${className}`}>
-        <div className="text-center">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600 text-sm font-medium">바코드 생성 오류</p>
-            <p className="text-red-500 text-xs mt-1">{barcodeError}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 로딩 상태
-  if (isLoading) {
-    return (
-      <div className={`bg-white rounded-[16px] p-6 shadow-sm ${className}`}>
-        <div className="text-center">
-          <div className="bg-gray-100 rounded-lg p-8 animate-pulse">
-            <div className="h-20 bg-gray-200 rounded mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
-          </div>
+      <div className={`text-center pb-4 ${className}`}>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-600 text-sm font-medium">바코드 생성 오류</p>
+          <p className="text-red-500 text-xs mt-1">{barcodeError}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white rounded-[16px] p-6 shadow-sm ${className}`}>
-      <div className="text-center">
-        {/* 바코드 영역 */}
-        <div 
-          className="inline-block bg-white rounded-lg border border-gray-200 p-4"
-          style={{ margin: `${margin}px` }}
-        >
-          <Barcode
-            value={code}
-            format={format}
-            width={width}
-            height={height}
-            displayValue={displayValue}
-            fontSize={fontSize}
-            background={background}
-            lineColor={lineColor}
-            margin={0}
-            textAlign="center"
-            textPosition="bottom"
-            textMargin={2}
-            font="monospace"
-          />
-        </div>
-
-        {/* 추가 정보 */}
-        <div className="mt-4 space-y-1">
-          <p className="text-xs text-gray-500">바코드를 스캔하여 적립하세요</p>
-          <p className="text-xs text-gray-400 font-mono">{format}</p>
-        </div>
-      </div>
+    <div className={`w-full flex justify-center pb-4${className}`}>
+      <Barcode
+        value={code}
+        format={format}
+        width={width}
+        height={height}
+        displayValue={displayValue}
+        fontSize={fontSize}
+        background={background}
+        lineColor={lineColor}
+        margin={margin}
+        textAlign="center"
+        textPosition="bottom"
+        textMargin={8}
+        font="monospace"
+      />
     </div>
   );
 };
@@ -145,24 +114,20 @@ export default BarcodeDisplay;
 /*
 사용법:
 
-기본 사용법:
+기본 사용법 (최소 props):
 <BarcodeDisplay 
-  code="1234567890"
+  code="344BA876Y89"
+  format="CODE128"
 />
 
-바코드 형식 변경:
-<BarcodeDisplay 
-  code="1234567890" 
-  format="EAN13"
-/>
-
-커스텀 스타일:
+커스텀 설정:
 <BarcodeDisplay 
   code="ABCD1234" 
+  format="CODE128"
   height={100}
+  width={1.5}
   fontSize={16}
-  lineColor="#333333"
-  className="shadow-lg"
+  className="my-4"
 />
 
 에러 처리:
@@ -171,40 +136,24 @@ export default BarcodeDisplay;
   onError={(error) => console.error('바코드 생성 실패:', error)}
 />
 
-API 연동 예시:
-const [barcodeData, setBarcodeData] = useState(null);
-
-useEffect(() => {
-  fetchUserBarcode()
-    .then(data => setBarcodeData(data))
-    .catch(error => console.error(error));
-}, []);
-
-{barcodeData && (
-  <BarcodeDisplay 
-    code={barcodeData.code}
-    format={barcodeData.format}
-  />
-)}
-
 Props:
 - code: 바코드로 표시할 코드 값 (필수)
-- format: 바코드 형식 ('CODE128' | 'CODE39' | 'EAN13' | 'EAN8' | 'UPC' | 'ITF14')
+- format: 바코드 형식 (기본값: 'CODE128')
 - height: 바코드 높이 (기본값: 80)
 - width: 바코드 너비 (기본값: 2)
 - displayValue: 코드 값 표시 여부 (기본값: true)
 - fontSize: 폰트 크기 (기본값: 14)
 - background: 배경색 (기본값: '#ffffff')
 - lineColor: 바코드 선 색상 (기본값: '#000000')
-- margin: 여백 (기본값: 10)
+- margin: 여백 (기본값: 0)
 - className: 추가 CSS 클래스
 - onError: 에러 처리 콜백
 
 특징:
-- 유니어 디자인 시스템에 맞는 스타일링
+- 간결하고 깔끔한 디자인
 - 바코드 유효성 검사
-- 에러 처리 및 로딩 상태 지원
-- 반응형 디자인
-- 접근성 고려
+- 에러 처리 지원
+- 중앙 정렬 기본 제공
 - TypeScript 지원
+- 바텀시트에 최적화된 스타일링
 */

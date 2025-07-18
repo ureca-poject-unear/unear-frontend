@@ -73,7 +73,7 @@ export const Default: Story = {
   },
   render: (args) => {
     const [isOpen, setIsOpen] = useState(args.isOpen);
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <button
@@ -82,11 +82,7 @@ export const Default: Story = {
         >
           모달 열기
         </button>
-        <CommonModal
-          {...args}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        >
+        <CommonModal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <div className="text-center py-8">
             <p className="text-sm text-black">기본 모달 컨텐츠입니다.</p>
           </div>
@@ -104,7 +100,7 @@ export const Empty: Story = {
   },
   render: (args) => {
     const [isOpen, setIsOpen] = useState(args.isOpen);
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <button
@@ -113,11 +109,7 @@ export const Empty: Story = {
         >
           빈 모달 열기
         </button>
-        <CommonModal
-          {...args}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        >
+        <CommonModal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
           {/* 컨텐츠 없음 */}
         </CommonModal>
       </div>
@@ -140,7 +132,7 @@ export const WeeklyJuniorGuideModal: Story = {
   },
   render: (args) => {
     const [isOpen, setIsOpen] = useState(args.isOpen);
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <button
@@ -149,11 +141,7 @@ export const WeeklyJuniorGuideModal: Story = {
         >
           이번주니어 안내 모달 열기
         </button>
-        <CommonModal
-          {...args}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        >
+        <CommonModal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <div className="text-center py-8">
             <p className="text-sm text-black">이번주니어 안내 컨텐츠가 들어갈 영역입니다.</p>
             <p className="text-xs text-gray-600 mt-4">
@@ -184,7 +172,7 @@ export const CustomStyled: Story = {
   },
   render: (args) => {
     const [isOpen, setIsOpen] = useState(args.isOpen);
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <button
@@ -193,16 +181,10 @@ export const CustomStyled: Story = {
         >
           커스텀 스타일 모달 열기
         </button>
-        <CommonModal
-          {...args}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        >
+        <CommonModal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <div className="text-center py-8">
             <p className="text-sm text-black">커스텀 스타일이 적용된 모달입니다.</p>
-            <p className="text-xs text-gray-600 mt-2">
-              테두리와 그림자가 추가되었습니다.
-            </p>
+            <p className="text-xs text-gray-600 mt-2">테두리와 그림자가 추가되었습니다.</p>
           </div>
         </CommonModal>
       </div>
@@ -225,7 +207,7 @@ export const ScrollTest: Story = {
   },
   render: (args) => {
     const [isOpen, setIsOpen] = useState(args.isOpen);
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <button
@@ -234,20 +216,14 @@ export const ScrollTest: Story = {
         >
           스크롤 테스트 모달 열기
         </button>
-        <CommonModal
-          {...args}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        >
+        <CommonModal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <div className="space-y-4">
             {Array.from({ length: 20 }, (_, i) => (
               <div key={i} className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="text-sm font-semibold text-black mb-2">
-                  섹션 {i + 1}
-                </h4>
+                <h4 className="text-sm font-semibold text-black mb-2">섹션 {i + 1}</h4>
                 <p className="text-xs text-gray-600">
-                  이것은 스크롤 테스트를 위한 긴 컨텐츠입니다. 
-                  모달이 화면 높이를 초과할 때 스크롤이 정상적으로 동작하는지 확인할 수 있습니다.
+                  이것은 스크롤 테스트를 위한 긴 컨텐츠입니다. 모달이 화면 높이를 초과할 때 스크롤이
+                  정상적으로 동작하는지 확인할 수 있습니다.
                 </p>
               </div>
             ))}
@@ -269,16 +245,14 @@ export const ScrollTest: Story = {
 export const VariousContent: Story = {
   render: () => {
     const [currentModal, setCurrentModal] = useState<string | null>(null);
-    
+
     const modalContents = {
       text: {
         title: '텍스트 모달',
         content: (
           <div className="space-y-4">
             <p className="text-sm text-black">일반적인 텍스트 컨텐츠입니다.</p>
-            <p className="text-xs text-gray-600">
-              모달은 다양한 종류의 컨텐츠를 담을 수 있습니다.
-            </p>
+            <p className="text-xs text-gray-600">모달은 다양한 종류의 컨텐츠를 담을 수 있습니다.</p>
           </div>
         ),
       },
@@ -287,9 +261,7 @@ export const VariousContent: Story = {
         content: (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-black mb-2">
-                이름
-              </label>
+              <label className="block text-sm font-medium text-black mb-2">이름</label>
               <input
                 type="text"
                 className="w-full p-2 border border-gray-300 rounded-lg"
@@ -297,21 +269,15 @@ export const VariousContent: Story = {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-black mb-2">
-                메시지
-              </label>
+              <label className="block text-sm font-medium text-black mb-2">메시지</label>
               <textarea
                 className="w-full p-2 border border-gray-300 rounded-lg h-20"
                 placeholder="메시지를 입력하세요"
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">
-                취소
-              </button>
-              <button className="px-4 py-2 bg-primary text-white rounded-lg">
-                확인
-              </button>
+              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">취소</button>
+              <button className="px-4 py-2 bg-primary text-white rounded-lg">확인</button>
             </div>
           </div>
         ),
@@ -332,7 +298,7 @@ export const VariousContent: Story = {
         ),
       },
     };
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -346,7 +312,7 @@ export const VariousContent: Story = {
             </button>
           ))}
         </div>
-        
+
         {Object.entries(modalContents).map(([key, modal]) => (
           <CommonModal
             key={key}
@@ -373,17 +339,15 @@ export const VariousContent: Story = {
 export const RealWorldUsage: Story = {
   render: () => {
     const [currentModal, setCurrentModal] = useState<string | null>(null);
-    
+
     return (
       <div style={{ height: '100vh', padding: '20px' }}>
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            실제 U:NEAR 앱에서의 사용 예시
-          </h3>
-          
+          <h3 className="text-lg font-semibold">실제 U:NEAR 앱에서의 사용 예시</h3>
+
           <div className="bg-background rounded-lg p-5 max-w-md">
             <h4 className="text-lg font-semibold text-black mb-4">매장 정보</h4>
-            
+
             <div className="space-y-3">
               <button
                 onClick={() => setCurrentModal('info')}
@@ -394,7 +358,7 @@ export const RealWorldUsage: Story = {
                   <span className="text-xs text-gray-500">ℹ️</span>
                 </div>
               </button>
-              
+
               <button
                 onClick={() => setCurrentModal('event')}
                 className="w-full bg-white border border-gray-300 rounded-lg p-3 text-left hover:bg-gray-50"
@@ -404,7 +368,7 @@ export const RealWorldUsage: Story = {
                   <span className="text-xs text-gray-500">📋</span>
                 </div>
               </button>
-              
+
               <button
                 onClick={() => setCurrentModal('guide')}
                 className="w-full bg-white border border-gray-300 rounded-lg p-3 text-left hover:bg-gray-50"
@@ -417,7 +381,7 @@ export const RealWorldUsage: Story = {
             </div>
           </div>
         </div>
-        
+
         {/* 매장 위치 안내 모달 */}
         <CommonModal
           isOpen={currentModal === 'info'}
@@ -436,7 +400,7 @@ export const RealWorldUsage: Story = {
             </div>
           </div>
         </CommonModal>
-        
+
         {/* 이벤트 모달 */}
         <CommonModal
           isOpen={currentModal === 'event'}
@@ -445,30 +409,22 @@ export const RealWorldUsage: Story = {
         >
           <div className="space-y-4">
             <div className="bg-primary bg-opacity-10 p-4 rounded-lg">
-              <h4 className="text-sm font-semibold text-primary mb-2">
-                🎉 7월 특별 이벤트
-              </h4>
-              <p className="text-xs text-gray-600">
-                매장 방문 시 특별 혜택을 받으세요!
-              </p>
+              <h4 className="text-sm font-semibold text-primary mb-2">🎉 7월 특별 이벤트</h4>
+              <p className="text-xs text-gray-600">매장 방문 시 특별 혜택을 받으세요!</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <span className="text-xs bg-primary text-white px-2 py-1 rounded">
-                  NEW
-                </span>
+                <span className="text-xs bg-primary text-white px-2 py-1 rounded">NEW</span>
                 <span className="text-xs text-black">신규 가입 시 10% 할인</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
-                  HOT
-                </span>
+                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">HOT</span>
                 <span className="text-xs text-black">리뷰 작성 시 포인트 적립</span>
               </div>
             </div>
           </div>
         </CommonModal>
-        
+
         {/* 이용 안내 모달 */}
         <CommonModal
           isOpen={currentModal === 'guide'}
@@ -488,8 +444,7 @@ export const RealWorldUsage: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          '실제 U:NEAR 앱에서 사용될 수 있는 다양한 모달 사용 시나리오입니다.',
+        story: '실제 U:NEAR 앱에서 사용될 수 있는 다양한 모달 사용 시나리오입니다.',
       },
     },
   },

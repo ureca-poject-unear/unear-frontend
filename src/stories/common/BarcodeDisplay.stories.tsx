@@ -133,20 +133,6 @@ export const Code39: Story = {
   },
 };
 
-export const Ean13: Story = {
-  args: {
-    code: '1234567890123',
-    format: 'EAN13',
-  },
-};
-
-export const Ean8: Story = {
-  args: {
-    code: '12345678',
-    format: 'EAN8',
-  },
-};
-
 export const LargeSize: Story = {
   args: {
     code: 'LARGE123',
