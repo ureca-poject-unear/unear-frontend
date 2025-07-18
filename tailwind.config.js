@@ -19,7 +19,7 @@ export default {
         black: '#333333', // 검정
         white: '#FFFFFF', // 흰색
         store: '#0F0034', // 스토리 네이비
-        storecard: '251A49', // 스토리 카드 네이비
+        storecard: '#251A49', // 스토리 카드 네이비
       },
       backgroundImage: {
         // bg-[지정명]
