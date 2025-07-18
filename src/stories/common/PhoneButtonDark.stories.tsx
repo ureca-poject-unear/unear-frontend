@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import PhoneButtonDark from '../../components/common/PhoneButtonDark'; // 경로는 실제 경로에 맞게 조정하세요
+import PhoneButtonDark from '@/components/common/PhoneButtonDark';
 
 const meta: Meta<typeof PhoneButtonDark> = {
-  title: 'Components/PhoneButtonDark',
+  title: 'Common/PhoneButtonDark',
   component: PhoneButtonDark,
   tags: ['autodocs'],
   argTypes: {

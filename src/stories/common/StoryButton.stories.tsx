@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import StoryButton from '../../components/common/StoryButton'; // 실제 파일 경로에 맞게 수정하세요.
+import StoryButton from '@/components/common/StoryButton';
 
 const meta: Meta<typeof StoryButton> = {
-  title: 'Components/StoryButton', // Storybook 사이드바에 표시될 컴포넌트 이름
+  title: 'Common/StoryButton', // Storybook 사이드바에 표시될 컴포넌트 이름
   component: StoryButton,
   tags: ['autodocs'],
   argTypes: {

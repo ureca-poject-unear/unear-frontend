@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import PhoneIcon from '../../components/common/PhoneButton'; // 실제 경로에 맞게 수정하세요
+import PhoneIcon from '@/components/common/PhoneButton';
 
 const meta: Meta<typeof PhoneIcon> = {
-  title: 'Components/PhoneButton', // 스토리북 사이드바에 표시될 제목
+  title: 'Common/PhoneButton', // 스토리북 사이드바에 표시될 제목
   component: PhoneIcon,
   tags: ['autodocs'],
   argTypes: {

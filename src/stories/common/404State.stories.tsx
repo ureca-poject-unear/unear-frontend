@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import _404State from '../../components/common/404State'; // 실제 경로 확인 필요
+import _404State from '@/components/common/404State';
 
 const meta: Meta<typeof _404State> = {
-  title: 'Components/404State',
+  title: 'Common/404State',
   component: _404State,
   tags: ['autodocs'],
   parameters: {

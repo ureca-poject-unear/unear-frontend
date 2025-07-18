@@ -13,9 +13,9 @@ export default function MiniLocationButton({ onClick }: MiniLocationButtonProps)
     <button
       type="button"
       onClick={onClick}
-      className="w-[252px] h-[31.6px] relative rounded border border-primary bg-white 
+      className="w-[252px] h-[31.6px] relative rounded border border-primary 
 
-                 flex items-center justify-center hover:bg-pink-50 transition-colors duration-200 group"
+                 flex items-center justify-center hover:bg-pink-50 transition-colors group"
     >
       <div className="flex items-center space-x-[4px]">
         <svg

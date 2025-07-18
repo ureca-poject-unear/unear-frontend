@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import EmptyState from '../../components/common/EmptyState'; // 실제 경로에 맞게 조정해주세요
+import EmptyState from '@/components/common/EmptyState';
 
 const meta: Meta<typeof EmptyState> = {
-  title: 'Components/EmptyState',
+  title: 'Common/EmptyState',
   component: EmptyState,
   tags: ['autodocs'],
   parameters: {

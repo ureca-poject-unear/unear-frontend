@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import Grade from '../../components/common/Grade'; // 실제 경로에 맞게 조정하세요
+import Grade from '@/components/common/Grade';
 
 type GradeType = 'VIP' | 'VVIP' | '우수';
 
 const meta: Meta<typeof Grade> = {
-  title: 'Components/Grade',
+  title: 'Common/Grade',
   component: Grade,
   tags: ['autodocs'],
   argTypes: {

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import FilterButton from '../../components/common/FilterButton'; // 실제 경로로 수정해주세요.
+import FilterButton from '@/components/common/FilterButton';
 
 const meta: Meta<typeof FilterButton> = {
-  title: 'Components/FilterButton',
+  title: 'Common/FilterButton',
   component: FilterButton,
   tags: ['autodocs'],
   argTypes: {
