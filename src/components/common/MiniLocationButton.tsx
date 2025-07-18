@@ -13,7 +13,7 @@ export default function MiniLocationButton({ onClick }: MiniLocationButtonProps)
     <button
       type="button"
       onClick={onClick}
-      className="w-[252px] h-[31.6px] relative rounded border border-[#e6007e] bg-white 
+      className="w-[252px] h-[31.6px] relative rounded border border-[#e6007e]
                  flex items-center justify-center hover:bg-pink-50 transition-colors duration-200 group"
     >
       <div className="flex items-center space-x-[4px]">
