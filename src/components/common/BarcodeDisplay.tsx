@@ -89,7 +89,7 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   }
 
   return (
-    <div className={`w-full flex justify-center pb-4${className}`}>
+    <div className={`w-full flex justify-center pb-4 ${className}`}>
       <Barcode
         value={code}
         format={format}
