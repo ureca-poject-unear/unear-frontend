@@ -43,8 +43,8 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ status, className = '' }) => 
   return (
     <div
       className={`
-        w-[58px]
         h-[20px]
+        px-[12px]
         rounded-[12px]
         text-s
         leading-[16px]
@@ -57,7 +57,7 @@ const StoreStatus: React.FC<StoreStatusProps> = ({ status, className = '' }) => 
         ${className}
       `}
     >
-      {status}
+      <span className="relative top-[1px]">{status}</span>
     </div>
   );
 };

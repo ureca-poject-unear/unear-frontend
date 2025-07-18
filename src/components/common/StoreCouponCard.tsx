@@ -103,12 +103,12 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
       </div>
 
       {/* 주소 */}
-      <div className="absolute left-[85px] top-[43px]">
+      <div className="absolute left-[85px] top-[46px]">
         <p className="font-regular text-sm text-gray-400 leading-[19px]">{store.address}</p>
       </div>
 
       {/* 거리 & 시간 & 상태 */}
-      <div className="absolute left-[19px] right-[15px] top-[74px] flex items-center justify-between">
+      <div className="absolute left-[19px] right-[15px] top-[80px] flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
           <LocationIcon />
           <span className="font-regular text-sm text-gray-500 relative top-[2px]">
@@ -119,7 +119,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
             {store.hours}
           </span>
         </div>
-        <StoreStatus status={store.status} />
+        <StoreStatus status={store.status} className="relative top-[1px]" />
       </div>
 
       {/* 쿠폰 섹션 */}

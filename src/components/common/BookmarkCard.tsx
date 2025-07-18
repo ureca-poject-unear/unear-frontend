@@ -72,12 +72,12 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
       </div>
 
       {/* 주소 */}
-      <div className="absolute left-[85px] top-[43px]">
+      <div className="absolute left-[85px] top-[46px]">
         <p className={`font-regular text-sm ${subTextColor} leading-[19px]`}>{store.address}</p>
       </div>
 
       {/* 거리 & 시간 & 상태 */}
-      <div className="absolute left-[19px] right-[15px] top-[74px] mb-[10px] flex items-center justify-between">
+      <div className="absolute left-[19px] right-[15px] top-[80px] mb-[10px] flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
           <IconLocation />
           <span className={`font-regular text-sm ${subTextColor} relative top-[2px]`}>
@@ -88,7 +88,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
             {store.hours}
           </span>
         </div>
-        <StoreStatus status={store.status} />
+        <StoreStatus status={store.status} className="relative top-[1px]" />
       </div>
 
       {/* 하단 버튼 */}
