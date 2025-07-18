@@ -12,12 +12,12 @@ export default function MiniButton({
   isActive = false, // 기본값을 false로 설정
 }: MiniButtonProps) {
   // isActive 상태에 따라 배경색을 결정하는 클래스
-  const backgroundColorClass = isActive ? 'bg-[#e6007e]' : 'bg-[#acacb5]/80';
+  const backgroundColorClass = isActive ? 'bg-primary' : 'bg-gray-200/80';
 
   return (
     <div
       className={`flex justify-center items-center w-[136px] h-[39px] overflow-hidden px-8 pt-[17px] pb-[19px] rounded-xl ${backgroundColorClass}`}
-      style={{ boxShadow: '0px 4px 16px 0 rgba(102,126,234,0.3)' }}
+      style={{ boxShadow: '0px 4px 16px 0 black/20' }}
     >
       <button
         className="flex justify-center items-start flex-grow-0 flex-shrink-0 relative text-base font-bold text-center text-white"

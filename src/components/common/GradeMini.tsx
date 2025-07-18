@@ -26,7 +26,7 @@ export default function GradeMini({ grade }: GradeProps) {
     <div className="relative w-[41px] h-[15px]">
       <div className={`absolute left-0 top-0 w-[41px] h-[15px] rounded-[20px] ${bg}`} />
       <p
-        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] font-bold text-center ${text}`}
+        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-center ${text}`}
       >
         {grade}
       </p>

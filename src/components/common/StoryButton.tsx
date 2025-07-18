@@ -11,7 +11,7 @@ export default function StoryButton({ text, onClick }: StoryButtonProps) {
 
       {/* 텍스트: 스타일 변경 */}
       <p
-        className="absolute top-1/2 left-1/2 w-[129px] text-lm font-bold text-center text-[#333]
+        className="absolute top-1/2 left-1/2 w-[129px] text-lm font-bold text-center text-black
                    -translate-x-1/2 -translate-y-1/2 whitespace-nowrap overflow-hidden text-ellipsis"
       >
         {text}
