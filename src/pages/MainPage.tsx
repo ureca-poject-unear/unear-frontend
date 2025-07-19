@@ -118,12 +118,6 @@ const MainPage = () => {
           </button>
         </div>
 
-        {/* 바코드 바텀시트 테스트 */}
-        <div className="mt-8 space-y-4">
-          <h3 className="text-m font-semibold text-black text-center">바코드 바텀시트 테스트</h3>
-          <BottomSheetBarcode userName="홍길동" userGrade="VVIP" barcodeValue="344BA876Y89" />
-        </div>
-
         <BottomSheetMain />
       </div>
     </>
