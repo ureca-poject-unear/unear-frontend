@@ -23,8 +23,6 @@ import PhoneButton from '../components/common/PhoneButton';
 import EmptyState from '@/components/common/EmptyState';
 import _404State from '@/components/common/404State';
 
-import BottomSheetBarcode from '../components/common/BottomSheetBarcode';
-
 const MainPage = () => {
   const handleActionClick = () => {};
   const handleMiniButtonClick = () => {

@@ -5,12 +5,30 @@ import MapActionButtons from '@/components/map/MapActionButtons';
 import MapTopRightButtons from '@/components/map/MapTopRightButtons';
 import BottomSheetEvent from '@/components/map/BottomSheetEvent';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
+import MapLocationButton from '@/components/map/MapLocationButton';
 
 const MapPage = () => {
   const [isBookmarkOnly, setIsBookmarkOnly] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
+  const handleCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('현재 위치:', latitude, longitude);
+          // TODO: 지도 중심 이동 로직 추가 예정
+        },
+        (error) => {
+          console.error('위치 정보를 가져오는데 실패했습니다:', error);
+          alert('위치 접근이 거부되었거나 실패했습니다.');
+        }
+      );
+    } else {
+      alert('이 브라우저에서는 위치 정보 사용이 지원되지 않습니다.');
+    }
+  };
   return (
     <div className="relative w-full h-[calc(100vh-65px)] bg-white">
       {/* 지도 영역 */}
@@ -26,8 +44,10 @@ const MapPage = () => {
         onEventClick={() => setIsEventOpen(true)}
         onBarcodeClick={() => setIsBarcodeOpen(true)}
       />
+      {/* 우측 하단 위치 버튼 */}
+      <MapLocationButton onClick={handleCurrentLocation} />
 
-      {/* 우측 상단 버튼 */}
+      {/* 우측 상단 필터링/즐겨찾기 버튼 */}
       <MapTopRightButtons
         onToggleFilter={() => setIsFilterOpen(true)}
         onToggleBookmark={() => setIsBookmarkOnly((prev) => !prev)}
