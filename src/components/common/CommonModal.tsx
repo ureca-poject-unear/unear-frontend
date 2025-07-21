@@ -36,8 +36,9 @@ const CommonModal: React.FC<CommonModalProps> = ({
           rounded-[16px] 
           overflow-hidden 
           shadow-lg 
-          max-h-[90vh] 
+          max-h-[60vh] 
           overflow-y-auto
+          scrollbar-hide
           ${className}
         `}
       >
