@@ -23,8 +23,6 @@ import PhoneButton from '../components/common/PhoneButton';
 import EmptyState from '@/components/common/EmptyState';
 import _404State from '@/components/common/404State';
 
-import BottomSheetBarcode from '../components/common/BottomSheetBarcode';
-
 const MainPage = () => {
   const handleActionClick = () => {};
   const handleMiniButtonClick = () => {
@@ -116,12 +114,6 @@ const MainPage = () => {
           <button className="bg-primary text-white px-6 py-2 rounded-[12px] text-lm">
             테스트 버튼
           </button>
-        </div>
-
-        {/* 바코드 바텀시트 테스트 */}
-        <div className="mt-8 space-y-4">
-          <h3 className="text-m font-semibold text-black text-center">바코드 바텀시트 테스트</h3>
-          <BottomSheetBarcode userName="홍길동" userGrade="VVIP" barcodeValue="344BA876Y89" />
         </div>
 
         <BottomSheetMain />
