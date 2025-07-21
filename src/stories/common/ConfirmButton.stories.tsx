@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import ConfirmButton from '../../components/common/ConfirmButton'; // 실제 경로에 맞게 수정하세요
+import ConfirmButton from '@/components/common/ConfirmButton';
 
 const meta: Meta<typeof ConfirmButton> = {
-  title: 'Components/ConfirmButton',
+  title: 'Common/ConfirmButton',
   component: ConfirmButton,
   tags: ['autodocs'],
   argTypes: {

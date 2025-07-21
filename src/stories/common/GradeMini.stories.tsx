@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import GradeMini from '../../components/common/GradeMini'; // 실제 경로에 맞게 조정하세요.
+import GradeMini from '@/components/common/GradeMini';
 
 type GradeType = 'VIP' | 'VVIP' | '우수';
 
 const meta: Meta<typeof GradeMini> = {
-  title: 'Components/GradeMini',
+  title: 'Common/GradeMini',
   component: GradeMini,
   tags: ['autodocs'],
   argTypes: {

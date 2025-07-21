@@ -31,7 +31,7 @@ const PhoneButton: React.FC<PhoneButtonProps> = ({ onClick }) => {
           height="30.5962"
           rx="3.5"
           className={`${
-            isHovered ? 'fill-white stroke-gray-400' : 'fill-background stroke-gray-500'
+            isHovered ? 'fill-background stroke-gray-400' : 'fill-white stroke-gray-500'
           }`} // Tailwind로 fill과 stroke 적용
         />
         <rect

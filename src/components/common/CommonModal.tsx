@@ -36,8 +36,9 @@ const CommonModal: React.FC<CommonModalProps> = ({
           rounded-[16px] 
           overflow-hidden 
           shadow-lg 
-          max-h-[90vh] 
+          max-h-[60vh] 
           overflow-y-auto
+          scrollbar-hide
           ${className}
         `}
       >
@@ -68,7 +69,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
         </div>
 
         {/* 컨텐츠 영역 */}
-        <div className="p-5">{children}</div>
+        <div className="pt-3 pb-5 pr-5 pl-5">{children}</div>
       </div>
     </div>
   );

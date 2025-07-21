@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import MiniLocationButton from '../../components/common/MiniLocationButton'; // 실제 경로에 맞게 수정하세요
+import MiniLocationButton from '@/components/common/MiniLocationButton';
 
 const meta: Meta<typeof MiniLocationButton> = {
-  title: 'Components/MiniLocationButton',
+  title: 'Common/MiniLocationButton',
   component: MiniLocationButton,
   tags: ['autodocs'],
   argTypes: {

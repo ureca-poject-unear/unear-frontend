@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import BookmarkButton from '../../components/common/BookmarkButton'; // 경로 맞게 수정하세요.
+import BookmarkButton from '@/components/common/BookmarkButton';
 
 const meta: Meta<typeof BookmarkButton> = {
-  title: 'Components/BookmarkButton',
+  title: 'Common/BookmarkButton',
   component: BookmarkButton,
   tags: ['autodocs'],
   argTypes: {

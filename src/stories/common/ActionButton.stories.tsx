@@ -1,9 +1,9 @@
 // src/components/common/ActionButton.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import ActionButton from '../../components/common/ActionButton'; // 경로 확인 필요
+import ActionButton from '@/components/common/ActionButton';
 
 const meta: Meta<typeof ActionButton> = {
-  title: 'Components/ActionButton',
+  title: 'Common/ActionButton',
   component: ActionButton,
   tags: ['autodocs'],
   argTypes: {

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import ToggleButton from '../../components/common/ToggleButton'; // 경로 확인
+import ToggleButton from '@/components/common/ToggleButton';
 
 const meta: Meta<typeof ToggleButton> = {
-  title: 'Components/ToggleButton',
+  title: 'Common/ToggleButton',
   component: ToggleButton,
   tags: ['autodocs'],
   argTypes: {

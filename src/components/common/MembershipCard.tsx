@@ -35,8 +35,7 @@ export default function MembershipCard({
           >
             <path
               d="M32.3928 0.5C49.9279 0.5 64.1233 14.39 64.1233 31.5C64.1233 48.61 49.9279 62.5 32.3928 62.5C14.8577 62.5 0.662354 48.61 0.662354 31.5C0.662354 14.39 14.8577 0.5 32.3928 0.5Z"
-              fill="white"
-              stroke="#E4E4E7"
+              className="fill-white stroke-gray-300"
             />
           </svg>
           <img
@@ -48,8 +47,8 @@ export default function MembershipCard({
 
         {/* 텍스트 정보 */}
         <div className="flex flex-col gap-1 w-[249.92px]">
-          <p className="text-xs font-bold text-[#333]">{name}</p>
-          <p className="text-s font-bold text-[#333]">{description}</p>
+          <p className="text-xs font-bold text-black">{name}</p>
+          <p className="text-s font-bold text-black">{description}</p>
 
           {/* 등급 뱃지 */}
           <div className="flex items-center gap-1.5">
