@@ -11,7 +11,7 @@ const Default = () => {
         isMapPage ? '' : 'px-5'
       }`}
     >
-      <main className={isMapPage ? '' : 'pt-[40px] pb-[65px]'}>
+      <main className={isMapPage ? '' : 'pt-[40px] pb-[77px]'}>
         <Outlet />
       </main>
 

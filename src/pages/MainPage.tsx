@@ -1,123 +1,151 @@
-import Header from '@/components/common/Header';
-import BottomSheetMain from '@/pages/BottomSheetMain';
-
-import CouponCard from '@/components/common/CouponCard';
-
-import ActionButton from '../components/common/ActionButton';
-import LocationButton from '../components/common/LocationButton';
-import CallButton from '../components/common/CallButton';
-import CouponButton from '../components/common/CouponBuuton';
-import BookmarkButton from '../components/common/BookmarkButton';
-import MiniButton from '../components/common/MiniButton';
-import ToggleButton from '../components/common/ToggleButton';
-import FilterButton from '../components/common/FilterButton';
-import ConfirmButton from '../components/common/ConfirmButton';
-import MiniLocationButton from '../components/common/MiniLocationButton';
-import PhoneButtonDark from '../components/common/PhoneButtonDark';
-import StoryButton from '../components/common/StoryButton';
-import Grade from '../components/common/Grade';
-import GradeMini from '../components/common/GradeMini';
-
-import MembershipCard from '../components/common/MembershipCard';
-import PhoneButton from '../components/common/PhoneButton';
-import EmptyState from '@/components/common/EmptyState';
-import _404State from '@/components/common/404State';
+import BarcodeIcon from '@/assets/common/barcode.svg?react';
+import InformationIcon from '@/assets/common/information.svg?react';
+import MainNubiImage from '@/assets/MainPage/mainnubi.svg?react';
+import EventBannerImage from '@/assets/MainPage/eventbanner.png';
+import StoryBackgroundImage from '@/assets/MainPage/storyBackground.png';
+import StoryNubiImage from '@/assets/MainPage/storynubi.svg?react';
+import Grade from '@/components/common/Grade';
+import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
+import MembershipBrandBanner from '@/components/MainPage/MembershipBrandBanner';
+import MembershipBenefitModal from '@/components/MainPage/MembershipBenefitModal';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
-  const handleActionClick = () => {};
-  const handleMiniButtonClick = () => {
-    console.log('버튼이 클릭되었습니다!');
+  const [isBarcodeSheetOpen, setIsBarcodeSheetOpen] = useState(false);
+  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBarcodeClick = () => {
+    setIsBarcodeSheetOpen(true);
   };
-  const handleLocationClick = () => {
-    console.log('위치 보기 버튼 클릭됨!');
+
+  const handleInformationClick = () => {
+    setIsMembershipModalOpen(true);
   };
-  const handleCallClick = () => {
-    console.log('전화 하기 버튼 클릭됨!');
+
+  const handleEventClick = () => {
+    navigate('/junior'); // 이번주니어 페이지로 이동
   };
-  const handlePhoneClick = () => {
-    console.log('전화 하기 버튼 클릭됨!');
-  };
-  const handleCouponButtonClick = () => {
-    console.log('쿠폰 버튼 클릭됨!');
-  };
-  const handleBookmarkButtonClick = () => {
-    console.log('즐겨찾기 버튼 클릭됨!');
+
+  const handleStoryClick = () => {
+    navigate('/story'); // 스토리 페이지로 이동
   };
 
   return (
     <>
-      <Header title="메인페이지" />
+      {/* 메인페이지 헤더 */}
+      <header className="absolute top-0 left-0 w-full h-[40px] bg-background">
+        <div className="w-full max-w-[393px] pt-1 mx-auto px-5 h-full flex items-center justify-between">
+          {/* U:NEAR 로고 */}
+          <h1 className="text-primary font-bold text-lg leading-[40px]">U:NEAR</h1>
 
-      <div className="App">
-        {/* 로그인/회원가입 공통 컴포넌트 */}
-        <ActionButton text="로그인" onClick={handleActionClick} />
-
-        {/* CouponCard 테스트 */}
-        <div>
-          <CouponCard
-            brand="스타벅스"
-            title="스타벅스 10% 할인 쿠폰"
-            validUntil="2025.08.31"
-            category="cafe"
-            storeClass="franchise"
-          />
-        </div>
-
-        {/* LocationButton 컴포넌트 */}
-        <LocationButton onClick={handleLocationClick} />
-
-        {/* CallButton 컴포넌트 */}
-        <CallButton onClick={handleCallClick} />
-        <CouponButton onClick={handleCouponButtonClick} />
-        <BookmarkButton onClick={handleBookmarkButtonClick} />
-        <MiniButton text="룰렛 돌리기" onClick={handleMiniButtonClick} />
-        <ToggleButton text="남자" />
-        <FilterButton text="카페" />
-        <ConfirmButton text="이메일 인증" />
-        <MiniLocationButton />
-        <PhoneButtonDark />
-        <StoryButton text="소비 스토리 보기" />
-        <Grade grade="우수" />
-        <GradeMini grade="VIP" />
-        <MembershipCard
-          name="CGV"
-          description="무료 예매 3회, 1+1 예매 9회"
-          grade={['VVIP', 'VIP']}
-          imageUrl="https://i.namu.wiki/i/RI24zLR5PQGyuxm1hh027dXQGus9T8kxvF0YCDvKFtfTBesZJh69aiAMwzuVaN8slC0wqjACL7DXDt3o03F7xFgTQK_SbcO07QLYqwuZT-mg70kVpBk6LqVNu3sUPSseq1QKL_hiU_DIj4tOaLBmEg.svg" // public/images 폴더 기준 경로
-        />
-        <PhoneButton onClick={handlePhoneClick} />
-
-        {/* EmptyState 컴포넌트 */}
-        <EmptyState />
-        <_404State />
-      </div>
-
-      {/* 스타일 테스트용 UI */}
-      <div className="">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-lg font-bold mb-2 text-primary">U:NEAR 프론트엔드 프로젝트</h1>
-
-          <div className="max-w-4xl mx-auto text-center space-y-4">
-            <h2 className="text-m font-thin text-primary">Thin - LGEIHeadline‑Thin</h2>
-            <h2 className="text-m font-light text-primary">Light - LGEIHeadline‑Light</h2>
-            <h2 className="text-m font-regular font-normal text-primary">
-              Regular - LGEIHeadline‑Regular
-            </h2>
-            <h2 className="text-m font-semibold text-primary">Semibold - LGEIHeadline‑Semibold</h2>
-            <h2 className="text-m font-bold text-primary">Bold - LGEIHeadline‑Bold</h2>
-          </div>
-
-          <p className="mt-8 text-sm font-bold text-black mb-6">스타일 테스트</p>
-          <div className="w-24 h-24 bg-storeicon rounded-full mx-auto mb-6" />
-          <div className="w-32 h-12 bg-store rounded-[12px] mx-auto mb-6" />
-
-          <button className="bg-primary text-white px-6 py-2 rounded-[12px] text-lm">
-            테스트 버튼
+          {/* 바코드 아이콘 */}
+          <button
+            onClick={handleBarcodeClick}
+            className="text-black"
+            aria-label="바코드"
+            type="button"
+          >
+            <BarcodeIcon width={24} height={24} />
           </button>
         </div>
+      </header>
 
-        <BottomSheetMain />
-      </div>
+      {/* 메인 컨텐츠 영역 */}
+      <main>
+        {/* 사용자 카드 */}
+        <div
+          className="w-full bg-white rounded-[20px] mt-3 pl-6 pt-3 pb-3 flex items-center justify-between"
+          style={{ boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
+        >
+          <div className="flex flex-col gap-3">
+            {/* 사용자 인사말 */}
+            <h2 className="text-black font-semibold text-lm leading-[18px]">
+              유니어님 안녕하세요!
+            </h2>
+
+            {/* 사용자 등급과 정보 아이콘 */}
+            <div className="flex items-center gap-2">
+              <Grade grade="VVIP" />
+              <button
+                onClick={handleInformationClick}
+                className="text-gray-400"
+                aria-label="등급 정보"
+                type="button"
+              >
+                <InformationIcon width={16} height={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* 메인 누비 이미지 */}
+          <div className="flex-shrink-0">
+            <MainNubiImage className="w-[89px] h-[89px]" />
+          </div>
+        </div>
+
+        {/* 이벤트 배너 */}
+        <div className="mt-3 relative rounded-[20px] overflow-hidden">
+          <img src={EventBannerImage} alt="이벤트 배너" className="w-full h-[353px] object-cover" />
+
+          {/* 이벤트 바로가기 오버레이 */}
+          <div className="absolute inset-0 flex items-end justify-center pb-[18px]">
+            <button onClick={handleEventClick}>
+              <span className="text-sm font-semibold text-gray-500 underline">이벤트 바로가기</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 스토리 배너 */}
+        <div
+          className="w-full mt-3 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
+          style={{
+            backgroundImage: `url(${StoryBackgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+          }}
+        >
+          <div className="flex-col gap-2">
+            {/* 스토리 텍스트 */}
+            <h3 className="text-white font-semibold mb-2 text-sm leading-[16px]">
+              AI가 분석한
+              <br />
+              나만의 스토리를 확인해보세요!
+            </h3>
+
+            {/* 스토리 바로가기 텍스트 */}
+            <button onClick={handleStoryClick}>
+              <span className="text-gray-300 font-semibold text-s underline">스토리 바로가기</span>
+            </button>
+          </div>
+
+          {/* 스토리 누비 이미지 */}
+          <div className="flex-shrink-0">
+            <StoryNubiImage className="w-[89px] h-[89px]" />
+          </div>
+        </div>
+
+        {/* 다양한 멤버십 브랜드 배너 */}
+        <MembershipBrandBanner />
+      </main>
+
+      {/* 바코드 바텀시트 */}
+      <BottomSheetBarcode
+        userName="유니어"
+        userGrade="VVIP"
+        barcodeValue="123456789"
+        isOpen={isBarcodeSheetOpen}
+        onClose={() => setIsBarcodeSheetOpen(false)}
+      />
+
+      {/* 멤버십 혜택 안내 모달 */}
+      <MembershipBenefitModal
+        isOpen={isMembershipModalOpen}
+        onClose={() => setIsMembershipModalOpen(false)}
+      />
     </>
   );
 };
