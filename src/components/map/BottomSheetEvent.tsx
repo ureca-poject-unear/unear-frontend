@@ -1,0 +1,106 @@
+import BottomSheet from '@/components/common/BottomSheet';
+import CoffeeIcon from '@/assets/map/IconExampleCoffee.svg?react';
+import BigCloud from '@/assets/map/BigCloud.svg?react';
+import SmallCloud from '@/assets/map/SmallCloud.svg?react';
+import { Link } from 'react-router-dom';
+
+interface BottomSheetEventProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const BottomSheetEvent = ({ isOpen, onClose }: BottomSheetEventProps) => {
+  return (
+    <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding={true}>
+      <div className="relative w-full h-[531px] bg-white rounded-t-[20px] overflow-hidden">
+        {/* 구름 */}
+        <BigCloud className="absolute left-[7.63%] top-[6.97%] w-[127px] h-[72px]" />
+        <SmallCloud className="absolute left-[70.99%] top-[26.93%] w-[82px] h-[46px]" />
+
+        {/* 메인 타이틀 */}
+        <h1 className="absolute left-1/2 -translate-x-1/2 top-[40px] font-bold text-[40px] leading-[54px] text-[#333333] text-center w-[148px] z-10">
+          동네탐험
+        </h1>
+        <h2 className="absolute left-1/2 -translate-x-1/2 top-[86px] font-bold text-[48px] leading-[64px] text-[#333333] text-center w-[133px] z-10">
+          성수편
+        </h2>
+
+        {/* 서브 타이틀 */}
+        <p className="absolute left-1/2 -translate-x-1/2 top-[159px] font-semibold text-[18px] leading-[18px] text-[#333333] text-center w-[210px] z-10">
+          혜택을 통해 성수에서 즐기는
+        </p>
+        <p className="absolute left-1/2 -translate-x-1/2 top-[183px] font-semibold text-[24px] leading-[32px] text-[#333333] text-center w-[143px] z-10">
+          특별한 이번주!
+        </p>
+
+        {/* 이번주니어 설명 */}
+        <p className="absolute left-1/2 -translate-x-1/2 top-[232px] font-semibold text-[16px] leading-[21px] text-[#333333] text-center w-[342px] z-10">
+          LG 유플러스 멤버십 고객이라면
+          <br />
+          성수동 인기 제휴처에서 카페, 식사, 팝업 행사 할인 등<br />
+          다양한 혜택 받고 스탬프도 찍어보세요!
+        </p>
+
+        {/* 원 모양 배경 */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-[322px] w-[500px] h-[500px] bg-[#E4E4E7] rounded-full z-0" />
+
+        {/* 아이콘들 */}
+        <div className="absolute left-[63px] top-[369px] flex gap-[40px] z-10">
+          {/* 프랜차이즈 매장 아이콘 */}
+          <div className="w-[34px] h-[34px] rounded-full bg-[#E6007E] flex items-center justify-center">
+            <CoffeeIcon className="w-5 h-5 text-white" />
+          </div>
+
+          {/* 소상공인 매장 아이콘 */}
+          <div className="w-[34px] h-[34px] rounded-full bg-[#FF860D] flex items-center justify-center">
+            <CoffeeIcon className="w-5 h-5 text-white" />
+          </div>
+
+          {/* 이번주니어 매장 아이콘 */}
+          <div className="w-[34px] h-[34px] rounded-full bg-[#3B82F6] flex items-center justify-center">
+            <CoffeeIcon className="w-5 h-5 text-white" />
+          </div>
+
+          {/* 이번주니어 필수매장 아이콘 */}
+          <div className="w-[35px] h-[35px] rounded-full bg-[#F472B6] flex items-center justify-center">
+            <CoffeeIcon className="w-5 h-5 text-white" />
+          </div>
+        </div>
+
+        {/* 각 아이콘의 제목 */}
+        <div className="absolute left-[52px] top-[414px] flex z-10">
+          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px]">
+            프랜차이즈
+            <br />
+            매장
+          </p>
+          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[45px] ml-[23px]">
+            소상공인
+            <br />
+            매장
+          </p>
+          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px] ml-[24px]">
+            이번주니어
+            <br />
+            매장
+          </p>
+          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px] ml-[20px]">
+            이번주니어
+            <br />
+            필수매장
+          </p>
+        </div>
+
+        {/* 이번주니어 이동 링크 영역 */}
+        <Link
+          to="/junior"
+          className="absolute left-1/2 -translate-x-1/2 top-[486px] font-semibold text-[16px] leading-[21px] text-[#333333] underline w-[201px] text-center z-10"
+        >
+          이번주니어 매장 확인하러 가기
+        </Link>
+      </div>
+    </BottomSheet>
+  );
+};
+
+export default BottomSheetEvent;

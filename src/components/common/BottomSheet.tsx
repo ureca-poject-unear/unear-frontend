@@ -5,9 +5,10 @@ interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  disablePadding?: boolean;
 }
 
-const BottomSheet = ({ isOpen, onClose, children }: BottomSheetProps) => {
+const BottomSheet = ({ isOpen, onClose, children, disablePadding }: BottomSheetProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -40,7 +41,9 @@ const BottomSheet = ({ isOpen, onClose, children }: BottomSheetProps) => {
               </div>
 
               {/* 내용 */}
-              <div className="flex-1 overflow-y-auto px-5 pt-1 pb-5">{children}</div>
+              <div className={`flex-1 overflow-y-auto ${disablePadding ? '' : 'px-5 pt-1 pb-5'}`}>
+                {children}
+              </div>
             </motion.div>
           </div>
         </div>
