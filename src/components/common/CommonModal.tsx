@@ -68,7 +68,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
         </div>
 
         {/* 컨텐츠 영역 */}
-        <div className="p-5">{children}</div>
+        <div className="pt-3 pb-5 pr-5 pl-5">{children}</div>
       </div>
     </div>
   );
