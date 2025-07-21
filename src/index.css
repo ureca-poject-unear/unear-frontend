@@ -43,6 +43,13 @@ html {
   font-family: 'LGEIHeadline-Regular', sans-serif;
 }
 
+html {
+  font-family: 'LGEIHeadline-Regular', sans-serif;
+  /* 스크롤바로 인한 레이아웃 시프트 방지 */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 /* 스크롤바 숨기기 */
 .scrollbar-hide {
   /* Firefox */
