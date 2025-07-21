@@ -13,7 +13,6 @@ export default function ActionButton({ text, onClick, isActive = false }: Action
       onClick={() => {
         if (isActive) {
           onClick();
-          alert(`${text} 되었습니다!`);
         }
       }}
       disabled={!isActive}

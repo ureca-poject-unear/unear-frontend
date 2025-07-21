@@ -53,7 +53,7 @@ const MainPage = () => {
       </header>
 
       {/* 메인 컨텐츠 영역 */}
-      <main>
+      <main className="px-5">
         {/* 사용자 카드 */}
         <div
           className="w-full bg-white rounded-[20px] mt-3 pl-6 pt-3 pb-3 flex items-center justify-between"
