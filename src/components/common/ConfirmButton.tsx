@@ -1,6 +1,7 @@
 type ConfirmButtonProps = {
   text: string;
   onClick?: () => void;
+  disabled?: boolean;
 };
 
 export default function ConfirmButton({ text, onClick }: ConfirmButtonProps) {

@@ -1,10 +1,14 @@
+import Grade from '../components/common/Grade';
+
+import _404State from '@/components/common/404State';
+
 import BarcodeIcon from '@/assets/common/barcode.svg?react';
 import InformationIcon from '@/assets/common/information.svg?react';
 import MainNubiImage from '@/assets/MainPage/mainnubi.svg?react';
 import EventBannerImage from '@/assets/MainPage/eventbanner.png';
 import StoryBackgroundImage from '@/assets/MainPage/storyBackground.png';
 import StoryNubiImage from '@/assets/MainPage/storynubi.svg?react';
-import Grade from '@/components/common/Grade';
+
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
 import MembershipBrandBanner from '@/components/MainPage/MembershipBrandBanner';
 import MembershipBenefitModal from '@/components/MainPage/MembershipBenefitModal';
