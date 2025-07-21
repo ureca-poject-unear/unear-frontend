@@ -6,44 +6,25 @@ interface BottomSheetBarcodeProps {
   userName?: string;
   userGrade?: 'VIP' | 'VVIP' | '우수';
   barcodeValue?: string;
-  isOpen?: boolean;
-  onClose?: () => void;
-  showButton?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
 }
-
 const BottomSheetBarcode = ({
   userName = '홍길동',
   userGrade = 'VVIP',
   barcodeValue = '344BA876Y89',
-  isOpen = false,
+  isOpen,
   onClose,
-  showButton = true,
 }: BottomSheetBarcodeProps) => {
-  const handleClose = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
-
   return (
     <>
-      {showButton && (
-        <button
-          onClick={() => {}}
-          className="w-full bg-primary text-white py-3 rounded-xl text-m font-semibold"
-        >
-          바코드 보기
-        </button>
-      )}
-
-      <BottomSheet isOpen={isOpen} onClose={handleClose}>
+      <BottomSheet isOpen={isOpen} onClose={onClose}>
         <div className="w-full flex flex-col items-center space-y-8 pb-2">
           {/* 사용자 정보 섹션 */}
           <div className="flex items-center gap-3">
             <span className="text-lm font-semibold text-black pt-1">{userName}님</span>
             <Grade grade={userGrade} />
           </div>
-
           {/* 바코드 섹션 */}
           <div className="w-full">
             <BarcodeDisplay code={barcodeValue} format="CODE128" />
@@ -53,28 +34,29 @@ const BottomSheetBarcode = ({
     </>
   );
 };
-
 export default BottomSheetBarcode;
 
 /*
 사용법:
 
-기본 사용법:
-<BottomSheetBarcode />
-
-커스텀 정보:
+기본 사용법 (외부 상태 제어):
 <BottomSheetBarcode 
   userName="김철수"
   userGrade="VIP"
   barcodeValue="123456789"
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
 />
 
 Props:
 - userName: 사용자 이름 (기본값: "홍길동")
 - userGrade: 사용자 등급 (기본값: "VVIP")
 - barcodeValue: 바코드 값 (기본값: "344BA876Y89")
+- isOpen: 바텀시트 열림 상태 (필수)
+- onClose: 바텀시트 닫기 함수 (필수)
 
 특징:
+- 외부에서 상태 제어 가능
 - BottomSheet 컴포넌트 활용
 - BarcodeDisplay 컴포넌트로 바코드 표시
 - Grade 컴포넌트로 등급 표시

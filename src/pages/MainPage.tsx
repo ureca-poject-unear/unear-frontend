@@ -84,12 +84,11 @@ const MainPage = () => {
 
       {/* 바코드 바텀시트 */}
       <BottomSheetBarcode
-        userName="유니aaa어"
-        userGrade="VIP"
+        userName="유니어"
+        userGrade="VVIP"
         barcodeValue="123456789"
         isOpen={isBarcodeSheetOpen}
         onClose={() => setIsBarcodeSheetOpen(false)}
-        showButton={false}
       />
     </>
   );
