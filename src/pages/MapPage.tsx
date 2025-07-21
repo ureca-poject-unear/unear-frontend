@@ -7,12 +7,14 @@ import BottomSheetEvent from '@/components/map/BottomSheetEvent';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
 import MapLocationButton from '@/components/map/MapLocationButton';
 import BottomSheetFilter from '@/components/map/BottomSheetFilter';
+import BottomSheetCoupon from '@/components/map/BottomSheetCoupon';
 
 const MapPage = () => {
   const [isBookmarkOnly, setIsBookmarkOnly] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
+  const [isCouponOpen, setIsCouponOpen] = useState(false);
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -44,6 +46,7 @@ const MapPage = () => {
       <MapActionButtons
         onEventClick={() => setIsEventOpen(true)}
         onBarcodeClick={() => setIsBarcodeOpen(true)}
+        onCouponClick={() => setIsCouponOpen(true)}
       />
       {/* 우측 하단 위치 버튼 */}
       <MapLocationButton onClick={handleCurrentLocation} />
@@ -55,6 +58,7 @@ const MapPage = () => {
         isBookmarkOnly={isBookmarkOnly}
       />
       <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
+      <BottomSheetCoupon isOpen={isCouponOpen} onClose={() => setIsCouponOpen(false)} />
       <BottomSheetBarcode
         userName="김누비"
         userGrade="VIP"

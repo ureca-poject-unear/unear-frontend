@@ -1,7 +1,7 @@
 import StoreTypeIcon from '@/components/common/StoreTypeIcon';
 import CouponBackground from '@/assets/common/coupon.svg?react';
 
-interface CouponCardProps {
+export interface CouponCardProps {
   brand: string;
   title: string;
   validUntil: string;

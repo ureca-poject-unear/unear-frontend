@@ -8,9 +8,10 @@ import MapDownArrowIcon from '@/assets/map/mapDownArrowIcon.svg?react';
 interface Props {
   onEventClick: () => void;
   onBarcodeClick: () => void;
+  onCouponClick: () => void;
 }
 
-const MapActionButtons = ({ onEventClick, onBarcodeClick }: Props) => {
+const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
@@ -36,7 +37,10 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick }: Props) => {
         </button>
 
         {/* 쿠폰 버튼 */}
-        <button className="relative w-[45px] h-[45px] drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] transition-transform duration-300">
+        <button
+          onClick={onCouponClick}
+          className="relative w-[45px] h-[45px] drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] transition-transform duration-300"
+        >
           <div className="absolute inset-0 bg-white rounded-full" />
           <MapCouponIcon className="absolute top-[9px] left-1/2 -translate-x-1/2 w-[22.5px] h-[22.5px]" />
           <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-regular leading-[8px] text-[#333]">
