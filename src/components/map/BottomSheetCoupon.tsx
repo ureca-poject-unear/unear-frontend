@@ -101,7 +101,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                   <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
                     곧 만료 예정
                   </span>
-                  <div className="w-[48px] h-[18px] bg-pink-200 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
+                  <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                     <span className="text-s font-semibold text-pink-700 mt-[3px]">
                       {mockCoupons.length}개
                     </span>
@@ -122,7 +122,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                   <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
                     전체 쿠폰
                   </span>
-                  <div className="w-[48px] h-[18px] bg-pink-200 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
+                  <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                     <span className="text-s font-semibold text-pink-700 mt-[3px]">
                       {mockCoupons.length}개
                     </span>
@@ -145,7 +145,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                 <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
                   가까운 매장
                 </span>
-                <div className="w-[48px] h-[18px] bg-pink-200 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
+                <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                   <span className="text-s font-semibold text-pink-700 mt-[3px]">
                     {mockStores.length}개
                   </span>
