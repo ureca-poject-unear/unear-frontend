@@ -31,7 +31,7 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         >
           <div className="absolute inset-0 bg-white rounded-full" />
           <EventIcon className="absolute top-[9px] left-1/2 -translate-x-1/2 w-[21px] h-[21px]" />
-          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-regular leading-[8px] text-[#333]">
+          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-semibold leading-[8px] text-[#333]">
             이벤트
           </span>
         </button>
@@ -43,7 +43,7 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         >
           <div className="absolute inset-0 bg-white rounded-full" />
           <MapCouponIcon className="absolute top-[9px] left-1/2 -translate-x-1/2 w-[22.5px] h-[22.5px]" />
-          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-regular leading-[8px] text-[#333]">
+          <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-semibold leading-[8px] text-[#333]">
             쿠폰
           </span>
         </button>
@@ -55,7 +55,7 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         >
           <div className="absolute inset-0 bg-white rounded-full" />
           <BarcodeIcon className="absolute top-[7px] left-1/2 -translate-x-1/2 w-[25px] h-[25px]" />
-          <span className="absolute bottom-[6px] left-1/2 -translate-x-1/2 text-[6px] font-regular leading-[8px] text-[#333]">
+          <span className="absolute bottom-[6px] left-1/2 -translate-x-1/2 text-[6px] font-semibold leading-[8px] text-[#333]">
             바코드
           </span>
         </button>
