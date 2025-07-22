@@ -1,17 +1,16 @@
 import GrowUpIcon from '@/assets/my/growup.svg?react';
 import BookmarkButton from '@/components/common/BookmarkButton';
 import CouponButton from '@/components/common/CouponBuuton';
+import type { MembershipBenefit } from '@/types/myPage';
 
-interface MembershipBenefitSectionProps {
-  currentMonthSavings?: string;
-  couponCount?: number;
+interface MembershipBenefitSectionProps extends MembershipBenefit {
   onCouponClick?: () => void;
   onBookmarkClick?: () => void;
 }
 
 const MembershipBenefitSection = ({
-  currentMonthSavings = '21,200원',
-  couponCount = 5,
+  currentMonthSavings,
+  couponCount,
   onCouponClick,
   onBookmarkClick,
 }: MembershipBenefitSectionProps) => {

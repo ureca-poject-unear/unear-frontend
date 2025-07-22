@@ -1,14 +1,14 @@
 import BackIcon from '@/assets/common/backIcon.svg?react';
 import StatisticsChart from './StatisticsChart';
+import type { StatisticsData } from '@/types/myPage';
 
-interface StatisticsSectionProps {
-  currentMonthSavings: string;
-  accumulatedSavings: string;
+interface StatisticsSectionProps extends StatisticsData {
   onDetailClick?: () => void;
 }
 
 const StatisticsSection = ({
-  accumulatedSavings = '21만원',
+  accumulatedSavings,
+  chartData,
   onDetailClick,
 }: StatisticsSectionProps) => {
   const handleDetailClick = () => {
@@ -21,7 +21,7 @@ const StatisticsSection = ({
 
   return (
     <div className="w-full bg-white mt-3 h-[284px]">
-      <div className="px-5 py-6">
+      <div className="px-5 py-5">
         {/* 헤더 */}
         <div>
           <div className="flex justify-between items-center mb-1">
@@ -37,7 +37,7 @@ const StatisticsSection = ({
         </div>
 
         {/* 바 차트 */}
-        <StatisticsChart className="mt-7" />
+        <StatisticsChart chartData={chartData} className="mt-7" />
       </div>
     </div>
   );

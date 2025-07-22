@@ -1,52 +1,13 @@
 import BackIcon from '@/assets/common/backIcon.svg?react';
 import UsageHistoryItem from './UsageHistoryItem';
-
-interface UsageHistoryData {
-  id: number;
-  storeName: string;
-  usedDate: string;
-  originalPrice: number;
-  discountPrice: number;
-  category: 'cafe' | 'food' | 'shopping' | 'education' | 'culture' | 'bakery' | 'beauty' | 'convenience' | 'activity' | 'popup';
-  storeClass: 'franchise' | 'small-business' | 'event';
-}
+import type { UsageHistoryItem as UsageHistoryItemType } from '@/types/myPage';
 
 interface RecentUsageSectionProps {
+  usageHistory: UsageHistoryItemType[];
   onDetailClick?: () => void;
 }
 
-const RecentUsageSection = ({ onDetailClick }: RecentUsageSectionProps) => {
-  // 목업 데이터
-  const mockUsageHistory: UsageHistoryData[] = [
-    {
-      id: 1,
-      storeName: '스타벅스 강남점',
-      usedDate: '7월 3일 17:29',
-      originalPrice: 16000,
-      discountPrice: 2400,
-      category: 'cafe',
-      storeClass: 'franchise',
-    },
-    {
-      id: 2,
-      storeName: '스타벅스 강남점',
-      usedDate: '7월 3일 17:29',
-      originalPrice: 16000,
-      discountPrice: 2400,
-      category: 'cafe',
-      storeClass: 'franchise',
-    },
-    {
-      id: 3,
-      storeName: '스타벅스 강남점',
-      usedDate: '7월 3일 17:29',
-      originalPrice: 16000,
-      discountPrice: 2400,
-      category: 'cafe',
-      storeClass: 'franchise',
-    },
-  ];
-
+const RecentUsageSection = ({ usageHistory, onDetailClick }: RecentUsageSectionProps) => {
   const handleDetailClick = () => {
     if (onDetailClick) {
       onDetailClick();
@@ -69,7 +30,7 @@ const RecentUsageSection = ({ onDetailClick }: RecentUsageSectionProps) => {
 
         {/* 이용 내역 리스트 */}
         <div className="-mx-5 px-5 space-y-1">
-          {mockUsageHistory.map((item) => (
+          {usageHistory.map((item) => (
             <UsageHistoryItem
               key={item.id}
               storeName={item.storeName}

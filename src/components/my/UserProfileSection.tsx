@@ -1,16 +1,14 @@
 import Grade from '@/components/common/Grade';
 import MyPageNubiImage from '@/assets/my/mypagenubi.png';
+import type { UserProfile } from '@/types/myPage';
 
-interface UserProfileSectionProps {
-  userName?: string;
-  userGrade?: 'VIP' | 'VVIP' | '우수';
-  greeting?: string;
+interface UserProfileSectionProps extends UserProfile {
   onLogout?: () => void;
 }
 
 const UserProfileSection = ({
-  userName = '유니어',
-  userGrade = 'VVIP',
+  name,
+  grade,
   greeting = '오늘도 알뜰한 하루 되세요! ✨',
   onLogout,
 }: UserProfileSectionProps) => {
@@ -36,9 +34,9 @@ const UserProfileSection = ({
               {/* 이름, 등급, 로그아웃 한 줄 */}
               <div className="flex justify-between w-full">
                 <div className="flex gap-2">
-                  <h2 className="text-lm font-semibold text-black">{userName}님</h2>
+                  <h2 className="text-lm font-semibold text-black">{name}님</h2>
                   <div className="mt-0.5">
-                    <Grade grade={userGrade} />
+                    <Grade grade={grade} />
                   </div>
                 </div>
                 <button

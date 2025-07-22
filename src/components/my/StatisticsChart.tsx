@@ -1,12 +1,13 @@
-import type { ChartDataItem } from '@/hooks/useStatisticsChart';
-import useStatisticsChart from '@/hooks/useStatisticsChart';
+import useStatisticsChart from '@/hooks/my/useStatisticsChart';
+import type { ChartDataItem } from '@/types/myPage';
 
 interface StatisticsChartProps {
+  chartData: ChartDataItem[];
   className?: string;
 }
 
-const StatisticsChart = ({ className = '' }: StatisticsChartProps) => {
-  const { chartData, calculateBarHeight } = useStatisticsChart();
+const StatisticsChart = ({ chartData, className = '' }: StatisticsChartProps) => {
+  const { calculateBarHeight } = useStatisticsChart({ chartData });
 
   const renderChartBar = (item: ChartDataItem, index: number) => {
     const { month, value, highlight } = item;

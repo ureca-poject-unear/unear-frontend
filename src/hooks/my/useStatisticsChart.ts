@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
+import type { ChartDataItem } from '@/types/myPage';
 
-export interface ChartDataItem {
-  month: string;
-  value: number;
-  highlight?: boolean;
+interface UseStatisticsChartProps {
+  chartData: ChartDataItem[];
 }
 
 interface UseStatisticsChartReturn {
@@ -13,19 +12,7 @@ interface UseStatisticsChartReturn {
   calculateBarHeight: (value: number) => number;
 }
 
-const useStatisticsChart = (): UseStatisticsChartReturn => {
-  // 차트 데이터 (실제로는 API에서 받아올 데이터)
-  const chartData: ChartDataItem[] = useMemo(
-    () => [
-      { month: '3월', value: 0 },
-      { month: '4월', value: 30 },
-      { month: '5월', value: 28 },
-      { month: '6월', value: 42 },
-      { month: '7월', value: 21, highlight: true },
-    ],
-    []
-  );
-
+const useStatisticsChart = ({ chartData }: UseStatisticsChartProps): UseStatisticsChartReturn => {
   // 차트 설정값
   const chartHeight = 120; // 차트 영역 최대 높이
 

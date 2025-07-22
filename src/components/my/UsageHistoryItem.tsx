@@ -1,23 +1,8 @@
 import StoreTypeIcon from '@/components/common/StoreTypeIcon';
+import type { UsageHistoryItem as UsageHistoryItemType } from '@/types/myPage';
 
-interface UsageHistoryItemProps {
-  storeName: string;
-  usedDate: string;
-  originalPrice: number;
-  discountPrice: number;
-  category?:
-    | 'cafe'
-    | 'food'
-    | 'shopping'
-    | 'education'
-    | 'culture'
-    | 'bakery'
-    | 'beauty'
-    | 'convenience'
-    | 'activity'
-    | 'popup';
-  storeClass?: 'franchise' | 'small-business' | 'event';
-}
+// 빈 인터페이스 대신 타입 별칭 사용
+type UsageHistoryItemProps = Omit<UsageHistoryItemType, 'id'>;
 
 const UsageHistoryItem = ({
   storeName,
