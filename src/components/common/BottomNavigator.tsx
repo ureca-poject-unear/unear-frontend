@@ -29,7 +29,7 @@ const BottomNavigator = () => {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 bg-white z-30 h-[65px] max-w-[393px] mx-auto"
+      className="fixed inset-x-0 bottom-0 bg-white z-50 h-[65px] max-w-[393px] mx-auto"
       style={{ boxShadow: '0 -1px 4px rgba(0, 0, 0, 0.15)' }}
     >
       <div className="w-full px-5 h-full relative">

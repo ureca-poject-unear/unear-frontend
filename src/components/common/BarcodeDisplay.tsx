@@ -22,6 +22,8 @@ interface BarcodeDisplayProps {
   /** 여백 (기본값: 0) */
   margin?: number;
   /** 추가 CSS 클래스 */
+  textMargin?: number;
+  /** 기본값 8 */
   className?: string;
   /** 에러 처리 콜백 */
   onError?: (error: Error) => void;
@@ -37,6 +39,7 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
   background = '#ffffff',
   lineColor = '#000000',
   margin = 0,
+  textMargin = 8,
   className = '',
   onError,
 }) => {
@@ -102,7 +105,7 @@ const BarcodeDisplay: React.FC<BarcodeDisplayProps> = ({
         margin={margin}
         textAlign="center"
         textPosition="bottom"
-        textMargin={8}
+        textMargin={textMargin}
         font="LGEIHeadline-Regular"
       />
     </div>
