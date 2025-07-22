@@ -35,8 +35,8 @@ const StampRoulette: React.FC<Props> = ({ stamps, onRouletteClick }) => {
   };
 
   return (
-    <div className="relative w-[393px] h-[210px] mx-auto bg-white rounded-xl p-5">
-      <h2 className="absolute left-5 top-3 text-lm font-bold">스탬프</h2>
+    <div className="relative w-[393px] h-[210px] mx-auto bg-white  p-5">
+      <h2 className="absolute left-5 top-3 text-lm font-bold text-black">스탬프</h2>
 
       <div className="w-[353px] h-36 rounded-xl bg-zinc-100 absolute left-[19.5px] top-[50px] flex flex-col justify-between p-4">
         <div className="flex justify-between items-start">
