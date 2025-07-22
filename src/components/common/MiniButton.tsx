@@ -16,7 +16,7 @@ export default function MiniButton({
 
   return (
     <div
-      className={`flex justify-center items-center w-[136px] h-[39px] overflow-hidden px-8 pt-[17px] pb-[19px] rounded-xl ${backgroundColorClass}`}
+      className={`flex justify-center items-center w-[121px] h-[23px] overflow-hidden px-8  rounded-xl ${backgroundColorClass}`}
       style={{ boxShadow: '0px 4px 16px 0 black/20' }}
     >
       <button

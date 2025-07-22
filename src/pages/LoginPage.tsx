@@ -136,7 +136,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center font-['Inter']">
+    <div className="relative w-full h-full flex flex-col items-center font-['Inter'] ">
       {/* 타이틀 */}
       <p className="absolute top-[171px] left-1/2 transform -translate-x-1/2 text-[32px] font-bold text-center whitespace-nowrap">
         <span className="text-primary">U:NEAR</span>

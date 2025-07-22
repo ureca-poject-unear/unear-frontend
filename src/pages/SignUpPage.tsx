@@ -284,7 +284,7 @@ const SignUpPage = () => {
         <div className="px-5 flex flex-col gap-6 ">
           {/* 이름 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">이름</label>
+            <label className="text-lm font-bold text-black">이름</label>
             <input
               type="text"
               placeholder="이름"
@@ -296,7 +296,7 @@ const SignUpPage = () => {
 
           {/* 성별 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">성별</label>
+            <label className="text-lm font-bold text-black">성별</label>
             <div className="flex gap-4 mt-2">
               {['남자', '여자'].map((g) => (
                 <ToggleButton
@@ -317,7 +317,7 @@ const SignUpPage = () => {
 
           {/* 생년월일 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">생년월일</label>
+            <label className="text-lm font-bold text-black">생년월일</label>
             <input
               type="text"
               placeholder="예: 19940508"
@@ -329,7 +329,7 @@ const SignUpPage = () => {
 
           {/* 전화번호 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">전화번호</label>
+            <label className="text-lm font-bold text-black">전화번호</label>
             <input
               type="text"
               placeholder="'-' 포함 입력 (예: 010-1234-5678)"
@@ -341,7 +341,7 @@ const SignUpPage = () => {
 
           {/* 이메일 섹션 시작 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">이메일</label>
+            <label className="text-lm font-bold text-black">이메일</label>
             <div className="flex justify-between items-center border-b border-zinc-300">
               <input
                 type="email"
@@ -359,11 +359,11 @@ const SignUpPage = () => {
             </div>
             {/* 이메일 중복/유효성 에러 메시지 */}
             {emailExistsError && (
-              <p className="text-[10px] text-red-500 mt-1">이미 가입된 이메일입니다.</p>
+              <p className="text-xs text-red-500 mt-1">이미 가입된 이메일입니다.</p>
             )}
             {/* 이메일 인증 완료 메시지 */}
             {isEmailVerified && (
-              <p className="text-[10px] text-green-500 mt-1">이메일 인증이 완료되었습니다.</p>
+              <p className="text-xs text-green-500 mt-1">이메일 인증이 완료되었습니다.</p>
             )}
           </div>
           {/* 이메일 섹션 끝 */}
@@ -371,7 +371,7 @@ const SignUpPage = () => {
           {/* 이메일 인증번호 입력 UI */}
           {showEmailVerification && !isEmailVerified && (
             <div>
-              <p className="text-lg font-bold text-[#333]">이메일 인증번호</p>
+              <p className="text-lm font-bold text-black">이메일 인증번호</p>
               <div className="flex justify-between items-center border-b border-zinc-300">
                 <input
                   type="text"
@@ -382,7 +382,7 @@ const SignUpPage = () => {
                 />
                 {/* 남은 시간 표시 */}
                 {isTimerRunning && emailVerificationTimer > 0 && (
-                  <p className="text-[10px] font-semibold text-red-600 mr-2">
+                  <p className="text-xs font-semibold text-red-600 mr-2">
                     {formatTime(emailVerificationTimer)}
                   </p>
                 )}
@@ -390,14 +390,14 @@ const SignUpPage = () => {
               </div>
               {/* 인증번호 틀림 에러 메시지 */}
               {verificationCodeError && (
-                <p className="text-[10px] text-red-500 mt-1">인증번호가 틀렸습니다.</p>
+                <p className="text-xs text-red-500 mt-1">인증번호가 틀렸습니다.</p>
               )}
             </div>
           )}
 
           {/* 비밀번호 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">비밀번호</label>
+            <label className="text-lm font-bold text-black">비밀번호</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -454,7 +454,7 @@ const SignUpPage = () => {
 
           {/* 비밀번호 확인 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">비밀번호 확인</label>
+            <label className="text-lm font-bold text-black">비밀번호 확인</label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
@@ -509,7 +509,7 @@ const SignUpPage = () => {
             </div>
             {/* 비밀번호가 일치하지 않을 때만 메시지 표시 */}
             {passwordMismatch && (
-              <p className="text-[10px] text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
+              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
             )}
           </div>
         </div>
@@ -533,7 +533,7 @@ const SignUpPage = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-[#666]">이미 계정이 있으신가요?</p>
           <p
-            className="text-sm font-semibold text-[#e6007e] cursor-pointer"
+            className="text-sm font-semibold text-primary cursor-pointer"
             onClick={() => (window.location.href = '/login')}
           >
             로그인
