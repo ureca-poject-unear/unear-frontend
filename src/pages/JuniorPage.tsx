@@ -3,6 +3,8 @@ import Header from '@/components/common/Header';
 import EventBanner from '@/components/JuniorPage/EventBanner';
 import StampRouletteCard from '@/components/JuniorPage/StampRouletteCard';
 import JuniorMap from '@/components/JuniorPage/JuniorMap';
+import TodayCouponSection from '@/components/JuniorPage/TodayCouponSection';
+import JuniorMarket from '@/components/JuniorPage/JuniorMarket';
 
 const sampleStamps = [
   { name: '매장1', isStamped: true, date: '07.21' },
@@ -23,6 +25,8 @@ const JuniorPage = () => {
           }}
         />
         <JuniorMap />
+        <TodayCouponSection />
+        <JuniorMarket />
       </div>
     </>
   );
