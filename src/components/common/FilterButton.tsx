@@ -1,15 +1,11 @@
-import { useState } from 'react';
-
 type FilterButtonProps = {
   text: string;
   onClick?: () => void; // 선택적 onClick prop
+  isActive?: boolean;
 };
 
-export default function FilterButton({ text, onClick }: FilterButtonProps) {
-  const [isActive, setIsActive] = useState(false);
-
+export default function FilterButton({ text, onClick, isActive }: FilterButtonProps) {
   const handleClick = () => {
-    setIsActive(!isActive);
     if (onClick) onClick();
   };
 
