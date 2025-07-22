@@ -21,7 +21,7 @@ const Header = ({
     >
       <div
         className="w-full max-w-[393px] mx-auto px-3 h-full flex items-center"
-        style={{ boxShadow: 'inset 0 -1px 4px rgba(0, 0, 0, 0.15)' }}
+        style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.15)' }}
       >
         <button
           onClick={onBack}
