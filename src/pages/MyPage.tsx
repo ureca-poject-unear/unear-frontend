@@ -1,7 +1,7 @@
 import Header from '@/components/common/Header';
 import { useNavigate } from 'react-router-dom';
 import Grade from '@/components/common/Grade';
-import MyPageNubiImage from '@/assets/MyPage/mypagenubi.png';
+import MyPageNubiImage from '@/assets/my/mypagenubi.png';
 import BookmarkButton from '@/components/common/BookmarkButton';
 import CouponButton from '@/components/common/CouponBuuton';
 import BackIcon from '@/assets/common/backIcon.svg?react';
