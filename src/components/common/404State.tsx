@@ -1,5 +1,4 @@
-import React from 'react';
-import Image404 from '../../assets/common/404nubi.png';
+import Image404 from '@/assets/common/404nubi.png';
 
 export default function _404State() {
   return (

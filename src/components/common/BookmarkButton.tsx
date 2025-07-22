@@ -1,5 +1,3 @@
-import React from 'react';
-
 type BookmarkButtonProps = {
   label?: string;
   onClick?: () => void;

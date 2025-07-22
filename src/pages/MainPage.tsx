@@ -119,12 +119,18 @@ const MainPage = () => {
             </h3>
 
             {/* 스토리 바로가기 텍스트 */}
-            <span className="text-gray-300 font-semibold text-s underline text-left block">스토리 바로가기</span>
+            <span className="text-gray-300 font-semibold text-s underline text-left block">
+              스토리 바로가기
+            </span>
           </div>
 
           {/* 스토리 누비 이미지 */}
           <div className="flex-shrink-0">
-            <img src={StoryNubiImage} alt="스토리 누비" className="w-[90px] h-[90px] object-contain" />
+            <img
+              src={StoryNubiImage}
+              alt="스토리 누비"
+              className="w-[90px] h-[90px] object-contain"
+            />
           </div>
         </button>
 

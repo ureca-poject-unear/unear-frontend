@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Grade from '@/components/common/Grade';
 import MyPageNubiImage from '@/assets/MyPage/mypagenubi.png';
 import BookmarkButton from '@/components/common/BookmarkButton';
-import CouponButton from '@/components/common/CouponBuuton';
+import CouponButton from '@/components/common/CouponButton';
 import BackIcon from '@/assets/common/backIcon.svg?react';
 
 const MyPage = () => {
@@ -60,26 +60,26 @@ const MyPage = () => {
           <div className="px-5 py-5">
             {/* 멤버십 혜택 헤더 */}
             <div className="flex items-center gap-2 mb-3">
-              <svg 
-                width="25" 
-                height="14" 
-                viewBox="0 0 25 14" 
-                fill="none" 
+              <svg
+                width="25"
+                height="14"
+                viewBox="0 0 25 14"
+                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-6 h-6"
               >
-                <path 
-                  d="M23.5 7.75L23.5 1L16.75 1" 
-                  stroke="#E6007E" 
-                  strokeWidth="1.5" 
-                  strokeLinecap="round" 
+                <path
+                  d="M23.5 7.75L23.5 1L16.75 1"
+                  stroke="#E6007E"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <path 
-                  d="M23.5 1L15.561 8.939C15.4217 9.07839 15.2563 9.18896 15.0742 9.26441C14.8922 9.33985 14.6971 9.37868 14.5 9.37868C14.3029 9.37868 14.1078 9.33985 13.9258 9.26441C13.7437 9.18896 13.5783 9.07839 13.439 8.939L10.311 5.811C10.1717 5.67161 10.0063 5.56104 9.82425 5.48559C9.6422 5.41015 9.44706 5.37132 9.25 5.37132C9.05294 5.37132 8.8578 5.41015 8.67575 5.48559C8.4937 5.56104 8.3283 5.67161 8.189 5.811L1 13" 
-                  stroke="#E6007E" 
-                  strokeWidth="1.5" 
-                  strokeLinecap="round" 
+                <path
+                  d="M23.5 1L15.561 8.939C15.4217 9.07839 15.2563 9.18896 15.0742 9.26441C14.8922 9.33985 14.6971 9.37868 14.5 9.37868C14.3029 9.37868 14.1078 9.33985 13.9258 9.26441C13.7437 9.18896 13.5783 9.07839 13.439 8.939L10.311 5.811C10.1717 5.67161 10.0063 5.56104 9.82425 5.48559C9.6422 5.41015 9.44706 5.37132 9.25 5.37132C9.05294 5.37132 8.8578 5.41015 8.67575 5.48559C8.4937 5.56104 8.3283 5.67161 8.189 5.811L1 13"
+                  stroke="#E6007E"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
