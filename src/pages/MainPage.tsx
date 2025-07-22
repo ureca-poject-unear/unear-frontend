@@ -1,13 +1,13 @@
 import BarcodeIcon from '@/assets/common/barcode.svg?react';
 import InformationIcon from '@/assets/common/information.svg?react';
-import MainNubiImage from '@/assets/MainPage/mainnubi.svg?react';
-import EventBannerImage from '@/assets/MainPage/eventbanner.png';
-import StoryBackgroundImage from '@/assets/MainPage/storyBackground.png';
-import StoryNubiImage from '@/assets/MainPage/storynubi.svg?react';
+import MainNubiImage from '@/assets/main/mainnubi.png';
+import EventBannerImage from '@/assets/main/eventbanner.png';
+import StoryBackgroundImage from '@/assets/main/storyBackground.png';
+import StoryNubiImage from '@/assets/main/storynubi.png';
 import Grade from '@/components/common/Grade';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
-import MembershipBrandBanner from '@/components/MainPage/MembershipBrandBanner';
-import MembershipBenefitModal from '@/components/MainPage/MembershipBenefitModal';
+import MembershipBrandBanner from '@/components/main/MembershipBrandBanner';
+import MembershipBenefitModal from '@/components/main/MembershipBenefitModal';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,7 +53,7 @@ const MainPage = () => {
       </header>
 
       {/* 메인 컨텐츠 영역 */}
-      <main className="px-5">
+      <main className="px-5 pb-3">
         {/* 사용자 카드 */}
         <div
           className="w-full bg-white rounded-[20px] mt-3 pl-6 pt-3 pb-3 flex items-center justify-between"
@@ -81,24 +81,26 @@ const MainPage = () => {
 
           {/* 메인 누비 이미지 */}
           <div className="flex-shrink-0">
-            <MainNubiImage className="w-[89px] h-[89px]" />
+            <img src={MainNubiImage} alt="메인 누비" className="w-[90px] h-[90px] object-contain" />
           </div>
         </div>
 
         {/* 이벤트 배너 */}
-        <div className="mt-3 relative rounded-[20px] overflow-hidden">
+        <button
+          onClick={handleEventClick}
+          className="mt-3 relative rounded-[20px] overflow-hidden block w-full"
+        >
           <img src={EventBannerImage} alt="이벤트 배너" className="w-full h-[353px] object-cover" />
 
           {/* 이벤트 바로가기 오버레이 */}
           <div className="absolute inset-0 flex items-end justify-center pb-[18px]">
-            <button onClick={handleEventClick}>
-              <span className="text-sm font-semibold text-gray-500 underline">이벤트 바로가기</span>
-            </button>
+            <span className="text-sm font-semibold text-gray-500 underline">이벤트 바로가기</span>
           </div>
-        </div>
+        </button>
 
         {/* 스토리 배너 */}
-        <div
+        <button
+          onClick={handleStoryClick}
           className="w-full mt-3 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
           style={{
             backgroundImage: `url(${StoryBackgroundImage})`,
@@ -110,23 +112,21 @@ const MainPage = () => {
         >
           <div className="flex-col gap-2">
             {/* 스토리 텍스트 */}
-            <h3 className="text-white font-semibold mb-2 text-sm leading-[16px]">
+            <h3 className="text-white font-semibold mb-2 text-sm leading-[16px] text-left">
               AI가 분석한
               <br />
               나만의 스토리를 확인해보세요!
             </h3>
 
             {/* 스토리 바로가기 텍스트 */}
-            <button onClick={handleStoryClick}>
-              <span className="text-gray-300 font-semibold text-s underline">스토리 바로가기</span>
-            </button>
+            <span className="text-gray-300 font-semibold text-s underline text-left block">스토리 바로가기</span>
           </div>
 
           {/* 스토리 누비 이미지 */}
           <div className="flex-shrink-0">
-            <StoryNubiImage className="w-[89px] h-[89px]" />
+            <img src={StoryNubiImage} alt="스토리 누비" className="w-[90px] h-[90px] object-contain" />
           </div>
-        </div>
+        </button>
 
         {/* 다양한 멤버십 브랜드 배너 */}
         <MembershipBrandBanner />
