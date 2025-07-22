@@ -24,52 +24,60 @@ const CommonModal: React.FC<CommonModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-5"
-      onClick={handleBackdropClick}
-    >
-      <div
-        className={`
-          w-full 
-          max-w-[353px] 
-          bg-white 
-          rounded-[16px] 
-          overflow-hidden 
-          shadow-lg 
-          max-h-[60vh] 
-          overflow-y-auto
-          scrollbar-hide
-          ${className}
-        `}
-      >
-        {/* 헤더 영역 */}
-        <div className="w-full h-[55px] bg-primary flex items-center justify-between px-5">
-          <h2 className="text-white text-lm pt-1 font-bold flex-1 truncate">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-white hover:text-gray-200 transition-colors duration-200 flex-shrink-0 ml-2"
-            aria-label="모달 닫기"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex justify-center">
+      {/* 배경 블러 - 지도페이지 방식 적용 */}
+      <div className="relative w-full max-w-[393px]">
+        <div
+          className="absolute inset-0 bottom-[65px] bg-black bg-opacity-40"
+          onClick={handleBackdropClick}
+        />
 
-        {/* 컨텐츠 영역 */}
-        <div className="pt-3 pb-5 pr-5 pl-5">{children}</div>
+        {/* 모달 위치 조정 */}
+        <div className="absolute inset-0 bottom-[65px] flex items-center justify-center px-5">
+          <div
+            className={`
+              w-full 
+              max-w-[353px] 
+              bg-white 
+              rounded-[16px] 
+              overflow-hidden 
+              shadow-lg 
+              max-h-[70vh]
+              flex
+              flex-col
+              ${className}
+            `}
+          >
+            {/* 헤더 영역 - 고정 */}
+            <div className="w-full h-[55px] bg-primary flex items-center justify-between px-5 flex-shrink-0">
+              <h2 className="text-white text-lm pt-1 font-bold flex-1 truncate">{title}</h2>
+              <button
+                onClick={onClose}
+                className="text-white hover:text-gray-200 transition-colors duration-200 flex-shrink-0 ml-2"
+                aria-label="모달 닫기"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* 컨텐츠 영역 - 스크롤 가능 */}
+            <div className="pt-3 pb-5 pr-5 pl-5 flex-1 overflow-y-auto scrollbar-hide">{children}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

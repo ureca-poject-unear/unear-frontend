@@ -1,14 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import BackIcon from '@/assets/common/backIcon.svg?react';
 // 브랜드 이미지들
-import CgvImage from '@/assets/MainPage/cgv.png';
-import Gs25Image from '@/assets/MainPage/gs25.png';
-import VipsImage from '@/assets/MainPage/vips.png';
-import BaskinRabbinsImage from '@/assets/MainPage/baskinrabbins.png';
-import LotteCinemaImage from '@/assets/MainPage/lottecinema.png';
-import ParisBaguetteImage from '@/assets/MainPage/parisbaguette.jpg';
-import SkRentalCarImage from '@/assets/MainPage/skrentalcar.png';
-import TourLesJoursImage from '@/assets/MainPage/tourlesjours.png';
+import CgvImage from '@/assets/main/cgv.png';
+import Gs25Image from '@/assets/main/gs25.png';
+import VipsImage from '@/assets/main/vips.png';
+import BaskinRabbinsImage from '@/assets/main/baskinrabbins.png';
+import LotteCinemaImage from '@/assets/main/lottecinema.png';
+import ParisBaguetteImage from '@/assets/main/parisbaguette.jpg';
+import SkRentalCarImage from '@/assets/main/skrentalcar.png';
+import TourLesJoursImage from '@/assets/main/tourlesjours.png';
 
 const MembershipBrandBanner = () => {
   const navigate = useNavigate();

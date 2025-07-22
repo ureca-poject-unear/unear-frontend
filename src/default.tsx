@@ -8,7 +8,7 @@ const Default = () => {
 
   return (
     <div className="w-full max-w-[393px] min-h-screen bg-background mx-auto flex flex-col relative">
-      <main className={isMapPage ? '' : 'pt-[40px] pb-[77px]'}>
+      <main className={isMapPage ? '' : 'pt-[40px] pb-[65px]'}>
         <Outlet />
       </main>
 
