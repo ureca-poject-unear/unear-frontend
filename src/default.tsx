@@ -7,10 +7,8 @@ const Default = () => {
   const isMapPage = pathname === '/map';
 
   return (
-    <div
-      className={`w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative ${pathname === '/login' || pathname === '/signup' ? 'bg-white' : 'bg-background'}`}
-    >
-      <main className={isMapPage ? '' : 'pt-[40px] pb-[77px]'}>
+    <div className="w-full max-w-[393px] min-h-screen bg-background mx-auto flex flex-col relative">
+      <main className={isMapPage ? '' : 'pt-[40px] pb-[65px]'}>
         <Outlet />
       </main>
 

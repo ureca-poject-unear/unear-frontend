@@ -1,8 +1,8 @@
 import CommonModal from '@/components/common/CommonModal';
-import TrophyIcon from '@/assets/MainPage/trophy.svg?react';
-import GiftboxIcon from '@/assets/MainPage/giftbox.svg?react';
-import CheckIcon from '@/assets/MainPage/check.svg?react';
-import WarningIcon from '@/assets/MainPage/warning.svg?react';
+import TrophyIcon from '@/assets/main/trophy.svg?react';
+import GiftboxIcon from '@/assets/main/giftbox.svg?react';
+import CheckIcon from '@/assets/main/check.svg?react';
+import WarningIcon from '@/assets/main/warning.svg?react';
 
 interface MembershipBenefitModalProps {
   isOpen: boolean;

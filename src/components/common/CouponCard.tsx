@@ -1,7 +1,7 @@
 import StoreTypeIcon from '@/components/common/StoreTypeIcon';
 import CouponBackground from '@/assets/common/coupon.svg?react';
 
-interface CouponCardProps {
+export interface CouponCardProps {
   brand: string;
   title: string;
   validUntil: string;
@@ -17,11 +17,22 @@ interface CouponCardProps {
     | 'activity'
     | 'popup';
   storeClass: 'franchise' | 'small-business' | 'event';
+  onClick?: () => void;
 }
 
-const CouponCard = ({ brand, title, validUntil, category, storeClass }: CouponCardProps) => {
+const CouponCard = ({
+  brand,
+  title,
+  validUntil,
+  category,
+  storeClass,
+  onClick,
+}: CouponCardProps) => {
   return (
-    <div className="relative w-full h-[107px] max-w-[393px] drop-shadow-[0_0px_10px_rgba(0,0,0,0.15)]">
+    <div
+      className="relative w-full h-[107px] max-w-[393px] drop-shadow-[0_0px_10px_rgba(0,0,0,0.15)] cursor-pointer"
+      onClick={onClick}
+    >
       <CouponBackground className="w-full h-full" />
       <div className="absolute inset-0 flex items-center px-2 py-3 gap-x-8">
         {/* 아이콘 */}
