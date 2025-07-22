@@ -25,7 +25,7 @@ const CategoryDiscountCard: React.FC<CategoryDiscountCardProps> = ({
     <div
       className={`
         relative
-        w-[353px]
+        w-full
         h-[69px]
         bg-white
         ${className}
