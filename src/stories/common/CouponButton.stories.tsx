@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import CouponButton from '@/components/common/CouponBuuton';
+import CouponButton from '@/components/common/CouponButton';
 
 const meta: Meta<typeof CouponButton> = {
   title: 'Common/CouponButton',

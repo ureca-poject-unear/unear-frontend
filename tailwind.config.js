@@ -18,12 +18,15 @@ export default {
         primary: '#E6007E', // 핑크
         black: '#333333', // 검정
         white: '#FFFFFF', // 흰색
-        store: '#0F0034', // 스토리 네이비
-        storecard: '#251A49', // 스토리 카드 네이비
+        story: '#0F0034', // 스토리 네이비
+        storycard: '#251A49', // 스토리 카드 네이비
       },
       backgroundImage: {
         // bg-[지정명]
-        storeicon: 'linear-gradient(180deg, #094275 0%, #0F0034 100%)', //하단바 스토리 아이콘
+        storyicon: 'linear-gradient(180deg, #094275 0%, #0F0034 100%)', //하단바 스토리 아이콘
+        storybackground1: 'linear-gradient(180deg, #0F0034 0%, #094275 100%)', //스토리 페이지 배경1
+        storybackground2: 'radial-gradient(ellipse 90% 40% at center, #094275 20%, #0F0034 60%)', //스토리 페이지 배경2
+        storybackground3: 'radial-gradient(ellipse at center, #0F0034 20%, #094275 60%)', //스토리 페이지 배경3
       },
 
       fontSize: {

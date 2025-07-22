@@ -3,6 +3,8 @@ import Default from '../default';
 import MainPage from '@/pages/MainPage';
 import MapPage from '@/pages/MapPage';
 import StoryPage from '@/pages/StoryPage';
+import StoryDiagnosisPage from '@/pages/StoryDiagnosisPage';
+import StoryRecommendPage from '@/pages/StoryRecommendPage';
 import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
@@ -15,6 +17,8 @@ const router = createBrowserRouter([
       { path: '/', element: <MainPage /> },
       { path: '/map', element: <MapPage /> },
       { path: '/story', element: <StoryPage /> },
+      { path: '/story/diagnosis', element: <StoryDiagnosisPage /> },
+      { path: '/story/recommend', element: <StoryRecommendPage /> },
       { path: '/junior', element: <JuniorPage /> },
       { path: '/my', element: <MyPage /> },
       { path: '/login', element: <LoginPage /> },

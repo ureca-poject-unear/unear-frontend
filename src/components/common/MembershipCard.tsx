@@ -1,4 +1,3 @@
-import React from 'react';
 import GradeMini from './GradeMini';
 type GradeType = 'VIP' | 'VVIP' | '우수';
 
