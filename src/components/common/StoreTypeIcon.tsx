@@ -1,4 +1,3 @@
-// SVG 파일들을 React 컴포넌트로 import
 import CoffeeIcon from '@/assets/common/coffee.svg?react';
 import FoodIcon from '@/assets/common/food.svg?react';
 import ShoppingIcon from '@/assets/common/shopping.svg?react';
@@ -10,21 +9,30 @@ import LifeIcon from '@/assets/common/life.svg?react';
 import ActivityIcon from '@/assets/common/activity.svg?react';
 import StoreIcon from '@/assets/common/store.svg?react';
 
-// 카테고리 타입 정의
+// 카테고리 타입 정의 (백엔드 PLACE_CATEGORY에 맞춤)
 export type CategoryType =
-  | 'cafe'
-  | 'food'
-  | 'shopping'
-  | 'education'
-  | 'culture'
-  | 'bakery'
-  | 'beauty'
-  | 'convenience'
-  | 'activity'
-  | 'popup';
+  | 'FOOD' // 푸드
+  | 'ACTIVITY' // 액티비티
+  | 'EDUCATION' // 교육
+  | 'CULTURE' // 문화/여가
+  | 'BAKERY' // 베이커리
+  | 'LIFE' // 생활/편의
+  | 'SHOPPING' // 쇼핑
+  | 'CAFE' // 카페
+  | 'BEAUTY' // 뷰티/건강
+  | 'POPUP'; // 팝업스토어
 
-// 구분 타입 정의
-type StoreClassType = 'franchise' | 'small-business' | 'event';
+// 매장 구분 타입 정의 (백엔드 PLACE_TYPE에 맞춤)
+export type StoreClassType =
+  | 'LOCAL' // 우리동네멤버십(소상공인)
+  | 'FRANCHISE' // 프랜차이즈
+  | 'BASIC'; // 기본 (프랜차이즈와 동일한 효과)
+
+// 이벤트 타입 정의 (백엔드 EVENT_TYPE에 맞춤)
+export type EventType =
+  | 'NONE' // 이벤트 아님
+  | 'GENERAL' // 이벤트 (일반)
+  | 'REQUIRE'; // 이벤트 (필수)
 
 // 모드 타입 정의
 type ModeType = 'store' | 'statistics';
@@ -36,6 +44,7 @@ type ShapeType = 'square' | 'circle';
 interface StoreTypeIconProps {
   category: CategoryType;
   storeClass: StoreClassType;
+  event?: EventType;
   size?: number;
   className?: string;
   mode?: ModeType;
@@ -44,62 +53,76 @@ interface StoreTypeIconProps {
 
 // 카테고리별 아이콘 컴포넌트 매핑
 const categoryIconMap: Record<CategoryType, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
-  cafe: CoffeeIcon,
-  food: FoodIcon,
-  shopping: ShoppingIcon,
-  education: BookIcon,
-  culture: CultureIcon,
-  bakery: BreadIcon,
-  beauty: BeautyIcon,
-  convenience: LifeIcon,
-  activity: ActivityIcon,
-  popup: StoreIcon,
+  CAFE: CoffeeIcon,
+  FOOD: FoodIcon,
+  SHOPPING: ShoppingIcon,
+  EDUCATION: BookIcon,
+  CULTURE: CultureIcon,
+  BAKERY: BreadIcon,
+  BEAUTY: BeautyIcon,
+  LIFE: LifeIcon,
+  ACTIVITY: ActivityIcon,
+  POPUP: StoreIcon,
 };
 
 const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
   category,
   storeClass,
+  event = 'NONE',
   size = 50,
   className = '',
   mode = 'store',
   shape = 'square',
 }) => {
+  // 아이콘 컴포넌트 반환
+  const getIconComponent = () => {
+    return categoryIconMap[category];
+  };
+
   // 매장 모드 색상 클래스 반환
   const getStoreColorClass = (): string => {
+    // 이벤트가 있는 경우 우선적으로 처리
+    if (event === 'REQUIRE') {
+      return 'text-pink-400'; // 필수 이벤트는 pink-400
+    }
+    if (event === 'GENERAL') {
+      return 'text-primary'; // 일반 이벤트는 핑크색 (이벤트 매장)
+    }
+
+    // 매장 구분에 따른 색상
     switch (storeClass) {
-      case 'franchise':
-        return 'text-orange-500';
-      case 'small-business':
-        return 'text-blue-500';
-      case 'event':
-        return 'text-primary';
+      case 'FRANCHISE':
+      case 'BASIC':
+        return 'text-orange-500'; // 프랜차이즈/기본 - 주황색
+      case 'LOCAL':
+        return 'text-blue-500'; // 소상공인 - 파란색
       default:
         return 'text-black';
     }
   };
 
-  // 통계 모드 색상 클래스 반환
+  // 통계 모드 색상 클래스 반환 (카테고리별)
   const getStatisticsColorClass = (): string => {
     switch (category) {
-      case 'cafe':
+      case 'CAFE':
         return 'text-amber-700';
-      case 'food':
+      case 'FOOD':
         return 'text-red-500';
-      case 'shopping':
+      case 'SHOPPING':
         return 'text-blue-500';
-      case 'education':
+      case 'EDUCATION':
         return 'text-green-500';
-      case 'culture':
+      case 'CULTURE':
         return 'text-violet-500';
-      case 'bakery':
+      case 'BAKERY':
         return 'text-orange-500';
-      case 'beauty':
+      case 'BEAUTY':
         return 'text-pink-500';
-      case 'convenience':
+      case 'LIFE':
         return 'text-gray-500';
-      case 'activity':
+      case 'ACTIVITY':
         return 'text-teal-500';
-      case 'popup':
+      case 'POPUP':
         return 'text-fuchsia-500';
       default:
         return 'text-black';
@@ -116,13 +139,19 @@ const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
     return shape === 'circle' ? 'rounded-full' : 'rounded-lg';
   };
 
-  const IconComponent = categoryIconMap[category];
+  // 배경 색상은 기본 회색으로 통일
+  const getBackgroundClass = (): string => {
+    return 'bg-gray-100';
+  };
+
+  const IconComponent = getIconComponent();
   const colorClass = getColorClass();
   const shapeClass = getShapeClass();
+  const backgroundClass = getBackgroundClass();
 
   return (
     <div
-      className={`flex items-center justify-center bg-gray-100 ${shapeClass} ${className}`}
+      className={`flex items-center justify-center ${backgroundClass} ${shapeClass} ${className}`}
       style={{
         width: size,
         height: size,
@@ -133,7 +162,7 @@ const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
           width={18}
           height={18}
           className={`w-full h-full ${
-            category === 'activity' ? 'fill-none stroke-current stroke-[1.2]' : 'fill-current'
+            category === 'ACTIVITY' ? 'fill-none stroke-current stroke-[1.2]' : 'fill-current'
           }`}
         />
       </div>
@@ -144,25 +173,41 @@ const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
 export default StoreTypeIcon;
 
 /*
-사용법
+사용법 (백엔드 API 스펙에 맞춤)
 
 기본 사용법 (매장 모드, 네모 모양):
-<StoreTypeIcon category="cafe" storeClass="franchise" />
+<StoreTypeIcon category="CAFE" storeClass="FRANCHISE" />
+
+팝업스토어 카테고리:
+<StoreTypeIcon category="POPUP" storeClass="BASIC" />
+
+기본 매장:
+<StoreTypeIcon category="FOOD" storeClass="BASIC" />
+
+이벤트 포함:
+<StoreTypeIcon category="FOOD" storeClass="LOCAL" event="GENERAL" />
 
 원형 모양:
-<StoreTypeIcon category="cafe" storeClass="franchise" shape="circle" />
+<StoreTypeIcon category="CAFE" storeClass="FRANCHISE" shape="circle" />
 
 통계 모드 (카테고리별 색상):
-<StoreTypeIcon category="cafe" storeClass="franchise" mode="statistics" />
-
-통계 모드 + 원형:
-<StoreTypeIcon category="cafe" storeClass="franchise" mode="statistics" shape="circle" />
+<StoreTypeIcon category="CAFE" storeClass="FRANCHISE" mode="statistics" />
 
 Props:
-- category: 카테고리 (cafe, food, shopping, education, culture, bakery, beauty, convenience, activity, popup)
-- storeClass: 매장 구분 (franchise, small-business, event) - store 모드에서만 사용
+- category: 카테고리 (FOOD, ACTIVITY, EDUCATION, CULTURE, BAKERY, LIFE, SHOPPING, CAFE, BEAUTY, POPUP)
+- storeClass: 매장 구분 (LOCAL, FRANCHISE, BASIC)
+- event: 이벤트 타입 (NONE, GENERAL, REQUIRE) - 선택적, 기본값: NONE
 - size: 크기 (기본값: 50)
 - className: 추가 CSS 클래스
 - mode: 색상 모드 (store, statistics) - 기본값: store
 - shape: 모양 (square, circle) - 기본값: square
+
+색상 규칙 (store 모드):
+- 이벤트 우선순위:
+  * REQUIRE 이벤트: pink-400
+  * GENERAL 이벤트: 핑크색 (text-primary) - 이벤트 매장
+- 매장 구분:
+  * FRANCHISE/BASIC: 주황색 (text-orange-500)
+  * LOCAL: 파란색 (text-blue-500) - 소상공인
+- statistics 모드: 카테고리별 고유 색상 (POPUP 포함)
 */

@@ -1,5 +1,4 @@
-import React from 'react';
-import emptyImage from '../../assets/common/emptynubi.png';
+import emptyImage from '@/assets/common/emptynubi.png';
 
 export default function EmptyState() {
   return (
