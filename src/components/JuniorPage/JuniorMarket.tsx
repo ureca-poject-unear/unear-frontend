@@ -1,6 +1,6 @@
 import React from 'react';
 import BookmarkCard from '../common/BookmarkCard';
-
+import type { CategoryType } from '@/components/common/StoreTypeIcon';
 const JuniorMarket = () => {
   const mockStores = [
     {
