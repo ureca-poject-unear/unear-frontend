@@ -9,7 +9,7 @@ const JuniorMarket = () => {
       address: '서울 강남구 테헤란로 152',
       distance: '0.2km',
       hours: '06:00 - 22:00',
-      category: 'cafe' as CategoryType,
+      category: 'CAFE' as CategoryType,
       status: '영업중' as StoreStatusType,
       isBookmarked: false,
       coupons: [
@@ -26,7 +26,7 @@ const JuniorMarket = () => {
       address: '서울 강남구 테헤란로 152',
       distance: '0.2km',
       hours: '06:00 - 22:00',
-      category: 'cafe' as CategoryType,
+      category: 'CAFE' as CategoryType,
       status: '영업중' as StoreStatusType,
       isBookmarked: false,
       coupons: [
@@ -43,7 +43,7 @@ const JuniorMarket = () => {
       address: '서울 강남구 테헤란로 152',
       distance: '0.2km',
       hours: '06:00 - 22:00',
-      category: 'cafe' as CategoryType,
+      category: 'CAFE' as CategoryType,
       status: '영업중' as StoreStatusType,
       isBookmarked: false,
       coupons: [
@@ -60,7 +60,7 @@ const JuniorMarket = () => {
       address: '서울 강남구 테헤란로 152',
       distance: '0.2km',
       hours: '06:00 - 22:00',
-      category: 'cafe' as CategoryType,
+      category: 'CAFE' as CategoryType,
       status: '영업중' as StoreStatusType,
       isBookmarked: false,
       coupons: [
