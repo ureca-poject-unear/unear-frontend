@@ -36,10 +36,7 @@ const useMyPageHandlers = (): MyPageHandlers & { handleBack: () => void } => {
   };
 
   const onUsageHistoryDetail = () => {
-    // 최근 이용 내역 자세히 보기 기능 구현
-    console.log('최근 이용 내역 자세히 보기 클릭');
-    // TODO: 이용 내역 상세 페이지 라우팅
-    // navigate('/usage-history');
+    navigate('/my/usage-history');
   };
 
   return {

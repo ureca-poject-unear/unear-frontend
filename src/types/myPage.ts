@@ -26,7 +26,7 @@ export interface ChartDataItem {
 
 // 이용 내역 관련 타입
 export interface UsageHistoryItem {
-  id: number;
+  id: string;
   storeName: string;
   usedDate: string;
   originalPrice: number;
