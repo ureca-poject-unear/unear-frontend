@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import type { MapContainerRef } from '@/components/map/MapContainer';
 import MapContainer from '@/components/map/MapContainer';
 import SearchBar from '@/components/common/SearchBar';
 import MapActionButtons from '@/components/map/MapActionButtons';
@@ -15,27 +16,16 @@ const MapPage = () => {
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
   const [isCouponOpen, setIsCouponOpen] = useState(false);
+  const mapRef = useRef<MapContainerRef>(null);
+
   const handleCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          console.log('현재 위치:', latitude, longitude);
-          // TODO: 지도 중심 이동 로직 추가 예정
-        },
-        (error) => {
-          console.error('위치 정보를 가져오는데 실패했습니다:', error);
-          alert('위치 접근이 거부되었거나 실패했습니다.');
-        }
-      );
-    } else {
-      alert('이 브라우저에서는 위치 정보 사용이 지원되지 않습니다.');
-    }
+    mapRef.current?.showCurrentLocation();
   };
+
   return (
     <div className="relative w-full h-[calc(100vh-65px)] bg-white">
       {/* 지도 영역 */}
-      <MapContainer />
+      <MapContainer ref={mapRef} />
 
       {/* 상단 검색바 */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
