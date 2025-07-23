@@ -58,10 +58,10 @@ const StatisticsDetailPage = () => {
   // 차트 데이터
   const chartData = [
     { month: '3월', value: 0 },
-    { month: '4월', value: 30 },
-    { month: '5월', value: 28 },
-    { month: '6월', value: 42 },
-    { month: '7월', value: 21, highlight: true },
+    { month: '4월', value: 6 },
+    { month: '5월', value: 5 },
+    { month: '6월', value: 1 },
+    { month: '7월', value: 2, highlight: true },
   ];
 
   // 포맷팅 함수
@@ -123,6 +123,7 @@ const StatisticsDetailPage = () => {
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
           onBarClick={handleBarClick}
+          onTooltipClose={clearHighlight}
           formatCurrency={formatCurrency}
         />
 

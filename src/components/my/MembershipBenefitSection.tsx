@@ -1,6 +1,6 @@
 import GrowUpIcon from '@/assets/my/growup.svg?react';
 import BookmarkButton from '@/components/common/BookmarkButton';
-import CouponButton from '@/components/common/CouponBuuton';
+import CouponButton from '@/components/common/CouponButton';
 import type { MembershipBenefit } from '@/types/myPage';
 
 interface MembershipBenefitSectionProps extends MembershipBenefit {

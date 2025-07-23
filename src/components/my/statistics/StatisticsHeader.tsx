@@ -20,6 +20,7 @@ interface StatisticsHeaderProps {
     percentage: number,
     categoryName: string
   ) => void;
+  onTooltipClose?: () => void; // 툴팁 닫기 핸들러 추가
   formatCurrency: (amount: number) => string;
 }
 
@@ -37,11 +38,16 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
       onPrevMonth,
       onNextMonth,
       onBarClick,
+      onTooltipClose,
       formatCurrency,
     },
     ref
   ) => {
     const progressBarRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // 월 변경 시 툴팁 닫기는 수동으로만 처리
+    // useEffect에서 자동 닫기 제거
 
     // 외부에서 바 위치를 가져올 수 있도록 노출
     useImperativeHandle(ref, () => ({
@@ -72,6 +78,8 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
     }));
 
     const handleBarClick = (event: React.MouseEvent, bar: ProgressBar) => {
+      event.stopPropagation(); // 이벤트 전파 방지
+
       if (!progressBarRef.current) return;
 
       const rect = progressBarRef.current.getBoundingClientRect();
@@ -79,6 +87,20 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
       const clickY = rect.bottom;
 
       onBarClick(bar.category, { x: clickX, y: clickY }, bar.displayPercentage, bar.categoryName);
+    };
+
+    const handlePrevMonth = () => {
+      onPrevMonth();
+      if (onTooltipClose) {
+        onTooltipClose();
+      }
+    };
+
+    const handleNextMonth = () => {
+      onNextMonth();
+      if (onTooltipClose) {
+        onTooltipClose();
+      }
     };
 
     // 바 기준으로 툴팁 위치 계산
@@ -108,8 +130,8 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
     };
 
     return (
-      <div className="bg-white">
-        <div className="px-5 pt-4 pb-4">
+      <div className="bg-white" ref={containerRef} onClick={(e) => e.stopPropagation()}>
+        <div className="px-5 pt-4 pb-1">
           {/* 멤버십 혜택으로 타이틀 */}
           <div className="flex items-center justify-center mb-2">
             <div className="flex items-center gap-2">
@@ -131,13 +153,13 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
 
           {/* 월 네비게이션 */}
           <div className="flex items-center justify-center mb-4">
-            <button onClick={onPrevMonth} disabled={currentMonth <= 1}>
+            <button onClick={handlePrevMonth} disabled={currentMonth <= 1}>
               <BackIcon
                 className={`w-5 h-5 ${currentMonth <= 1 ? 'text-gray-300' : 'text-black'}`}
               />
             </button>
             <span className="mx-2 pt-1 text-lm font-semibold text-black">{currentMonth}월</span>
-            <button onClick={onNextMonth} disabled={currentMonth >= 7}>
+            <button onClick={handleNextMonth} disabled={currentMonth >= 7}>
               <BackIcon
                 className={`w-5 h-5 transform rotate-180 ${currentMonth >= 7 ? 'text-gray-300' : 'text-black'}`}
               />
@@ -153,7 +175,7 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
           </div>
 
           {/* 클릭 가능한 진행률 바 + 툴팁 */}
-          <div className="mb-8 relative">
+          <div className="mb-2 relative">
             {progressBars.length > 0 ? (
               <div
                 ref={progressBarRef}

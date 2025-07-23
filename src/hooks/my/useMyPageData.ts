@@ -69,8 +69,8 @@ const useMyPageData = (): UseMyPageDataReturn => {
         usedDate: '7월 3일 17:29',
         originalPrice: 16000,
         discountPrice: 2400,
-        category: 'cafe',
-        storeClass: 'franchise',
+        category: 'CAFE',
+        storeClass: 'FRANCHISE',
       },
       {
         id: 2,
@@ -78,8 +78,8 @@ const useMyPageData = (): UseMyPageDataReturn => {
         usedDate: '7월 3일 17:29',
         originalPrice: 16000,
         discountPrice: 2400,
-        category: 'cafe',
-        storeClass: 'franchise',
+        category: 'CAFE',
+        storeClass: 'FRANCHISE',
       },
       {
         id: 3,
@@ -87,8 +87,8 @@ const useMyPageData = (): UseMyPageDataReturn => {
         usedDate: '7월 3일 17:29',
         originalPrice: 16000,
         discountPrice: 2400,
-        category: 'cafe',
-        storeClass: 'franchise',
+        category: 'CAFE',
+        storeClass: 'FRANCHISE',
       },
     ],
     []

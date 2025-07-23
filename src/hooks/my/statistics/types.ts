@@ -1,16 +1,16 @@
 // 카테고리 데이터 타입
 export interface CategoryData {
   category:
-    | 'food'
-    | 'shopping'
-    | 'cafe'
-    | 'beauty'
-    | 'culture'
-    | 'education'
-    | 'bakery'
-    | 'convenience'
-    | 'activity'
-    | 'popup';
+    | 'FOOD'
+    | 'ACTIVITY'
+    | 'EDUCATION'
+    | 'CULTURE'
+    | 'BAKERY'
+    | 'LIFE'
+    | 'SHOPPING'
+    | 'CAFE'
+    | 'BEAUTY'
+    | 'POPUP';
   categoryName: string;
   discountAmount: number;
 }

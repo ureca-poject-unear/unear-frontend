@@ -9,8 +9,8 @@ const UsageHistoryItem = ({
   usedDate,
   originalPrice,
   discountPrice,
-  category = 'cafe',
-  storeClass = 'franchise',
+  category = 'CAFE',
+  storeClass = 'FRANCHISE',
 }: UsageHistoryItemProps) => {
   const formatPrice = (price: number) => {
     return `${price.toLocaleString()}원`;

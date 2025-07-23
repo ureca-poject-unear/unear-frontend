@@ -37,18 +37,18 @@ export interface UsageHistoryItem {
 
 // StoreTypeIcon 관련 타입 (재사용)
 export type CategoryType =
-  | 'cafe'
-  | 'food'
-  | 'shopping'
-  | 'education'
-  | 'culture'
-  | 'bakery'
-  | 'beauty'
-  | 'convenience'
-  | 'activity'
-  | 'popup';
+  | 'FOOD'
+  | 'ACTIVITY'
+  | 'EDUCATION'
+  | 'CULTURE'
+  | 'BAKERY'
+  | 'LIFE'
+  | 'SHOPPING'
+  | 'CAFE'
+  | 'BEAUTY'
+  | 'POPUP';
 
-export type StoreClassType = 'franchise' | 'small-business' | 'event';
+export type StoreClassType = 'LOCAL' | 'FRANCHISE' | 'BASIC';
 
 // 액션 핸들러 타입
 export interface MyPageHandlers {

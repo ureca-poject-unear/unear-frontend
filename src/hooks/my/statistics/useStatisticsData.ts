@@ -10,15 +10,15 @@ export const useStatisticsData = () => {
     1: {
       month: 1,
       categoryData: [
-        { category: 'cafe', categoryName: '카페', discountAmount: 7200 },
-        { category: 'shopping', categoryName: '쇼핑', discountAmount: 5200 },
+        { category: 'CAFE', categoryName: '카페', discountAmount: 7200 },
+        { category: 'SHOPPING', categoryName: '쇼핑', discountAmount: 5200 },
       ],
     },
     2: {
       month: 2,
       categoryData: [
-        { category: 'food', categoryName: '외식', discountAmount: 9100 },
-        { category: 'beauty', categoryName: '뷰티', discountAmount: 6700 },
+        { category: 'FOOD', categoryName: '외식', discountAmount: 9100 },
+        { category: 'BEAUTY', categoryName: '뷰티', discountAmount: 6700 },
       ],
     },
     3: {
@@ -28,32 +28,32 @@ export const useStatisticsData = () => {
     4: {
       month: 4,
       categoryData: [
-        { category: 'food', categoryName: '외식', discountAmount: 18000 },
-        { category: 'shopping', categoryName: '쇼핑', discountAmount: 12000 },
+        { category: 'FOOD', categoryName: '외식', discountAmount: 18000 },
+        { category: 'SHOPPING', categoryName: '쇼핑', discountAmount: 12000 },
       ],
     },
     5: {
       month: 5,
       categoryData: [
-        { category: 'cafe', categoryName: '카페', discountAmount: 16800 },
-        { category: 'food', categoryName: '외식', discountAmount: 11200 },
+        { category: 'CAFE', categoryName: '카페', discountAmount: 16800 },
+        { category: 'FOOD', categoryName: '외식', discountAmount: 11200 },
       ],
     },
     6: {
       month: 6,
       categoryData: [
-        { category: 'food', categoryName: '외식', discountAmount: 25200 },
-        { category: 'cafe', categoryName: '카페', discountAmount: 16800 },
+        { category: 'FOOD', categoryName: '외식', discountAmount: 25200 },
+        { category: 'CAFE', categoryName: '카페', discountAmount: 16800 },
       ],
     },
     7: {
       month: 7,
       categoryData: [
-        { category: 'food', categoryName: '외식', discountAmount: 8904 },
-        { category: 'shopping', categoryName: '쇼핑', discountAmount: 7420 },
-        { category: 'cafe', categoryName: '카페', discountAmount: 2544 },
-        { category: 'beauty', categoryName: '뷰티', discountAmount: 1696 },
-        { category: 'culture', categoryName: '문화', discountAmount: 636 },
+        { category: 'FOOD', categoryName: '외식', discountAmount: 8904 },
+        { category: 'SHOPPING', categoryName: '쇼핑', discountAmount: 7420 },
+        { category: 'CAFE', categoryName: '카페', discountAmount: 2544 },
+        { category: 'BEAUTY', categoryName: '뷰티', discountAmount: 1696 },
+        { category: 'CULTURE', categoryName: '문화', discountAmount: 636 },
       ],
     },
   };

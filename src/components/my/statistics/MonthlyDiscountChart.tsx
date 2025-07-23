@@ -20,18 +20,18 @@ const MonthlyDiscountChart = ({ chartData }: MonthlyDiscountChartProps) => {
         </div>
 
         {/* 범례 */}
-        <div className="bg-gray-100 rounded-lg p-4">
-          <div className="flex items-center justify-center space-x-9">
+        <div className="bg-gray-100 rounded-lg p-2">
+          <div className="flex items-center justify-center space-x-8">
             <div className="flex items-center">
               <div className="w-3 h-3 bg-primary rounded-full mr-2"></div>
-              <span className="text-m font-semibold text-black">현재 월</span>
+              <span className="text-m font-semibold text-black mt-[3px]">현재 월</span>
             </div>
             <div className="flex items-center">
               <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
-              <span className="text-m font-semibold text-black">이전 월</span>
+              <span className="text-m font-semibold text-black mt-[3px]">이전 월</span>
             </div>
             <div className="flex items-center">
-              <span className="text-m font-semibold text-black">평균: 20만원</span>
+              <span className="text-m font-semibold text-black mt-[3px]">평균: 20만원</span>
             </div>
           </div>
         </div>

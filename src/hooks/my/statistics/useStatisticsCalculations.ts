@@ -1,8 +1,8 @@
-import type { 
-  CategoryData, 
-  CalculatedCategoryData, 
-  ApiMonthlyData, 
-  CalculatedMonthSummary 
+import type {
+  CategoryData,
+  CalculatedCategoryData,
+  ApiMonthlyData,
+  CalculatedMonthSummary,
 } from './types';
 
 export const useStatisticsCalculations = () => {
@@ -49,7 +49,7 @@ export const useStatisticsCalculations = () => {
 
     if (totalDiscount === 0) return [];
 
-    return categoryData.map(item => ({
+    return categoryData.map((item) => ({
       ...item,
       discountPercentage: Math.round((item.discountAmount / totalDiscount) * 100),
     }));

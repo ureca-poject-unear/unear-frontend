@@ -14,7 +14,7 @@ const StatisticsChart = ({ chartData, className = '' }: StatisticsChartProps) =>
     const barHeight = Math.max(calculateBarHeight(value), 4);
 
     return (
-      <div key={index} className="flex flex-col items-center gap-2 w-[50px]">
+      <div key={index} className="flex flex-col items-center gap-1 w-[50px]">
         {/* 값 표시 */}
         <span className={`text-m font-semibold ${highlight ? 'text-primary' : 'text-black'}`}>
           {value}
@@ -22,8 +22,11 @@ const StatisticsChart = ({ chartData, className = '' }: StatisticsChartProps) =>
 
         {/* 바 차트 */}
         <div
-          className={`rounded-t-lg w-8 ${highlight ? 'bg-primary' : 'bg-gray-500'}`}
-          style={{ height: `${barHeight}px` }}
+          className="rounded-t-lg w-8"
+          style={{
+            height: `${barHeight}px`,
+            backgroundColor: highlight ? '#E6007E' : '#6B7280', // primary, gray-500 색상을 직접 지정
+          }}
         />
 
         {/* 월 표시 */}

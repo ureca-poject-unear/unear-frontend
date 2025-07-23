@@ -4,17 +4,28 @@ export const useProgressBars = () => {
   // 카테고리별 색상 매핑
   const getCategoryColor = (category: string): string => {
     switch (category) {
-      case 'cafe': return 'bg-amber-700';
-      case 'food': return 'bg-red-500';
-      case 'shopping': return 'bg-blue-500';
-      case 'education': return 'bg-green-500';
-      case 'culture': return 'bg-violet-500';
-      case 'bakery': return 'bg-orange-500';
-      case 'beauty': return 'bg-pink-500';
-      case 'convenience': return 'bg-gray-500';
-      case 'activity': return 'bg-teal-500';
-      case 'popup': return 'bg-fuchsia-500';
-      default: return 'bg-gray-400';
+      case 'CAFE':
+        return 'bg-amber-700';
+      case 'FOOD':
+        return 'bg-red-500';
+      case 'SHOPPING':
+        return 'bg-blue-500';
+      case 'EDUCATION':
+        return 'bg-green-500';
+      case 'CULTURE':
+        return 'bg-violet-500';
+      case 'BAKERY':
+        return 'bg-orange-500';
+      case 'BEAUTY':
+        return 'bg-pink-500';
+      case 'LIFE':
+        return 'bg-gray-500';
+      case 'ACTIVITY':
+        return 'bg-teal-500';
+      case 'POPUP':
+        return 'bg-fuchsia-500';
+      default:
+        return 'bg-gray-400';
     }
   };
 
