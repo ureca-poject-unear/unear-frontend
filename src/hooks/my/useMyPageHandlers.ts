@@ -32,10 +32,7 @@ const useMyPageHandlers = (): MyPageHandlers & { handleBack: () => void } => {
   };
 
   const onStatisticsDetail = () => {
-    // 통계 자세히 보기 기능 구현
-    console.log('통계 자세히 보기 클릭');
-    // TODO: 통계 상세 페이지 라우팅
-    // navigate('/statistics');
+    navigate('/my/statistics');
   };
 
   const onUsageHistoryDetail = () => {

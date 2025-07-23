@@ -7,6 +7,7 @@ import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
+import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
       { path: '/story', element: <StoryPage /> },
       { path: '/junior', element: <JuniorPage /> },
       { path: '/my', element: <MyPage /> },
+      { path: '/my/statistics', element: <StatisticsDetailPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
     ],
