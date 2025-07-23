@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import CouponCard from '@/components/common/CouponCard';
 import StoreCouponCard from '@/components/common/StoreCouponCard';
@@ -9,8 +9,6 @@ import type { CategoryType } from '@/components/common/StoreTypeIcon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
 import type { CouponCardProps } from '@/components/common/CouponCard';
 import CouponModal from '@/components/common/CouponModal';
-import { getUserCoupons } from '@/apis/getUserCoupons';
-import { isExpiringSoon } from '@/utils/isExpiringSoon';
 
 interface BottomSheetCouponProps {
   isOpen: boolean;
@@ -21,8 +19,6 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
   const [activeTab, setActiveTab] = useState<'couponbox' | 'nearby'>('couponbox');
   const [selectedCoupon, setSelectedCoupon] = useState<CouponCardProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userCoupons, setUserCoupons] = useState<CouponCardProps[]>([]);
-  const [expiringCoupons, setExpiringCoupons] = useState<CouponCardProps[]>([]);
 
   const handleCardClick = (coupon: CouponCardProps) => {
     setSelectedCoupon(coupon);
@@ -34,29 +30,29 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
     setSelectedCoupon(null);
   };
 
-  // API 호출 및 데이터 가공
-  useEffect(() => {
-    const fetchCoupons = async () => {
-      try {
-        const apiCoupons = await getUserCoupons();
-
-        const formattedCoupons: CouponCardProps[] = apiCoupons.map((coupon) => ({
-          brand: coupon.couponName,
-          title: coupon.couponName,
-          validUntil: coupon.couponEnd.split('T')[0].replaceAll('-', '.'),
-          category: 'cafe',
-          storeClass: 'franchise',
-        }));
-
-        setUserCoupons(formattedCoupons);
-        setExpiringCoupons(formattedCoupons.filter((c) => isExpiringSoon(c.validUntil)));
-      } catch (error) {
-        console.error('❌ 사용자 쿠폰 불러오기 실패:', error);
-      }
-    };
-
-    fetchCoupons();
-  }, []);
+  const mockCoupons: CouponCardProps[] = [
+    {
+      brand: '스타벅스',
+      title: '아메리카노 10% 할인 쿠폰',
+      validUntil: '2025.08.16',
+      category: 'CAFE',
+      storeClass: 'FRANCHISE',
+    },
+    {
+      brand: '이디야',
+      title: '전 메뉴 1천원 할인',
+      validUntil: '2025.08.10',
+      category: 'CAFE',
+      storeClass: 'FRANCHISE',
+    },
+    {
+      brand: '이디야',
+      title: '전 메뉴 1천원 할인',
+      validUntil: '2025.08.10',
+      category: 'CAFE',
+      storeClass: 'FRANCHISE',
+    },
+  ];
 
   const mockStores = [
     {
@@ -65,7 +61,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
       address: '서울 강남구 테헤란로 152',
       distance: '0.2km',
       hours: '06:00 - 22:00',
-      category: 'cafe' as CategoryType,
+      category: 'CAFE' as CategoryType,
       status: '영업중' as StoreStatusType,
       isBookmarked: false,
       coupons: [
@@ -82,7 +78,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
     <>
       <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding={true}>
         <div className="w-full h-[520px] flex flex-col">
-          {/* 탭 바 영역 */}
+          {/* 탭 바 영역: 고정 */}
           <div className="shrink-0 pt-4 bg-white z-10">
             <div className="flex text-m font-semibold text-center">
               <button
@@ -108,7 +104,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
             </div>
           </div>
 
-          {/* 콘텐츠 영역 */}
+          {/* 콘텐츠 영역: 스크롤 대상 */}
           <div className="flex-1 overflow-y-auto">
             {activeTab === 'couponbox' && (
               <div className="space-y-4">
@@ -121,12 +117,13 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                     </span>
                     <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                       <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                        {expiringCoupons.length}개
+                        {mockCoupons.length}개
                       </span>
                     </div>
                   </div>
+
                   <div className="space-y-3">
-                    {expiringCoupons.map((coupon, index) => (
+                    {mockCoupons.map((coupon, index) => (
                       <CouponCard
                         key={`expire-${index}`}
                         {...coupon}
@@ -145,12 +142,13 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                     </span>
                     <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                       <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                        {userCoupons.length}개
+                        {mockCoupons.length}개
                       </span>
                     </div>
                   </div>
+
                   <div className="space-y-[14px]">
-                    {userCoupons.map((coupon, index) => (
+                    {mockCoupons.map((coupon, index) => (
                       <CouponCard
                         key={`all-${index}`}
                         {...coupon}
@@ -186,7 +184,6 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
         </div>
       </BottomSheet>
 
-      {/* 쿠폰 상세 모달 */}
       {selectedCoupon && isModalOpen && (
         <CouponModal
           brand={selectedCoupon.brand}
