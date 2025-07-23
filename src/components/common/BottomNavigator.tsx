@@ -35,7 +35,7 @@ const BottomNavigator = () => {
       <div className="w-full px-5 h-full relative">
         {tabs.map(({ id, label, Icon, path }, index) => {
           const isActive = activeTab === id;
-          const colorClass = isActive ? 'text-store' : 'text-gray-400';
+          const colorClass = isActive ? 'text-story' : 'text-gray-400';
           const leftPercent = 20 * index + 10;
 
           return (
@@ -49,7 +49,7 @@ const BottomNavigator = () => {
             >
               <div className="flex flex-col items-center justify-center gap-1">
                 {id === 'story' ? (
-                  <div className="bg-storeicon rounded-full w-14 h-14 flex flex-col items-center justify-center">
+                  <div className="bg-storyicon rounded-full w-14 h-14 flex flex-col items-center justify-center">
                     <Icon className={isActive ? 'text-blue-100' : 'text-white'} />
                     <span
                       className={`text-s font-semibold ${

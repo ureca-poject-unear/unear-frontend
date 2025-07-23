@@ -12,7 +12,7 @@ const meta: Meta<typeof StoreTypeIcon> = {
       },
       description: {
         component:
-          'U:NEAR 프로젝트에서 사용하는 매장 타입별 아이콘 컴포넌트입니다. 매장 모드와 통계 모드를 지원하며, 네모와 원형 모양을 선택할 수 있습니다.',
+          'U:NEAR 프로젝트에서 사용하는 매장 타입별 아이콘 컴포넌트입니다. 백엔드 API 스펙에 맞춰 설계되었으며, 매장 모드와 통계 모드를 지원합니다.',
       },
     },
   },
@@ -21,35 +21,44 @@ const meta: Meta<typeof StoreTypeIcon> = {
     category: {
       control: 'select',
       options: [
-        'cafe',
-        'food',
-        'shopping',
-        'education',
-        'culture',
-        'bakery',
-        'beauty',
-        'convenience',
-        'activity',
-        'popup',
+        'FOOD',
+        'ACTIVITY',
+        'EDUCATION',
+        'CULTURE',
+        'BAKERY',
+        'LIFE',
+        'SHOPPING',
+        'CAFE',
+        'BEAUTY',
+        'POPUP',
       ],
-      description: '매장 카테고리 타입',
+      description: '매장 카테고리 타입 (백엔드 PLACE_CATEGORY)',
       table: {
         type: { summary: 'CategoryType' },
-        defaultValue: { summary: 'cafe' },
+        defaultValue: { summary: 'CAFE' },
       },
     },
     storeClass: {
       control: 'select',
-      options: ['franchise', 'small-business', 'event'],
-      description: '매장 구분 타입 (store 모드에서만 사용)',
+      options: ['LOCAL', 'FRANCHISE', 'BASIC'],
+      description: '매장 구분 타입 (백엔드 PLACE_TYPE)',
       table: {
         type: { summary: 'StoreClassType' },
-        defaultValue: { summary: 'franchise' },
+        defaultValue: { summary: 'FRANCHISE' },
+      },
+    },
+    event: {
+      control: 'select',
+      options: ['NONE', 'GENERAL', 'REQUIRE'],
+      description: '이벤트 타입 (백엔드 EVENT_TYPE)',
+      table: {
+        type: { summary: 'EventType' },
+        defaultValue: { summary: 'NONE' },
       },
     },
     size: {
       control: { type: 'range', min: 30, max: 100, step: 10 },
-      description: '아이콘 컨테이너 크기 (px)',
+      description: '아이콘 컴테이너 크기 (px)',
       table: {
         type: { summary: 'number' },
         defaultValue: { summary: '50' },
@@ -90,53 +99,118 @@ type Story = StoryObj<typeof meta>;
 // 기본 스토리
 export const Default: Story = {
   args: {
-    category: 'cafe',
-    storeClass: 'franchise',
+    category: 'CAFE',
+    storeClass: 'FRANCHISE',
+    event: 'NONE',
     size: 50,
     mode: 'store',
     shape: 'square',
   },
 };
 
-// 매장 모드 - 각 색상별 예시
-export const StoreMode: Story = {
+// 매장 구분별 색상 예시
+export const StoreClassColors: Story = {
   render: () => (
     <div className="space-y-6 p-4">
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">프랜차이즈 (Orange)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">프랜차이즈 (FRANCHISE) - 주황색</h3>
         <div className="flex gap-4">
-          <StoreTypeIcon category="cafe" storeClass="franchise" size={50} />
-          <StoreTypeIcon category="food" storeClass="franchise" size={50} />
-          <StoreTypeIcon category="shopping" storeClass="franchise" size={50} />
+          <StoreTypeIcon category="CAFE" storeClass="FRANCHISE" event="NONE" size={50} />
+          <StoreTypeIcon category="FOOD" storeClass="FRANCHISE" event="NONE" size={50} />
+          <StoreTypeIcon category="SHOPPING" storeClass="FRANCHISE" event="NONE" size={50} />
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-blue-500">소상공인 (Blue)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">기본 (BASIC) - 주황색</h3>
         <div className="flex gap-4">
-          <StoreTypeIcon category="cafe" storeClass="small-business" size={50} />
-          <StoreTypeIcon category="food" storeClass="small-business" size={50} />
-          <StoreTypeIcon category="shopping" storeClass="small-business" size={50} />
+          <StoreTypeIcon category="CAFE" storeClass="BASIC" event="NONE" size={50} />
+          <StoreTypeIcon category="FOOD" storeClass="BASIC" event="NONE" size={50} />
+          <StoreTypeIcon category="SHOPPING" storeClass="BASIC" event="NONE" size={50} />
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-primary">이벤트 (Pink)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-blue-500">소상공인 (LOCAL) - 파란색</h3>
         <div className="flex gap-4">
-          <StoreTypeIcon category="cafe" storeClass="event" size={50} />
-          <StoreTypeIcon category="food" storeClass="event" size={50} />
-          <StoreTypeIcon category="shopping" storeClass="event" size={50} />
+          <StoreTypeIcon category="CAFE" storeClass="LOCAL" event="NONE" size={50} />
+          <StoreTypeIcon category="FOOD" storeClass="LOCAL" event="NONE" size={50} />
+          <StoreTypeIcon category="SHOPPING" storeClass="LOCAL" event="NONE" size={50} />
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">팝업스토어 카테고리 - Store 아이콘</h3>
+        <div className="flex gap-4">
+          <StoreTypeIcon category="POPUP" storeClass="FRANCHISE" event="NONE" size={50} />
+          <StoreTypeIcon category="POPUP" storeClass="BASIC" event="NONE" size={50} />
+          <StoreTypeIcon category="POPUP" storeClass="LOCAL" event="NONE" size={50} />
+        </div>
+        <p className="text-sm text-gray-600 mt-2">팝업스토어는 카테고리로 분류되어 Store 아이콘 사용</p>
+      </div>
+    </div>
+  ),
+};
+
+// 전체 카테고리 아이콘 미리보기
+export const AllCategories: Story = {
+  render: () => (
+    <div className="space-y-6 p-4">
+      <h3 className="text-lg font-semibold mb-4">전체 카테고리 아이콘 (팝업 포함)</h3>
+      <div className="grid grid-cols-5 gap-6">
+        <div className="text-center">
+          <StoreTypeIcon category="CAFE" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">CAFE</p>
+          <p className="text-xs text-gray-500">카페</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="FOOD" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">FOOD</p>
+          <p className="text-xs text-gray-500">푸드</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="SHOPPING" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">SHOPPING</p>
+          <p className="text-xs text-gray-500">쇼핑</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="EDUCATION" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">EDUCATION</p>
+          <p className="text-xs text-gray-500">교육</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="CULTURE" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">CULTURE</p>
+          <p className="text-xs text-gray-500">문화/여가</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="BAKERY" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">BAKERY</p>
+          <p className="text-xs text-gray-500">베이커리</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="BEAUTY" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">BEAUTY</p>
+          <p className="text-xs text-gray-500">뷰티/건강</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="LIFE" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">LIFE</p>
+          <p className="text-xs text-gray-500">생활/편의</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="ACTIVITY" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">ACTIVITY</p>
+          <p className="text-xs text-gray-500">액티비티</p>
+        </div>
+        <div className="text-center">
+          <StoreTypeIcon category="POPUP" storeClass="FRANCHISE" size={60} />
+          <p className="text-sm mt-2 font-medium">POPUP</p>
+          <p className="text-xs text-gray-500">팝업스토어</p>
         </div>
       </div>
     </div>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story: '매장 모드에서 storeClass에 따른 색상 변화를 보여주는 예시입니다.',
-      },
-    },
-  },
 };
 
 // 통계 모드 - 카테고리별 색상
@@ -147,24 +221,25 @@ export const StatisticsMode: Story = {
       <div className="grid grid-cols-5 gap-4">
         {(
           [
-            'cafe',
-            'food',
-            'shopping',
-            'education',
-            'culture',
-            'bakery',
-            'beauty',
-            'convenience',
-            'activity',
-            'popup',
+            'CAFE',
+            'FOOD',
+            'SHOPPING',
+            'EDUCATION',
+            'CULTURE',
+            'BAKERY',
+            'BEAUTY',
+            'LIFE',
+            'ACTIVITY',
+            'POPUP',
           ] as const
         ).map((category) => (
           <div key={category} className="text-center">
-            <StoreTypeIcon category={category} storeClass="franchise" size={50} mode="statistics" />
-            <p className="text-sm mt-2 capitalize">{category}</p>
+            <StoreTypeIcon category={category} storeClass="FRANCHISE" size={50} mode="statistics" />
+            <p className="text-sm mt-2">{category}</p>
           </div>
         ))}
       </div>
+      <p className="text-sm text-gray-600">통계 모드에서는 이벤트나 매장 구분과 관계없이 카테고리별 고유 색상을 사용합니다.</p>
     </div>
   ),
   parameters: {
@@ -183,18 +258,18 @@ export const ShapeComparison: Story = {
       <div>
         <h3 className="text-lg font-semibold mb-4">네모 모양 (Square)</h3>
         <div className="flex gap-4">
-          <StoreTypeIcon category="cafe" storeClass="franchise" size={50} shape="square" />
-          <StoreTypeIcon category="food" storeClass="small-business" size={50} shape="square" />
-          <StoreTypeIcon category="shopping" storeClass="event" size={50} shape="square" />
+          <StoreTypeIcon category="CAFE" storeClass="FRANCHISE" size={50} shape="square" />
+          <StoreTypeIcon category="FOOD" storeClass="LOCAL" size={50} shape="square" />
+          <StoreTypeIcon category="POPUP" storeClass="BASIC" size={50} shape="square" />
         </div>
       </div>
 
       <div>
         <h3 className="text-lg font-semibold mb-4">원형 모양 (Circle)</h3>
         <div className="flex gap-4">
-          <StoreTypeIcon category="cafe" storeClass="franchise" size={50} shape="circle" />
-          <StoreTypeIcon category="food" storeClass="small-business" size={50} shape="circle" />
-          <StoreTypeIcon category="shopping" storeClass="event" size={50} shape="circle" />
+          <StoreTypeIcon category="CAFE" storeClass="FRANCHISE" size={50} shape="circle" />
+          <StoreTypeIcon category="FOOD" storeClass="LOCAL" size={50} shape="circle" />
+          <StoreTypeIcon category="POPUP" storeClass="BASIC" size={50} shape="circle" />
         </div>
       </div>
     </div>
@@ -203,167 +278,6 @@ export const ShapeComparison: Story = {
     docs: {
       description: {
         story: '네모 모양(square)과 원형 모양(circle)의 차이를 보여주는 예시입니다.',
-      },
-    },
-  },
-};
-
-// 통계 모드 + 원형 조합
-export const StatisticsWithCircle: Story = {
-  render: () => (
-    <div className="space-y-6 p-4">
-      <h3 className="text-lg font-semibold mb-4">통계 모드 + 원형 조합</h3>
-      <div className="grid grid-cols-5 gap-4">
-        {(
-          [
-            'cafe',
-            'food',
-            'shopping',
-            'education',
-            'culture',
-            'bakery',
-            'beauty',
-            'convenience',
-            'activity',
-            'popup',
-          ] as const
-        ).map((category) => (
-          <div key={category} className="text-center">
-            <StoreTypeIcon
-              category={category}
-              storeClass="franchise"
-              size={50}
-              mode="statistics"
-              shape="circle"
-            />
-            <p className="text-sm mt-2 capitalize">{category}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '통계 모드와 원형 모양을 조합한 예시입니다.',
-      },
-    },
-  },
-};
-
-// 실제 사용 시나리오
-export const RealWorldUsage: Story = {
-  render: () => (
-    <div className="space-y-6 p-4">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">매장 리스트 (Store Mode)</h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={40} />
-            <div>
-              <h4 className="font-semibold">스타벅스 강남점</h4>
-              <p className="text-sm text-gray-600">프랜차이즈 카페</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-            <StoreTypeIcon category="food" storeClass="small-business" size={40} />
-            <div>
-              <h4 className="font-semibold">할머니 손만두</h4>
-              <p className="text-sm text-gray-600">소상공인 음식점</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">통계 차트 (Statistics Mode)</h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-            <StoreTypeIcon
-              category="cafe"
-              storeClass="franchise"
-              size={40}
-              mode="statistics"
-              shape="circle"
-            />
-            <div>
-              <h4 className="font-semibold">카페 통계</h4>
-              <p className="text-sm text-gray-600">전체 매장의 35%</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-            <StoreTypeIcon
-              category="food"
-              storeClass="franchise"
-              size={40}
-              mode="statistics"
-              shape="circle"
-            />
-            <div>
-              <h4 className="font-semibold">음식점 통계</h4>
-              <p className="text-sm text-gray-600">전체 매장의 28%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '실제 앱에서 사용될 수 있는 매장 모드와 통계 모드의 활용 예시입니다.',
-      },
-    },
-  },
-};
-
-// 크기 비교
-export const SizeComparison: Story = {
-  render: () => (
-    <div className="space-y-6 p-4">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">네모 모양 크기 비교</h3>
-        <div className="flex items-end gap-4">
-          <div className="text-center">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={30} />
-            <p className="text-sm mt-2">30px</p>
-          </div>
-          <div className="text-center">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={50} />
-            <p className="text-sm mt-2">50px</p>
-          </div>
-          <div className="text-center">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={70} />
-            <p className="text-sm mt-2">70px</p>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">원형 모양 크기 비교</h3>
-        <div className="flex items-end gap-4">
-          <div className="text-center">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={30} shape="circle" />
-            <p className="text-sm mt-2">30px</p>
-          </div>
-          <div className="text-center">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={50} shape="circle" />
-            <p className="text-sm mt-2">50px</p>
-          </div>
-          <div className="text-center">
-            <StoreTypeIcon category="cafe" storeClass="franchise" size={70} shape="circle" />
-            <p className="text-sm mt-2">70px</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '다양한 크기와 모양의 아이콘을 비교할 수 있습니다.',
       },
     },
   },
