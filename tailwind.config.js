@@ -40,8 +40,15 @@ export default {
         xl: '2rem', // 32px
         xxl: '2.25rem', //36px
       },
-      screens: {
-        //추후결정
+      animation: {
+        'blink-pulse': 'blink-pulse 1.5s ease-in-out infinite',
+      },
+      keyframes: {
+        'blink-pulse': {
+          '0%': { opacity: '0.1' },
+          '50%': { opacity: '0.8' },
+          '100%': { opacity: '0.1' },
+        },
       },
     },
     plugins: [],
