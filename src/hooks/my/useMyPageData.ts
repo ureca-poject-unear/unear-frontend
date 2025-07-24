@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { UserProfile, MembershipBenefit, StatisticsData, ChartDataItem } from '@/types/myPage';
 import type { UsageHistoryItem } from '@/types/usageHistory';
+import useCouponCount from './useCouponCount';
 
 interface UseMyPageDataReturn {
   userProfile: UserProfile;
@@ -13,6 +14,7 @@ interface UseMyPageDataReturn {
 
 const useMyPageData = (): UseMyPageDataReturn => {
   const [isLoading, setIsLoading] = useState(false); // true로 변경하면 로딩 테스트 가능
+  const couponCount = useCouponCount();
 
   // 사용자 프로필 데이터 (실제로는 API에서 받아올 데이터)
   const userProfile: UserProfile = useMemo(
@@ -28,9 +30,9 @@ const useMyPageData = (): UseMyPageDataReturn => {
   const membershipBenefit: MembershipBenefit = useMemo(
     () => ({
       currentMonthSavings: '21,200원',
-      couponCount: 5,
+      couponCount,
     }),
-    []
+    [couponCount]
   );
 
   // 통계 차트 데이터

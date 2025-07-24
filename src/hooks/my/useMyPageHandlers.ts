@@ -19,9 +19,7 @@ const useMyPageHandlers = (): MyPageHandlers & { handleBack: () => void } => {
 
   const onCouponClick = () => {
     // 쿠폰 페이지로 이동
-    console.log('쿠폰 클릭');
-    // TODO: 쿠폰 페이지 라우팅
-    // navigate('/coupons');
+    navigate('/my/coupons');
   };
 
   const onBookmarkClick = () => {

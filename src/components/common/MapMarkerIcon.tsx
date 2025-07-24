@@ -108,15 +108,9 @@ const MapMarkerIcon: React.FC<MapMarkerIconProps> = ({
     return isSelected ? 'text-black' : 'text-white';
   };
 
-  // 그림자 효과 (필수 이벤트는 더 강한 그림자)
-  const getShadowClass = (): string => {
-    return event === 'REQUIRE' ? 'shadow-xl' : 'shadow-lg';
-  };
-
   const IconComponent = getIconComponent();
   const backgroundColorClass = getBackgroundColorClass();
   const iconColorClass = getIconColorClass();
-  const shadowClass = getShadowClass();
   const size = getSize();
 
   return (
@@ -131,7 +125,6 @@ const MapMarkerIcon: React.FC<MapMarkerIconProps> = ({
         active:scale-95
         cursor-pointer
         ${backgroundColorClass}
-        ${shadowClass}
         ${className}
       `}
       style={{
@@ -209,7 +202,7 @@ Props:
 
 색상 규칙:
 - 이벤트 우선순위:
-  * REQUIRE 이벤트: pink-400 + 더 큰 크기 + 강한 그림자
+  * REQUIRE 이벤트: pink-400 + 더 큰 크기
   * GENERAL 이벤트: 핑크색 (bg-primary) - 이벤트 매장
 - 매장 구분:
   * FRANCHISE/BASIC: 주황색 (bg-orange-500)
@@ -217,7 +210,7 @@ Props:
 
 특징:
 - StoreTypeIcon과 동일한 색상 규칙 적용
-- 필수 이벤트(REQUIRE)는 크기가 더 크고 강한 그림자
+- 필수 이벤트(REQUIRE)는 크기가 더 큼
 - 팝업스토어는 카테고리로 분류되어 Store 아이콘 사용
 - 부드러운 애니메이션 효과 (300ms 전환)
 - 호버 및 클릭 피드백 효과
