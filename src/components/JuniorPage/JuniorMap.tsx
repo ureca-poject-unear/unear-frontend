@@ -1,5 +1,5 @@
 import React from 'react';
-import MapContainer from '@/components/map/MapContainer';
+import MapContainer from '@/components/JuniorPage/MapContainer';
 
 const JuniorMap = () => {
   return (

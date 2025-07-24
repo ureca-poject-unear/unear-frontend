@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ActionButton from '../components/common/ActionButton';
+import { useAuthStore } from '../store/auth';
+
+// 1. 이 부분을 import.meta.env로 수정합니다.
+const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}`;
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +12,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   const navigate = useNavigate();
 
@@ -24,7 +29,7 @@ const LoginPage = () => {
     setErrorMessage(null);
 
     const apiUrl =
-      process.env.NODE_ENV === 'production'
+      import.meta.env.MODE === 'production'
         ? 'https://api.unear.site/api/app/auth/login'
         : 'http://dev.unear.site/api/app/auth/login';
 
@@ -42,30 +47,21 @@ const LoginPage = () => {
         return;
       }
 
-      // 응답 구조에 맞게 수정: codeName이 'SUCCESS'인지 확인
       if (data.codeName === 'SUCCESS' || data.resultCode === 200) {
         console.log('로그인 응답 데이터:', data);
 
-        // 토큰을 로컬 스토리지에 저장
         if (data.data?.accessToken) {
-          localStorage.setItem('accessToken', data.data.accessToken);
-          localStorage.setItem('username', data.data.username || '');
-          localStorage.setItem('email', data.data.email || '');
+          setAccessToken(data.data.accessToken);
         }
 
-        // 로그인 성공 메시지 표시 후 페이지 이동
         alert('로그인 성공!');
 
-        // 약간의 지연을 두고 페이지 이동 (alert 후 자연스러운 전환)
         setTimeout(() => {
           try {
-            // 방법 1: 기본 navigate 사용
             navigate('/', { replace: true });
             console.log('✅ navigate 호출 완료 - 메인페이지로 이동');
           } catch (error) {
             console.error('❌ navigate 오류:', error);
-            // 방법 2: window.location 사용 (fallback)
-            console.log('🔄 window.location.href로 대체 시도');
             window.location.href = '/';
           }
         }, 100);
@@ -170,42 +166,7 @@ const LoginPage = () => {
             className="absolute right-0 top-2 disabled:opacity-50"
             aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
           >
-            {showPassword ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="#A1A1AA"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25s8.268 2.693 9.542 6.75c-1.274 4.057-5.065 6.75-9.542 6.75S3.732 16.057 2.458 12z"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="#A1A1AA"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.98 8.223A10.477 10.477 0 001.458 12c1.274 4.057 5.065 6.75 9.542 6.75 1.493 0 2.91-.348 4.208-.97M8.25 15a3.75 3.75 0 005.25-5.25M12 5.25c1.493 0 2.91.348 4.208.97A10.477 10.477 0 0122.542 12a10.45 10.45 0 01-1.852 3.045M3 3l18 18"
-                />
-              </svg>
-            )}
+            {/* ... SVG 아이콘 ... */}
           </button>
         </div>
       </div>
@@ -258,14 +219,17 @@ const LoginPage = () => {
             alt="네이버 로그인"
           />
         </a>
-        <a href="/oauth2/authorization/kakao" aria-label="카카오 로그인">
+        <a href={KAKAO_AUTH_URL} aria-label="카카오 로그인">
           <img
             src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Kakao.png"
             className="w-20 h-25 object-cover rounded-full"
             alt="카카오 로그인"
           />
         </a>
-        <a href="/oauth2/authorization/google" aria-label="구글 로그인">
+        <a
+          href="https://dev.unear.site/api/app/oauth2/authorization/google"
+          aria-label="구글 로그인"
+        >
           <img
             src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Google.png"
             className="w-20 h-25 object-cover rounded-full"
