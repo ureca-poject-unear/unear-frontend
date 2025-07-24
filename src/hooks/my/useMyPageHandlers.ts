@@ -26,9 +26,7 @@ const useMyPageHandlers = (): MyPageHandlers & { handleBack: () => void } => {
 
   const onBookmarkClick = () => {
     // 즐겨찾기 페이지로 이동
-    console.log('즐겨찾기 클릭');
-    // TODO: 즐겨찾기 페이지 라우팅
-    // navigate('/bookmarks');
+    navigate('/my/bookmarks');
   };
 
   const onStatisticsDetail = () => {

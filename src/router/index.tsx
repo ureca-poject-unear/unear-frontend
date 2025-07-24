@@ -11,6 +11,7 @@ import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
 import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
 import UsageHistoryPage from '@/pages/UsageHistoryPage';
+import BookmarkPage from '@/pages/BookmarkPage';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: '/my', element: <MyPage /> },
       { path: '/my/statistics', element: <StatisticsDetailPage /> },
       { path: '/my/usage-history', element: <UsageHistoryPage /> },
+      { path: '/my/bookmarks', element: <BookmarkPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
     ],
