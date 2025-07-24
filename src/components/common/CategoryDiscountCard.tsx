@@ -25,7 +25,7 @@ const CategoryDiscountCard: React.FC<CategoryDiscountCardProps> = ({
     <div
       className={`
         relative
-        w-[353px]
+        w-full
         h-[69px]
         bg-white
         ${className}
@@ -66,8 +66,8 @@ export default CategoryDiscountCard;
 [Props 정보]
 
 - category: 카테고리 코드 문자열 (CategoryType)
-  └ 'cafe' | 'food' | 'shopping' | 'education' | 'culture' | 'bakery'
-    | 'beauty' | 'convenience' | 'activity' | 'popup'
+  └ 'FOOD' | 'ACTIVITY' | 'EDUCATION' | 'CULTURE' | 'BAKERY' | 'LIFE'
+    | 'SHOPPING' | 'CAFE' | 'BEAUTY' | 'POPUP'
 
 categoryName: 사용자에게 보여줄 카테고리 이름 (string)
 discountPercentage: 할인율 (숫자, 예: 35 → "35%")
@@ -76,14 +76,14 @@ className: 추가 스타일 클래스 (선택)
 
 - 사용법
 <CategoryDiscountCard
-  category="food"
+  category="FOOD"
   categoryName="외식"
   discountPercentage={42}
   discountAmount={8904}
 />
 
 <CategoryDiscountCard
-  category="shopping"
+  category="SHOPPING"
   categoryName="쇼핑"
   discountPercentage={28}
   discountAmount={15600}

@@ -10,14 +10,14 @@ type LocationButtonProps = {
 const LocationButton: React.FC<LocationButtonProps> = ({ onClick }) => {
   return (
     <button
-      className="group w-[169px] h-[46px] relative flex items-center justify-center bg-white 
-                 hover:bg-pink-50 transition-colors duration-200 rounded-lg" // 배경색을 흰색으로 설정하고 호버 시 pink-50으로 변경
+      className="group w-full max-w-[146px] h-[46px] relative flex items-center justify-center bg-white 
+                 hover:bg-pink-50 transition-colors duration-200 rounded-lg"
       onClick={onClick}
     >
       {/* 버튼 외곽 박스 */}
       <div
-        className="w-[169px] h-[46px] absolute left-0 top-0 rounded-lg border border-primary
-                   group-hover:border-pink-600 transition-colors duration-200" // 호버 시 테두리 색상 변경
+        className="w-full h-[46px] absolute left-0 top-0 rounded-lg border border-primary
+                   group-hover:border-pink-600 transition-colors duration-200"
       />
 
       {/* 내부 콘텐츠: SVG 아이콘과 텍스트 */}

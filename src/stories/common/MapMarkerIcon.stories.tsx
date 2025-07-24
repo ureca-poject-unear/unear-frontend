@@ -94,7 +94,9 @@ export const StoreClassColors: Story = {
   render: () => (
     <div className="space-y-6 p-4">
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">프랜차이즈 (FRANCHISE) - 주황색</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">
+          프랜차이즈 (FRANCHISE) - 주황색
+        </h3>
         <div className="flex gap-4">
           <MapMarkerIcon category="CAFE" storeClass="FRANCHISE" event="NONE" />
           <MapMarkerIcon category="FOOD" storeClass="FRANCHISE" event="NONE" />
@@ -103,7 +105,9 @@ export const StoreClassColors: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">기본 (BASIC) - 주황색 (프랜차이즈와 동일)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">
+          기본 (BASIC) - 주황색 (프랜차이즈와 동일)
+        </h3>
         <div className="flex gap-4">
           <MapMarkerIcon category="CAFE" storeClass="BASIC" event="NONE" />
           <MapMarkerIcon category="FOOD" storeClass="BASIC" event="NONE" />
@@ -121,13 +125,17 @@ export const StoreClassColors: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">팝업스토어 카테고리 - Store 아이콘</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">
+          팝업스토어 카테고리 - Store 아이콘
+        </h3>
         <div className="flex gap-4">
           <MapMarkerIcon category="POPUP" storeClass="FRANCHISE" event="NONE" />
           <MapMarkerIcon category="POPUP" storeClass="BASIC" event="NONE" />
           <MapMarkerIcon category="POPUP" storeClass="LOCAL" event="NONE" />
         </div>
-        <p className="text-sm text-gray-600 mt-2">팝업스토어는 카테고리로 분류되어 Store 아이콘 사용</p>
+        <p className="text-sm text-gray-600 mt-2">
+          팝업스토어는 카테고리로 분류되어 Store 아이콘 사용
+        </p>
       </div>
     </div>
   ),
