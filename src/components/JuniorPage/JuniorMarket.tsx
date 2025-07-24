@@ -47,7 +47,7 @@ const JuniorMarket = () => {
           expiryDate: '2025.08.16',
         },
       ],
-      event: 'GENERAL',
+      event: 'REQUIRE',
     },
     {
       id: 'store2',
@@ -59,7 +59,7 @@ const JuniorMarket = () => {
       status: '영업중',
       isBookmarked: true,
       coupons: [],
-      event: 'REQUIRE',
+      event: 'GENERAL',
     },
     {
       id: 'store3',
@@ -77,7 +77,7 @@ const JuniorMarket = () => {
           expiryDate: '2025.09.01',
         },
       ],
-      event: 'REQUIRE',
+      event: 'GENERAL',
     },
     {
       id: 'store4',
@@ -89,7 +89,7 @@ const JuniorMarket = () => {
       status: '영업중',
       isBookmarked: false,
       coupons: [],
-      event: 'REQUIRE',
+      event: 'GENERAL',
     },
   ];
 
