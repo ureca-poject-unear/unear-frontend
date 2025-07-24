@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
 
 //토근 전역 상태관리 전까지 테스트용도
 axiosInstance.interceptors.request.use((config) => {
-  const token = 'token값';
+  const token = 'TOKEN값';
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
