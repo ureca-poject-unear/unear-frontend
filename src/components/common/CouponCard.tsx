@@ -52,7 +52,7 @@ const CouponCard = ({
           <p className="text-sm font-semibold text-black">{title}</p>
 
           {/* 유효기한 */}
-          <p className="text-s font-semibold text-gray-400">{validUntil}까지</p>
+          <p className="text-sm font-regular text-gray-400">{validUntil}까지</p>
         </div>
       </div>
     </div>

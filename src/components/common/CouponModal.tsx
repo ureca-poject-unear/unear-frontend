@@ -42,7 +42,7 @@ const CouponModal = ({
             <p className="text-sm font-regular px-[27px]">{brand}</p>
             <h2 className="text-lm font-semibold mt-1 px-6">{title}</h2>
             <p className="text-lg font-bold mt-2 text-center">{discountRate}</p>
-            <p className="text-lm font-semibold text-gray-400 mt-1 text-center">{expireDate}까지</p>
+            <p className="text-lm font-regular text-gray-400 mt-1 text-center">{expireDate}까지</p>
           </div>
 
           {/* 안내 텍스트 */}

@@ -80,7 +80,7 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
         <div>
           <h4 className="text-sm font-semibold text-black mb-2">카테고리</h4>
           <div
-            className="flex overflow-x-auto pl-0.5 gap-3 py-1 scrollbar-hide"
+            className="flex overflow-x-auto pl-0.5 gap-3 py-1"
             style={{ maxWidth: '100%', WebkitOverflowScrolling: 'touch' }}
           >
             {categoryOptions.map((option) => (
@@ -99,7 +99,7 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
         <div>
           <h4 className="text-sm font-semibold text-black mb-2">날짜</h4>
           <div
-            className="flex overflow-x-auto pl-0.5 gap-3 py-1 scrollbar-hide"
+            className="flex overflow-x-auto pl-0.5 gap-3 py-1"
             style={{ maxWidth: '100%', WebkitOverflowScrolling: 'touch' }}
           >
             {periodOptions.map((option) => (
