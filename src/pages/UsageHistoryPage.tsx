@@ -4,7 +4,7 @@ import LoadingScreen from '@/components/common/LoadingScreen';
 import UsageHistoryStats from '@/components/my/usagehistory/UsageHistoryStats';
 import UsageHistoryList from '@/components/my/usagehistory/UsageHistoryList';
 import UsageHistoryFilter from '@/components/my/usagehistory/UsageHistoryFilter';
-import { useUsageHistory } from '@/hooks/usagehistory/useUsageHistory';
+import { useUsageHistory } from '@/hooks/my';
 import type { UsageHistoryItem } from '@/types/usageHistory';
 
 const dummyData: UsageHistoryItem[] = [
