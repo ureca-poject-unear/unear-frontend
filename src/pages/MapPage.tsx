@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { MapContainerRef } from '@/components/map/MapContainer';
 import MapContainer from '@/components/map/MapContainer';
 import SearchBar from '@/components/common/SearchBar';
@@ -11,12 +11,42 @@ import BottomSheetFilter from '@/components/map/BottomSheetFilter';
 import BottomSheetCoupon from '@/components/map/BottomSheetCoupon';
 
 const MapPage = () => {
-  const [isBookmarkOnly, setIsBookmarkOnly] = useState(false);
+  const [isBookmarkOnly, setIsBookmarkOnly] = useState<boolean>(() => {
+    const stored = localStorage.getItem('isBookmarkOnly');
+    return stored ? JSON.parse(stored) : false;
+  });
+  const [categoryCode, setCategoryCode] = useState<string | null>(() => {
+    return localStorage.getItem('categoryCode');
+  });
+  const [benefitCategory, setBenefitCategory] = useState<string | null>(() => {
+    return localStorage.getItem('benefitCategory');
+  });
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const mapRef = useRef<MapContainerRef>(null);
+
+  useEffect(() => {
+    localStorage.setItem('isBookmarkOnly', JSON.stringify(isBookmarkOnly));
+  }, [isBookmarkOnly]);
+
+  useEffect(() => {
+    if (categoryCode) {
+      localStorage.setItem('categoryCode', categoryCode);
+    } else {
+      localStorage.removeItem('categoryCode');
+    }
+  }, [categoryCode]);
+
+  useEffect(() => {
+    if (benefitCategory) {
+      localStorage.setItem('benefitCategory', benefitCategory);
+    } else {
+      localStorage.removeItem('benefitCategory');
+    }
+  }, [benefitCategory]);
 
   const handleCurrentLocation = () => {
     mapRef.current?.showCurrentLocation();
@@ -25,7 +55,13 @@ const MapPage = () => {
   return (
     <div className="relative w-full h-[calc(100vh-65px)] bg-white">
       {/* 지도 영역 */}
-      <MapContainer ref={mapRef} />
+      <MapContainer
+        ref={mapRef}
+        isBookmarkOnly={isBookmarkOnly}
+        categoryCode={categoryCode}
+        benefitCategory={benefitCategory}
+        shouldRestoreLocation={false}
+      />
 
       {/* 상단 검색바 */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
@@ -46,6 +82,8 @@ const MapPage = () => {
         onToggleFilter={() => setIsFilterOpen(true)}
         onToggleBookmark={() => setIsBookmarkOnly((prev) => !prev)}
         isBookmarkOnly={isBookmarkOnly}
+        categoryCode={categoryCode}
+        benefitCategory={benefitCategory}
       />
       <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
       <BottomSheetCoupon isOpen={isCouponOpen} onClose={() => setIsCouponOpen(false)} />
@@ -56,7 +94,16 @@ const MapPage = () => {
         isOpen={isBarcodeOpen}
         onClose={() => setIsBarcodeOpen(false)}
       />
-      <BottomSheetFilter isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      <BottomSheetFilter
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={(category, benefit) => {
+          setCategoryCode(category);
+          setBenefitCategory(benefit);
+        }}
+        selectedCategoryCode={categoryCode}
+        selectedBenefitCategory={benefitCategory}
+      />
     </div>
   );
 };
