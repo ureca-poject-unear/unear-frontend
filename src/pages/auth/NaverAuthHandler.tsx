@@ -18,7 +18,7 @@ const NaverAuthHandler = () => {
     // 백엔드에 Naver code 전달하여 토큰 받아오기
     const sendCodeToServer = async () => {
       try {
-        const response = await fetch('http://dev.unear.site/api/auth/naver', {
+        const response = await fetch('https://dev.unear.site/api/auth/naver', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -27,8 +27,8 @@ const KakaoRedirectHandler: React.FC = () => {
       // 이 URL은 백엔드에서 카카오 로그인을 처리하도록 구현한 API 엔드포인트여야 합니다.
       const apiUrl =
         import.meta.env.MODE === 'production'
-          ? 'https://api.unear.site/api/app/auth/kakao/login' // 백엔드의 카카오 로그인 처리 API
-          : 'http://dev.unear.site/api/app/auth/kakao/login'; // 백엔드의 카카오 로그인 처리 API
+          ? 'http://dev.unear.site/login/oauth2/code/kakao' // 백엔드의 카카오 로그인 처리 API
+          : 'http://dev.unear.site/login/oauth2/code/kakao'; // 백엔드의 카카오 로그인 처리 API
 
       try {
         const response = await fetch(apiUrl, {

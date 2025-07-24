@@ -12,9 +12,10 @@ type Stamp = {
 type Props = {
   stamps: Stamp[]; // 최대 4개
   onRouletteClick: () => void;
+  hasAlreadySpun: boolean; // 사용자가 이미 룰렛을 돌렸는지 여부
 };
 
-const StampRoulette: React.FC<Props> = ({ stamps, onRouletteClick }) => {
+const StampRouletteCard: React.FC<Props> = ({ stamps, onRouletteClick, hasAlreadySpun }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const displayStamps: Stamp[] = [...stamps];
 
@@ -23,12 +24,19 @@ const StampRoulette: React.FC<Props> = ({ stamps, onRouletteClick }) => {
     displayStamps.push({ name: '-', isStamped: false });
   }
 
-  // 버튼 활성화 여부: 4개가 다 찍혀 있어야 true
+  // 모든 스탬프가 찍혔는지 여부
   const isAllStamped = displayStamps.every((stamp) => stamp.isStamped);
+
+  // [수정] 버튼 활성화 조건: 모든 스탬프가 찍혀있고, 아직 룰렛을 돌리지 않았어야 함
+  const isButtonActive = isAllStamped && !hasAlreadySpun;
+
+  // [수정] 룰렛 참여 여부에 따라 버튼 텍스트 변경
+  const buttonText = hasAlreadySpun ? '참여 완료' : '룰렛 돌리기';
 
   // 룰렛 버튼 클릭 시 모달 열기
   const handleRouletteClick = () => {
-    if (isAllStamped) {
+    // 활성화 상태일 때만 모달 열기 및 콜백 함수 실행
+    if (isButtonActive) {
       setIsModalOpen(true);
       onRouletteClick();
     }
@@ -162,7 +170,8 @@ const StampRoulette: React.FC<Props> = ({ stamps, onRouletteClick }) => {
 
         {/* 버튼 */}
         <div className="flex justify-center mt-0">
-          <MiniButton text="룰렛 돌리기" onClick={handleRouletteClick} isActive={isAllStamped} />
+          {/* [수정] 버튼 텍스트와 활성화 상태를 새로운 변수로 제어 */}
+          <MiniButton text={buttonText} onClick={handleRouletteClick} isActive={isButtonActive} />
         </div>
       </div>
 
@@ -174,4 +183,4 @@ const StampRoulette: React.FC<Props> = ({ stamps, onRouletteClick }) => {
   );
 };
 
-export default StampRoulette;
+export default StampRouletteCard;

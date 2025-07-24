@@ -3,14 +3,14 @@ import Header from '../components/common/Header'; // 실제 경로에 맞게 수
 import ToggleButton from '../components/common/ToggleButton'; // 실제 경로에 맞게 수정해주세요.
 
 // --- 1. 타입 정의 ---
-// /me API 응답으로 기대하는 사용자 정보 타입
+// /me API 응답으로 기대하는 사용자 정보 타입 (이름 제외)
 interface UserInfo {
   email: string;
-  name: string;
 }
 
-// 추가로 입력받을 폼 데이터 타입
+// 추가로 입력받을 폼 데이터 타입 (이름 추가)
 interface ProfileForm {
+  name: string; // 이름 필드 추가
   password: string;
   confirmPassword: string;
   gender: '남자' | '여자';
@@ -32,8 +32,9 @@ interface MeApiResponse {
 
 const CompleteProfilePage: React.FC = () => {
   // --- 2. 상태(State) 정의 ---
-  const [user, setUser] = useState<UserInfo>({ email: '', name: '' });
+  const [user, setUser] = useState<UserInfo>({ email: '' }); // name 제거
   const [form, setForm] = useState<ProfileForm>({
+    name: '', // name 초기값 추가
     password: '',
     confirmPassword: '',
     gender: '남자', // 기본값
@@ -49,7 +50,7 @@ const CompleteProfilePage: React.FC = () => {
   // --- 3. 데이터 로딩 및 검증 ---
   useEffect(() => {
     const fetchAndVerifyUser = async () => {
-      const accessToken = localStorage.getItem('accessToken'); // 토큰 저장 위치에 따라 변경
+      const accessToken = localStorage.getItem('accessToken');
 
       if (!accessToken) {
         alert('잘못된 접근입니다. 다시 로그인해주세요.');
@@ -58,7 +59,7 @@ const CompleteProfilePage: React.FC = () => {
       }
 
       try {
-        const response = await fetch('http://dev.unear.site/api/app/me', {
+        const response = await fetch('https://dev.unear.site/api/app/me', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -68,14 +69,15 @@ const CompleteProfilePage: React.FC = () => {
 
         const result = (await response.json()) as MeApiResponse;
 
-        // 이미 추가 정보를 입력한 경우 홈으로 보냅니다.
         if (result.data.isProfileComplete) {
           alert('이미 모든 정보를 입력하셨습니다. 홈으로 이동합니다.');
           window.location.href = '/';
           return;
         }
 
-        setUser({ email: result.data.email, name: result.data.username });
+        // user 상태에는 email만 설정하고, form의 name 초기값으로 백엔드에서 받은 username을 설정
+        setUser({ email: result.data.email });
+        setForm((prev) => ({ ...prev, name: result.data.username }));
       } catch (error) {
         console.error('API Error:', error);
         alert('오류가 발생했습니다. 다시 로그인해주세요.');
@@ -91,7 +93,6 @@ const CompleteProfilePage: React.FC = () => {
     const { value } = e.target;
     setForm((prev) => {
       const newForm = { ...prev, [field]: value };
-      // 비밀번호 일치 여부를 실시간으로 확인
       if (newForm.password && newForm.confirmPassword) {
         setPasswordMismatch(newForm.password !== newForm.confirmPassword);
       } else {
@@ -106,13 +107,12 @@ const CompleteProfilePage: React.FC = () => {
       const year = birthString.substring(0, 4);
       const month = birthString.substring(4, 6);
       const day = birthString.substring(6, 8);
-      return `${year}-${month}-${day}T00:00:00`; // 백엔드 요구 포맷
+      return `${year}-${month}-${day}T00:00:00`;
     }
     return birthString;
   };
 
   const handleSubmit = async () => {
-    // 최종 제출 전 유효성 검사
     if (passwordMismatch) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
@@ -121,19 +121,23 @@ const CompleteProfilePage: React.FC = () => {
       alert('생년월일을 8자리로 입력해주세요.');
       return;
     }
+    if (form.name.trim() === '') {
+      alert('이름을 입력해주세요.');
+      return;
+    }
 
     setIsLoading(true);
     const accessToken = localStorage.getItem('accessToken');
 
     try {
-      // 백엔드와 협의된 PATCH API 엔드포인트
-      const response = await fetch('http://dev.unear.site/api/app/users/me/complete-profile', {
+      const response = await fetch('https://dev.unear.site/api/app/users/me/complete-profile', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
+          username: form.name, // 수정된 이름(username) 전송
           password: form.password,
           tel: form.phone,
           birthdate: formatBirthdate(form.birth),
@@ -143,7 +147,7 @@ const CompleteProfilePage: React.FC = () => {
 
       if (response.ok) {
         alert('추가 정보 입력이 완료되었습니다! 서비스를 시작합니다.');
-        window.location.href = '/'; // 정보 입력 완료 후 이동할 메인 페이지
+        window.location.href = '/';
       } else {
         const errorResult = await response.json();
         alert(errorResult.message || '정보 업데이트에 실패했습니다. 다시 시도해주세요.');
@@ -156,8 +160,8 @@ const CompleteProfilePage: React.FC = () => {
     }
   };
 
-  // 모든 필수 필드가 채워졌는지 확인하는 변수
   const isFormValid =
+    form.name.trim() !== '' && // 이름 필드 유효성 검사 추가
     form.birth.trim() !== '' &&
     form.phone.trim() !== '' &&
     form.password.trim() !== '' &&
@@ -170,12 +174,16 @@ const CompleteProfilePage: React.FC = () => {
       <Header title="추가 정보 입력" />
       <div className="mt-[25px]">
         <div className="px-5 flex flex-col gap-6">
-          {/* 이름 (수정 불가) */}
+          {/* 이름 (수정 가능) */}
           <div>
             <label className="text-lm font-bold text-black">이름</label>
-            <div className="w-full h-10 pt-2 border-b border-zinc-300 text-zinc-500 bg-zinc-100 rounded px-2">
-              {user.name}
-            </div>
+            <input
+              type="text"
+              placeholder="이름을 입력해주세요"
+              value={form.name}
+              onChange={handleChange('name')}
+              className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent"
+            />
           </div>
 
           {/* 이메일 (수정 불가) */}

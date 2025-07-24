@@ -31,7 +31,7 @@ const LoginPage = () => {
     const apiUrl =
       import.meta.env.MODE === 'production'
         ? 'https://api.unear.site/api/app/auth/login'
-        : 'http://dev.unear.site/api/app/auth/login';
+        : 'https://dev.unear.site/api/app/auth/login';
 
     try {
       const response = await fetch(apiUrl, {

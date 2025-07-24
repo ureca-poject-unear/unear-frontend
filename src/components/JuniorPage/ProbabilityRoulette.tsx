@@ -143,7 +143,7 @@ const ProbabilityRoulette = () => {
       {/* 결과 표시 */}
       {showResult && result && (
         <div className="p-1 bg-white text-black rounded-xl shadow-xl animate-bounce max-w-sm w-full text-center">
-          <p className="text-xl font-bold text-primary mb-2">
+          <p className="text-lg font-bold text-primary mb-2">
             {result.prizeName.split('\n').map((line: string, i: number) => (
               <span key={i} className="block">
                 {line}
