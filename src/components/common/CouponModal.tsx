@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import BarcodeDisplay from '@/components/common/BarcodeDisplay';
+import { formatDateToKorean } from '@/utils/formatDate';
 
 interface CouponModalProps {
   brand: string;
@@ -42,7 +43,9 @@ const CouponModal = ({
             <p className="text-sm font-regular px-[27px]">{brand}</p>
             <h2 className="text-lm font-semibold mt-1 px-6">{title}</h2>
             <p className="text-lg font-bold mt-2 text-center">{discountRate}</p>
-            <p className="text-lm font-semibold text-gray-400 mt-1 text-center">{expireDate}까지</p>
+            <p className="text-lm font-semibold text-gray-400 mt-1 text-center">
+              {formatDateToKorean(expireDate)}까지
+            </p>
           </div>
 
           {/* 안내 텍스트 */}
@@ -54,7 +57,7 @@ const CouponModal = ({
           <div className="flex justify-center mt-2">
             <BarcodeDisplay
               height={80}
-              width={2}
+              width={1}
               code={barcodeValue}
               format="CODE128"
               textMargin={6}
