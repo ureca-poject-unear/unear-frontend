@@ -13,7 +13,7 @@ const meta: Meta<typeof MapMarkerIcon> = {
       },
       description: {
         component:
-          'U:NEAR 프로젝트에서 사용하는 지도 마커 아이콘 컴포넌트입니다. 매장 구분에 따른 색상과 일반/필수 매장에 따른 크기 차이를 지원하며, 선택 상태에 따른 시각적 피드백을 제공합니다.',
+          'U:NEAR 프로젝트에서 사용하는 지도 마커 아이콘 컴포넌트입니다. 백엔드 API 스펙에 맞춰 설계되었으며, 매장 구분과 이벤트에 따른 색상과 크기 차이를 지원합니다.',
       },
     },
   },
@@ -22,38 +22,39 @@ const meta: Meta<typeof MapMarkerIcon> = {
     category: {
       control: 'select',
       options: [
-        'cafe',
-        'food',
-        'shopping',
-        'education',
-        'culture',
-        'bakery',
-        'beauty',
-        'convenience',
-        'activity',
-        'popup',
+        'FOOD',
+        'ACTIVITY',
+        'EDUCATION',
+        'CULTURE',
+        'BAKERY',
+        'LIFE',
+        'SHOPPING',
+        'CAFE',
+        'BEAUTY',
+        'POPUP',
       ],
-      description: '매장 카테고리 타입',
+      description: '매장 카테고리 타입 (백엔드 PLACE_CATEGORY)',
       table: {
         type: { summary: 'CategoryType' },
-        defaultValue: { summary: 'cafe' },
+        defaultValue: { summary: 'CAFE' },
       },
     },
     storeClass: {
       control: 'select',
-      options: ['franchise', 'small-business', 'event'],
-      description: '매장 구분 타입 (배경 색상 결정)',
+      options: ['LOCAL', 'FRANCHISE', 'BASIC'],
+      description: '매장 구분 타입 (백엔드 PLACE_TYPE)',
       table: {
         type: { summary: 'StoreClassType' },
-        defaultValue: { summary: 'franchise' },
+        defaultValue: { summary: 'FRANCHISE' },
       },
     },
-    isEssential: {
-      control: 'boolean',
-      description: '필수 매장 여부 (크기와 색상에 영향)',
+    event: {
+      control: 'select',
+      options: ['NONE', 'GENERAL', 'REQUIRE'],
+      description: '이벤트 타입 (백엔드 EVENT_TYPE)',
       table: {
-        type: { summary: 'boolean' },
-        defaultValue: { summary: 'false' },
+        type: { summary: 'EventType' },
+        defaultValue: { summary: 'NONE' },
       },
     },
     isSelected: {
@@ -81,100 +82,59 @@ type Story = StoryObj<typeof meta>;
 // 기본 스토리
 export const Default: Story = {
   args: {
-    category: 'cafe',
-    storeClass: 'franchise',
-    isEssential: false,
+    category: 'CAFE',
+    storeClass: 'FRANCHISE',
+    event: 'NONE',
     isSelected: false,
   },
 };
 
-// 선택된 상태
-export const Selected: Story = {
-  args: {
-    category: 'cafe',
-    storeClass: 'franchise',
-    isEssential: false,
-    isSelected: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '선택된 상태의 마커입니다. 크기가 커지고 아이콘 색상이 검정색으로 변합니다.',
-      },
-    },
-  },
-};
-
-// 필수 매장
-export const Essential: Story = {
-  args: {
-    category: 'food',
-    storeClass: 'small-business',
-    isEssential: true,
-    isSelected: false,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '필수 매장 마커입니다. 일반 마커보다 크기가 크고 핑크색 배경을 가집니다.',
-      },
-    },
-  },
-};
-
-// 선택된 필수 매장
-export const EssentialSelected: Story = {
-  args: {
-    category: 'beauty',
-    storeClass: 'event',
-    isEssential: true,
-    isSelected: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '선택된 필수 매장 마커입니다. 가장 큰 크기를 가집니다.',
-      },
-    },
-  },
-};
-
-// 매장 구분별 색상
+// 매장 구분별 색상 (이벤트 없는 상태)
 export const StoreClassColors: Story = {
   render: () => (
     <div className="space-y-6 p-4">
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">프랜차이즈 (Orange)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">프랜차이즈 (FRANCHISE) - 주황색</h3>
         <div className="flex gap-4">
-          <MapMarkerIcon category="cafe" storeClass="franchise" />
-          <MapMarkerIcon category="food" storeClass="franchise" />
-          <MapMarkerIcon category="shopping" storeClass="franchise" />
+          <MapMarkerIcon category="CAFE" storeClass="FRANCHISE" event="NONE" />
+          <MapMarkerIcon category="FOOD" storeClass="FRANCHISE" event="NONE" />
+          <MapMarkerIcon category="SHOPPING" storeClass="FRANCHISE" event="NONE" />
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-blue-500">소상공인 (Blue)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">기본 (BASIC) - 주황색 (프랜차이즈와 동일)</h3>
         <div className="flex gap-4">
-          <MapMarkerIcon category="cafe" storeClass="small-business" />
-          <MapMarkerIcon category="food" storeClass="small-business" />
-          <MapMarkerIcon category="shopping" storeClass="small-business" />
+          <MapMarkerIcon category="CAFE" storeClass="BASIC" event="NONE" />
+          <MapMarkerIcon category="FOOD" storeClass="BASIC" event="NONE" />
+          <MapMarkerIcon category="SHOPPING" storeClass="BASIC" event="NONE" />
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-primary">이벤트 (Pink)</h3>
+        <h3 className="text-lg font-semibold mb-4 text-blue-500">소상공인 (LOCAL) - 파란색</h3>
         <div className="flex gap-4">
-          <MapMarkerIcon category="cafe" storeClass="event" />
-          <MapMarkerIcon category="food" storeClass="event" />
-          <MapMarkerIcon category="shopping" storeClass="event" />
+          <MapMarkerIcon category="CAFE" storeClass="LOCAL" event="NONE" />
+          <MapMarkerIcon category="FOOD" storeClass="LOCAL" event="NONE" />
+          <MapMarkerIcon category="SHOPPING" storeClass="LOCAL" event="NONE" />
         </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">팝업스토어 카테고리 - Store 아이콘</h3>
+        <div className="flex gap-4">
+          <MapMarkerIcon category="POPUP" storeClass="FRANCHISE" event="NONE" />
+          <MapMarkerIcon category="POPUP" storeClass="BASIC" event="NONE" />
+          <MapMarkerIcon category="POPUP" storeClass="LOCAL" event="NONE" />
+        </div>
+        <p className="text-sm text-gray-600 mt-2">팝업스토어는 카테고리로 분류되어 Store 아이콘 사용</p>
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: '매장 구분에 따른 배경 색상 차이를 확인할 수 있습니다.',
+        story: '이벤트가 없는 상태에서 매장 구분(storeClass)에 따른 색상을 보여주는 예시입니다.',
       },
     },
   },
@@ -184,88 +144,57 @@ export const StoreClassColors: Story = {
 export const AllCategories: Story = {
   render: () => (
     <div className="space-y-6 p-4">
-      <h3 className="text-lg font-semibold mb-4">모든 카테고리 아이콘</h3>
-      <div className="grid grid-cols-5 gap-4">
-        {(
-          [
-            'cafe',
-            'food',
-            'shopping',
-            'education',
-            'culture',
-            'bakery',
-            'beauty',
-            'convenience',
-            'activity',
-            'popup',
-          ] as const
-        ).map((category) => (
-          <div key={category} className="text-center">
-            <MapMarkerIcon category={category} storeClass="franchise" />
-            <p className="text-sm mt-2 capitalize">{category}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: '모든 카테고리의 마커 아이콘을 한 번에 확인할 수 있습니다.',
-      },
-    },
-  },
-};
-
-// 크기 비교
-export const SizeComparison: Story = {
-  render: () => (
-    <div className="space-y-6 p-4">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">크기 비교</h3>
-        <div className="flex items-end gap-4">
-          <div className="text-center">
-            <MapMarkerIcon category="cafe" storeClass="franchise" isEssential={false} />
-            <p className="text-sm mt-2">
-              일반 매장
-              <br />
-              25×25px
-            </p>
-          </div>
-          <div className="text-center">
-            <MapMarkerIcon category="cafe" storeClass="franchise" isEssential={true} />
-            <p className="text-sm mt-2">
-              필수 매장
-              <br />
-              35×35px
-            </p>
-          </div>
-          <div className="text-center">
-            <MapMarkerIcon
-              category="cafe"
-              storeClass="franchise"
-              isEssential={false}
-              isSelected={true}
-            />
-            <p className="text-sm mt-2">
-              선택된 일반
-              <br />
-              30×30px
-            </p>
-          </div>
-          <div className="text-center">
-            <MapMarkerIcon
-              category="cafe"
-              storeClass="franchise"
-              isEssential={true}
-              isSelected={true}
-            />
-            <p className="text-sm mt-2">
-              선택된 필수
-              <br />
-              42×42px
-            </p>
-          </div>
+      <h3 className="text-lg font-semibold mb-4">모든 카테고리 마커 (팝업 포함)</h3>
+      <div className="grid grid-cols-5 gap-6">
+        <div className="text-center">
+          <MapMarkerIcon category="CAFE" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">CAFE</p>
+          <p className="text-xs text-gray-500">카페</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="FOOD" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">FOOD</p>
+          <p className="text-xs text-gray-500">푸드</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="SHOPPING" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">SHOPPING</p>
+          <p className="text-xs text-gray-500">쇼핑</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="EDUCATION" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">EDUCATION</p>
+          <p className="text-xs text-gray-500">교육</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="CULTURE" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">CULTURE</p>
+          <p className="text-xs text-gray-500">문화/여가</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="BAKERY" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">BAKERY</p>
+          <p className="text-xs text-gray-500">베이커리</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="BEAUTY" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">BEAUTY</p>
+          <p className="text-xs text-gray-500">뷰티/건강</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="LIFE" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">LIFE</p>
+          <p className="text-xs text-gray-500">생활/편의</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="ACTIVITY" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">ACTIVITY</p>
+          <p className="text-xs text-gray-500">액티비티</p>
+        </div>
+        <div className="text-center">
+          <MapMarkerIcon category="POPUP" storeClass="FRANCHISE" />
+          <p className="text-sm mt-2 font-medium">POPUP</p>
+          <p className="text-xs text-gray-500">팝업스토어</p>
         </div>
       </div>
     </div>
@@ -273,7 +202,7 @@ export const SizeComparison: Story = {
   parameters: {
     docs: {
       description: {
-        story: '일반 매장과 필수 매장, 선택 상태에 따른 크기 차이를 비교할 수 있습니다.',
+        story: '백엔드 API에서 제공하는 모든 카테고리의 마커를 미리보기할 수 있습니다.',
       },
     },
   },
@@ -291,31 +220,45 @@ export const InteractiveExample: Story = {
     const markers = [
       {
         id: 'marker1',
-        category: 'cafe',
-        storeClass: 'franchise',
+        category: 'CAFE',
+        storeClass: 'FRANCHISE',
+        event: 'NONE',
         label: '프랜차이즈 카페',
-        isEssential: false,
       },
       {
         id: 'marker2',
-        category: 'food',
-        storeClass: 'small-business',
-        label: '소상공인 음식점',
-        isEssential: false,
+        category: 'FOOD',
+        storeClass: 'BASIC',
+        event: 'NONE',
+        label: '기본 음식점',
       },
       {
         id: 'marker3',
-        category: 'shopping',
-        storeClass: 'event',
-        label: '이벤트 쇼핑',
-        isEssential: false,
+        category: 'SHOPPING',
+        storeClass: 'LOCAL',
+        event: 'NONE',
+        label: '소상공인 쇼핑',
       },
       {
-        id: 'essential1',
-        category: 'beauty',
-        storeClass: 'franchise',
-        label: '필수 뷰티',
-        isEssential: true,
+        id: 'marker4',
+        category: 'POPUP',
+        storeClass: 'BASIC',
+        event: 'NONE',
+        label: '팝업스토어',
+      },
+      {
+        id: 'marker5',
+        category: 'BEAUTY',
+        storeClass: 'FRANCHISE',
+        event: 'GENERAL',
+        label: '일반 이벤트',
+      },
+      {
+        id: 'require1',
+        category: 'BEAUTY',
+        storeClass: 'LOCAL',
+        event: 'REQUIRE',
+        label: '필수 이벤트',
       },
     ] as const;
 
@@ -329,7 +272,7 @@ export const InteractiveExample: Story = {
                 <MapMarkerIcon
                   category={marker.category}
                   storeClass={marker.storeClass}
-                  isEssential={marker.isEssential}
+                  event={marker.event}
                   isSelected={selectedId === marker.id}
                   onClick={() => handleClick(marker.id)}
                 />
@@ -365,55 +308,44 @@ export const RealWorldUsage: Story = {
   render: () => (
     <div className="space-y-6 p-4">
       <div>
-        <h3 className="text-lg font-semibold mb-4">지도 위의 매장 마커들</h3>
-        <div
-          className="bg-gray-100 p-6 rounded-lg relative"
-          style={{ minHeight: '300px', width: '100%', maxWidth: '500px' }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg opacity-50"></div>
-
-          <div className="relative z-10" style={{ width: '100%', height: '100%' }}>
-            <div className="absolute" style={{ top: '20px', left: '30px' }}>
-              <MapMarkerIcon category="cafe" storeClass="franchise" />
-            </div>
-
-            <div className="absolute" style={{ top: '40px', right: '40px' }}>
-              <MapMarkerIcon category="food" storeClass="small-business" />
-            </div>
-
-            <div
-              className="absolute"
-              style={{ top: '80px', left: '50%', transform: 'translateX(-50%)' }}
-            >
-              <MapMarkerIcon category="activity" storeClass="small-business" isSelected={true} />
-            </div>
-
-            <div className="absolute" style={{ top: '140px', left: '50px' }}>
-              <MapMarkerIcon category="shopping" storeClass="event" />
-            </div>
-
-            <div className="absolute" style={{ top: '80px', right: '30px' }}>
-              <MapMarkerIcon category="beauty" storeClass="franchise" isEssential={true} />
-            </div>
-
-            <div
-              className="absolute"
-              style={{ top: '160px', left: '45%', transform: 'translateX(-50%)' }}
-            >
-              <MapMarkerIcon category="bakery" storeClass="event" />
-            </div>
+        <h3 className="text-lg font-semibold mb-4">실제 사용 예시</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="CAFE" storeClass="FRANCHISE" event="NONE" />
+            <span className="text-sm">프랜차이즈 카페</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="FOOD" storeClass="BASIC" event="NONE" />
+            <span className="text-sm">기본 음식점</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="SHOPPING" storeClass="LOCAL" event="NONE" />
+            <span className="text-sm">소상공인 쇼핑</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="POPUP" storeClass="BASIC" event="NONE" />
+            <span className="text-sm">팝업스토어</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="BEAUTY" storeClass="FRANCHISE" event="GENERAL" />
+            <span className="text-sm">일반 이벤트 매장</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="ACTIVITY" storeClass="LOCAL" event="REQUIRE" />
+            <span className="text-sm">필수 이벤트 매장</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapMarkerIcon category="CAFE" storeClass="LOCAL" event="NONE" isSelected={true} />
+            <span className="text-sm">선택된 매장</span>
           </div>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          실제 지도 화면에서 다양한 매장 마커들이 어떻게 보일지 시뮬레이션
-        </p>
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: '실제 지도 애플리케이션에서 마커들이 어떻게 배치되고 표시될지 보여주는 예시입니다.',
+        story: '실제 애플리케이션에서 다양한 매장 마커들이 어떻게 사용될지 보여주는 예시입니다.',
       },
     },
   },
