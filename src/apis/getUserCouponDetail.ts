@@ -1,5 +1,3 @@
-// /apis/getUserCouponDetail.ts
-
 import axiosInstance from './axiosInstance';
 import type { UserCouponDetail } from '@/types/coupon';
 
