@@ -28,7 +28,6 @@ export default {
         storybackground2: 'radial-gradient(ellipse 90% 40% at center, #094275 20%, #0F0034 60%)', //스토리 페이지 배경2
         storybackground3: 'radial-gradient(ellipse at center, #0F0034 20%, #094275 60%)', //스토리 페이지 배경3
       },
-
       fontSize: {
         // text-[지정명]
         xs: '0.625rem', // 10px
@@ -40,6 +39,23 @@ export default {
         xl: '2rem', // 32px
         xxl: '2.25rem', //36px
       },
+      keyframes: {
+        zoom: {
+          '0%': { transform: 'scale(1)' },
+          '100%': { transform: 'scale(1.1)' },
+        },
+        slideLeft: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
+      animation: {
+        zoom: 'zoom 6s ease-in-out forwards',
+        slideLeft: 'slideLeft 20s linear infinite',
+      },
+    },
+  },
+  plugins: [],
       animation: {
         'blink-pulse': 'blink-pulse 1.5s ease-in-out infinite',
       },

@@ -35,7 +35,7 @@ const CategoryDiscountCard: React.FC<CategoryDiscountCardProps> = ({
       <div className="absolute left-[11px] top-[9px]">
         <StoreTypeIcon
           category={category}
-          storeClass="franchise"
+          storeClass="FRANCHISE"
           size={50}
           mode="statistics"
           shape="circle"
