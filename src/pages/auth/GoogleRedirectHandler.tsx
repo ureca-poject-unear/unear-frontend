@@ -17,8 +17,7 @@ const GoogleRedirectHandler: React.FC = () => {
 
   useEffect(() => {
     // 1. URL에서 백엔드가 보내준 토큰을 추출합니다.
-    // 예: http://내사이트/login/oauth2/code/google?token=JWT토큰값
-    const accessToken = searchParams.get('token');
+    const accessToken = searchParams.get('accessToken');
 
     if (!accessToken) {
       // 토큰이 없으면 로그인 실패로 간주하고 로그인 페이지로 보냅니다.
@@ -33,7 +32,7 @@ const GoogleRedirectHandler: React.FC = () => {
     // 3. 저장된 토큰으로 /me API를 호출하여 프로필 완성 여부를 확인합니다.
     const checkProfileStatus = async () => {
       try {
-        const response = await fetch('http://dev.unear.site/api/app/me', {
+        const response = await fetch('http://dev.unear.site/api/app/users/me', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -43,21 +42,23 @@ const GoogleRedirectHandler: React.FC = () => {
           throw new Error('사용자 정보 조회 실패');
         }
 
-        const result = (await response.json()) as MeApiResponse;
+        const result = await response.json();
+        console.log('✅ /me API 응답:', result);
 
         // 4. ✨ 여기가 핵심: 프로필 완성 여부에 따라 분기 처리합니다.
+        if (!result?.data) {
+          throw new Error('사용자 데이터가 존재하지 않습니다.');
+        }
+
         if (result.data.isProfileComplete) {
-          // 이미 정보가 다 있으면 메인 페이지로 보냅니다.
           navigate('/', { replace: true });
         } else {
-          // 추가 정보가 필요하면 CompleteProfilePage로 보냅니다.
           alert('서비스 이용을 위해 추가 정보 입력이 필요합니다.');
           navigate('/complete-profile', { replace: true });
         }
       } catch (error) {
         console.error('프로필 확인 오류:', error);
         alert('사용자 정보를 확인하는 중 오류가 발생했습니다.');
-        localStorage.removeItem('accessToken'); // 잘못된 토큰은 삭제
         navigate('/login', { replace: true });
       }
     };

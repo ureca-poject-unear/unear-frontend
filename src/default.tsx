@@ -9,7 +9,8 @@ const Default = () => {
   const isMapPage = pathname === '/map';
 
   // Check if it's the login or signup page
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const isAuthPage =
+    pathname === '/login' || pathname === '/signup' || pathname === '/complete-profile';
 
   return (
     <div

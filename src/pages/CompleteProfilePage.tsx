@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/common/Header'; // 실제 경로에 맞게 수정해주세요.
 import ToggleButton from '../components/common/ToggleButton'; // 실제 경로에 맞게 수정해주세요.
 
-// --- 1. 타입 정의 ---
-// /me API 응답으로 기대하는 사용자 정보 타입 (이름 제외)
+// --- 1. 타입 정의 (변경 없음) ---
 interface UserInfo {
   email: string;
 }
 
-// 추가로 입력받을 폼 데이터 타입 (이름 추가)
 interface ProfileForm {
-  name: string; // 이름 필드 추가
+  name: string;
   password: string;
   confirmPassword: string;
   gender: '남자' | '여자';
@@ -18,26 +16,24 @@ interface ProfileForm {
   phone: string;
 }
 
-// 백엔드의 /me API 응답 전체 구조에 대한 타입 (실제 구조에 맞게 조정)
 interface MeApiResponse {
   resultCode: number;
   message: string;
   data: {
     email: string;
     username: string;
-    isProfileComplete: boolean; // 이 값이 false일 때 이 페이지로 이동합니다.
-    // ... 기타 백엔드가 제공하는 사용자 정보
+    isProfileComplete: boolean;
   };
 }
 
 const CompleteProfilePage: React.FC = () => {
-  // --- 2. 상태(State) 정의 ---
-  const [user, setUser] = useState<UserInfo>({ email: '' }); // name 제거
+  // --- 2. 상태(State) 정의 (변경 없음) ---
+  const [user, setUser] = useState<UserInfo>({ email: '' });
   const [form, setForm] = useState<ProfileForm>({
-    name: '', // name 초기값 추가
+    name: '',
     password: '',
     confirmPassword: '',
-    gender: '남자', // 기본값
+    gender: '남자',
     birth: '',
     phone: '',
   });
@@ -47,35 +43,28 @@ const CompleteProfilePage: React.FC = () => {
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- 3. 데이터 로딩 및 검증 ---
+  // --- 3. 데이터 로딩 및 검증 (변경 없음) ---
   useEffect(() => {
     const fetchAndVerifyUser = async () => {
       const accessToken = localStorage.getItem('accessToken');
-
       if (!accessToken) {
         alert('잘못된 접근입니다. 다시 로그인해주세요.');
         window.location.href = '/login';
         return;
       }
-
       try {
-        const response = await fetch('https://dev.unear.site/api/app/me', {
+        const response = await fetch('https://dev.unear.site/api/app/users/me', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
         if (!response.ok) throw new Error('사용자 정보 조회 실패');
-
         const result = (await response.json()) as MeApiResponse;
-
         if (result.data.isProfileComplete) {
           alert('이미 모든 정보를 입력하셨습니다. 홈으로 이동합니다.');
           window.location.href = '/';
           return;
         }
-
-        // user 상태에는 email만 설정하고, form의 name 초기값으로 백엔드에서 받은 username을 설정
         setUser({ email: result.data.email });
         setForm((prev) => ({ ...prev, name: result.data.username }));
       } catch (error) {
@@ -84,11 +73,10 @@ const CompleteProfilePage: React.FC = () => {
         window.location.href = '/login';
       }
     };
-
     fetchAndVerifyUser();
   }, []);
 
-  // --- 4. 핸들러 함수 ---
+  // --- 4. 핸들러 함수 (변경 없음) ---
   const handleChange = (field: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setForm((prev) => {
@@ -128,23 +116,21 @@ const CompleteProfilePage: React.FC = () => {
 
     setIsLoading(true);
     const accessToken = localStorage.getItem('accessToken');
-
     try {
-      const response = await fetch('https://dev.unear.site/api/app/users/me/complete-profile', {
-        method: 'PATCH',
+      const response = await fetch('https://dev.unear.site/api/app/auth/oauth/complete-profile', {
+        method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          username: form.name, // 수정된 이름(username) 전송
-          password: form.password,
+          username: form.name,
           tel: form.phone,
           birthdate: formatBirthdate(form.birth),
           gender: form.gender === '남자' ? 'M' : 'F',
         }),
       });
-
       if (response.ok) {
         alert('추가 정보 입력이 완료되었습니다! 서비스를 시작합니다.');
         window.location.href = '/';
@@ -161,16 +147,17 @@ const CompleteProfilePage: React.FC = () => {
   };
 
   const isFormValid =
-    form.name.trim() !== '' && // 이름 필드 유효성 검사 추가
+    form.name.trim() !== '' &&
     form.birth.trim() !== '' &&
     form.phone.trim() !== '' &&
     form.password.trim() !== '' &&
     form.confirmPassword.trim() !== '' &&
     !passwordMismatch;
 
-  // --- 5. JSX 렌더링 ---
+  // --- 5. JSX 렌더링 (수정된 부분) ---
   return (
-    <>
+    // 최상위 Fragment를 div로 변경하고 배경색 및 전체 화면 클래스 추가
+    <div className="bg-white min-h-screen">
       <Header title="추가 정보 입력" />
       <div className="mt-[25px]">
         <div className="px-5 flex flex-col gap-6">
@@ -197,25 +184,115 @@ const CompleteProfilePage: React.FC = () => {
           {/* 비밀번호 */}
           <div>
             <label className="text-lm font-bold text-black">비밀번호 설정</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="8자리 이상, 영문/숫자/특수문자 조합"
-              value={form.password}
-              onChange={handleChange('password')}
-              className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="8자리 이상, 영문/숫자/특수문자 조합"
+                value={form.password}
+                onChange={handleChange('password')}
+                className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-0 top-2"
+                aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+              >
+                {showPassword ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="#A1A1AA"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25s8.268 2.693 9.542 6.75c-1.274 4.057-5.065 6.75-9.542 6.75S3.732 16.057 2.458 12z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="#A1A1AA"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.98 8.223A10.477 10.477 0 001.458 12c1.274 4.057 5.065 6.75 9.542 6.75 1.493 0 2.91-.348 4.208-.97M8.25 15a3.75 3.75 0 005.25-5.25M12 5.25c1.493 0 2.91.348 4.208-.97A10.477 10.477 0 0122.542 12a10.45 10.45 0 01-1.852 3.045M3 3l18 18"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* 비밀번호 확인 */}
           <div>
             <label className="text-lm font-bold text-black">비밀번호 확인</label>
-            <input
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="비밀번호를 다시 입력해주세요"
-              value={form.confirmPassword}
-              onChange={handleChange('confirmPassword')}
-              className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="비밀번호를 다시 입력해주세요"
+                value={form.confirmPassword}
+                onChange={handleChange('confirmPassword')}
+                className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-0 top-2"
+                aria-label={showConfirmPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+              >
+                {showConfirmPassword ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="#A1A1AA"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25s8.268 2.693 9.542 6.75c-1.274 4.057-5.065 6.75-9.542 6.75S3.732 16.057 2.458 12z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="#A1A1AA"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.98 8.223A10.477 10.477 0 001.458 12c1.274 4.057 5.065 6.75 9.542 6.75 1.493 0 2.91-.348 4.208-.97M8.25 15a3.75 3.75 0 005.25-5.25M12 5.25c1.493 0 2.91.348 4.208.97A10.477 10.477 0 0122.542 12a10.45 10.45 0 01-1.852 3.045M3 3l18 18"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
             {passwordMismatch && (
               <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
             )}
@@ -277,7 +354,7 @@ const CompleteProfilePage: React.FC = () => {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

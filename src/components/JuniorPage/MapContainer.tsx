@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 import type { CategoryType, StoreClassType, EventType } from '@/components/common/MapMarkerIcon';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
+import BookmarkCard, { type StoreInfo } from '@/components/JuniorPage/BookmarkCard';
 
-// --- 가정: 필요한 컴포넌트 및 타입 import ---
-import BookmarkCard, { type StoreInfo } from '@/components/common/BookmarkCard'; // 예시 경로
-
-// --- 1. 타입 및 데이터 정의 ---
+// 타입 정의
 type MarkerStoreData = StoreInfo & {
   lat: number;
   lng: number;
 };
 
+// 초기 데이터
 const initialStoreMarkers: MarkerStoreData[] = [
   {
     id: 'marker1',
@@ -64,25 +63,33 @@ const MapContainer = () => {
 
   const [map, setMap] = useState<any>(null);
   const [infoOverlay, setInfoOverlay] = useState<any>(null);
-  const [markersData] = useState(initialStoreMarkers);
+  const [markersData, setMarkersData] = useState(initialStoreMarkers);
   const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
 
-  const closeInfoWindow = () => {
+  const closeInfoWindow = useCallback(() => {
     if (infoOverlay) {
       infoOverlay.setMap(null);
     }
     setInfoOverlay(null);
     setSelectedMarkerId(null);
+  }, [infoOverlay]);
+
+  const handleBookmarkToggle = (storeId: string) => {
+    setMarkersData((prevMarkers) =>
+      prevMarkers.map((marker) =>
+        marker.id === storeId ? { ...marker, isBookmarked: !marker.isBookmarked } : marker
+      )
+    );
   };
 
   const handleMarkerClick = (markerId: string) => {
-    if (infoOverlay) {
-      infoOverlay.setMap(null);
-    }
-
     if (selectedMarkerId === markerId) {
       closeInfoWindow();
       return;
+    }
+
+    if (infoOverlay) {
+      infoOverlay.setMap(null);
     }
 
     const markerInfo = markersData.find((m) => m.id === markerId);
@@ -90,13 +97,18 @@ const MapContainer = () => {
 
     const contentNode = document.createElement('div');
     const root = ReactDOM.createRoot(contentNode);
-    root.render(<BookmarkCard store={markerInfo} />);
+    root.render(
+      <BookmarkCard store={markerInfo} variant="compact" onBookmarkToggle={handleBookmarkToggle} />
+    );
+
+    const gapOffset = 0.001;
+    const infoWindowCenterOffset = 0.0007;
 
     const newInfoOverlay = new window.kakao.maps.CustomOverlay({
       content: contentNode,
-      position: new window.kakao.maps.LatLng(markerInfo.lat, markerInfo.lng),
-      yAnchor: 2.8,
-      // [수정] 인포윈도우는 마커보다 아래에 위치하도록 zIndex 조정
+      position: new window.kakao.maps.LatLng(markerInfo.lat, markerInfo.lng + gapOffset),
+      xAnchor: 0,
+      yAnchor: 1.5,
       zIndex: 50,
     });
 
@@ -104,9 +116,11 @@ const MapContainer = () => {
     setInfoOverlay(newInfoOverlay);
     setSelectedMarkerId(markerId);
 
-    map.panTo(new window.kakao.maps.LatLng(markerInfo.lat, markerInfo.lng));
+    const panToTargetLng = markerInfo.lng + gapOffset + infoWindowCenterOffset;
+    map.panTo(new window.kakao.maps.LatLng(markerInfo.lat, panToTargetLng));
   };
 
+  // 카카오맵 스크립트 로딩을 위한 useEffect
   useEffect(() => {
     if (map || !kakaoMapKey) return;
 
@@ -129,17 +143,36 @@ const MapContainer = () => {
     };
   }, [kakaoMapKey, map]);
 
+  // 맵 클릭 시 인포윈도우를 닫기 위한 useEffect
   useEffect(() => {
     if (!map) return;
-
     const handleMapClickHandler = () => closeInfoWindow();
     const listener = window.kakao.maps.event.addListener(map, 'click', handleMapClickHandler);
-
     return () => {
       window.kakao.maps.event.removeListener(map, 'click', listener);
     };
-  }, [map, infoOverlay]);
+  }, [map, closeInfoWindow]);
 
+  // 즐겨찾기 상태가 변경되었을 때, 열려있는 인포윈도우의 컨텐츠를 다시 렌더링
+  useEffect(() => {
+    if (infoOverlay && selectedMarkerId) {
+      const markerInfo = markersData.find((m) => m.id === selectedMarkerId);
+      if (markerInfo) {
+        const contentNode = document.createElement('div');
+        const root = ReactDOM.createRoot(contentNode);
+        root.render(
+          <BookmarkCard
+            store={markerInfo}
+            variant="compact"
+            onBookmarkToggle={handleBookmarkToggle}
+          />
+        );
+        infoOverlay.setContent(contentNode);
+      }
+    }
+  }, [markersData, infoOverlay, selectedMarkerId]);
+
+  // 마커 및 원을 지도에 그리는 useEffect
   useEffect(() => {
     if (!map) return;
 
@@ -162,8 +195,6 @@ const MapContainer = () => {
       const contentNode = document.createElement('div');
       const root = ReactDOM.createRoot(contentNode);
       const isSelected = selectedMarkerId === markerInfo.id;
-
-      // [수정] 선택된 마커가 가장 위에 오도록 zIndex를 가장 높게 설정
       const zIndex = isSelected ? 100 : 1;
 
       root.render(
