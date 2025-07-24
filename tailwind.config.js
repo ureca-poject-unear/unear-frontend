@@ -55,7 +55,7 @@ export default {
         },
       },
       animation: {
-        'blink-pulse': 'blinkPulse 1.5s ease-in-out infinite',
+        'blink-pulse': 'blinkPulse 2.5s ease-in-out infinite',
         zoom: 'zoom 6s ease-in-out forwards',
         slideLeft: 'slideLeft 20s linear infinite',
       },
