@@ -2,6 +2,8 @@ import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import type { KakaoMap, KakaoCustomOverlay } from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
+import axiosInstance from '@/apis/axiosInstance';
+import MapMarkerIcon from '../common/MapMarkerIcon';
 
 export interface MapContainerRef {
   showCurrentLocation: () => void;
@@ -12,6 +14,33 @@ const MapContainer = forwardRef<MapContainerRef, object>((_, ref) => {
   const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
   const mapInstanceRef = useRef<KakaoMap | null>(null);
   const overlayRef = useRef<KakaoCustomOverlay | null>(null);
+  const markersRef = useRef<KakaoCustomOverlay[]>([]);
+
+  interface Place {
+    id: number;
+    latitude: number;
+    longitude: number;
+    categoryCode: CategoryType;
+    markerCode: StoreClassType;
+    eventCode: EventType;
+    benefitCategory: string;
+    favorite: boolean;
+  }
+
+  type CategoryType =
+    | 'FOOD'
+    | 'ACTIVITY'
+    | 'EDUCATION'
+    | 'CULTURE'
+    | 'BAKERY'
+    | 'LIFE'
+    | 'SHOPPING'
+    | 'CAFE'
+    | 'BEAUTY'
+    | 'POPUP';
+
+  type StoreClassType = 'LOCAL' | 'FRANCHISE' | 'BASIC';
+  type EventType = 'NONE' | 'GENERAL' | 'REQUIRE';
 
   const showCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -25,8 +54,6 @@ const MapContainer = forwardRef<MapContainerRef, object>((_, ref) => {
         const currentLatLng = new window.kakao.maps.LatLng(latitude, longitude);
         const map = mapInstanceRef.current;
         if (!map) return;
-
-        console.log('📍 현재 위치', latitude, longitude);
 
         const markerHTML = ReactDOMServer.renderToString(<CurrentLocationMarker />);
         if (overlayRef.current) {
@@ -85,6 +112,61 @@ const MapContainer = forwardRef<MapContainerRef, object>((_, ref) => {
           mapInstanceRef.current = map;
 
           showCurrentLocation();
+
+          const fetchPlacesInViewport = async () => {
+            const bounds = map.getBounds();
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+
+            try {
+              const res = await axiosInstance.get('/places', {
+                params: {
+                  southWestLatitude: sw.getLat(),
+                  southWestLongitude: sw.getLng(),
+                  northEastLatitude: ne.getLat(),
+                  northEastLongitude: ne.getLng(),
+                },
+              });
+
+              const places: Place[] = res.data?.data || [];
+              console.log('📌 장소 목록:', places);
+
+              // 기존 마커 제거
+              markersRef.current.forEach((marker) => marker.setMap(null));
+              markersRef.current = [];
+
+              // 새 마커 생성
+              places.forEach((place) => {
+                const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
+
+                const markerHTML = ReactDOMServer.renderToString(
+                  <MapMarkerIcon
+                    category={place.categoryCode}
+                    storeClass={place.markerCode}
+                    event={place.eventCode}
+                  />
+                );
+
+                const el = document.createElement('div');
+                el.innerHTML = markerHTML;
+
+                const overlay = new window.kakao.maps.CustomOverlay({
+                  position,
+                  content: el.firstChild as Node,
+                  yAnchor: 1,
+                  zIndex: 1,
+                });
+
+                overlay.setMap(map);
+                markersRef.current.push(overlay);
+              });
+            } catch (error) {
+              console.error('장소 가져오기 실패:', error);
+            }
+          };
+
+          window.kakao.maps.event.addListener(map, 'idle', fetchPlacesInViewport);
+          fetchPlacesInViewport();
         });
       }
     };
