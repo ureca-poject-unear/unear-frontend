@@ -4,6 +4,8 @@ import MainPage from '@/pages/MainPage';
 import MapPage from '@/pages/MapPage';
 import StoryPage from '@/pages/StoryPage';
 import StoryDiagnosisPage from '@/pages/StoryDiagnosisPage';
+import StoryDetailPage from '@/pages/StoryDetailPage';
+import StoryEndPage from '@/pages/StoryEndPage';
 import StoryRecommendPage from '@/pages/StoryRecommendPage';
 import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
@@ -21,6 +23,8 @@ const router = createBrowserRouter([
       { path: '/map', element: <MapPage /> },
       { path: '/story', element: <StoryPage /> },
       { path: '/story/diagnosis', element: <StoryDiagnosisPage /> },
+      { path: '/story/detail', element: <StoryDetailPage /> },
+      { path: '/story/end', element: <StoryEndPage /> },
       { path: '/story/recommend', element: <StoryRecommendPage /> },
       { path: '/junior', element: <JuniorPage /> },
       { path: '/my', element: <MyPage /> },

@@ -6,17 +6,17 @@ export interface CouponCardProps {
   title: string;
   validUntil: string;
   category:
-    | 'cafe'
-    | 'food'
-    | 'shopping'
-    | 'education'
-    | 'culture'
-    | 'bakery'
-    | 'beauty'
-    | 'convenience'
-    | 'activity'
-    | 'popup';
-  storeClass: 'franchise' | 'small-business' | 'event';
+    | 'CAFE'
+    | 'FOOD'
+    | 'SHOPPING'
+    | 'EDUCATION'
+    | 'CULTURE'
+    | 'BAKERY'
+    | 'BEAUTY'
+    | 'LIFE'
+    | 'ACTIVITY'
+    | 'POPUP';
+  storeClass: 'FRANCHISE' | 'LOCAL' | 'BASIC';
   onClick?: () => void;
 }
 

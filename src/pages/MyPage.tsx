@@ -1,5 +1,4 @@
 import Header from '@/components/common/Header';
-import { useNavigate } from 'react-router-dom';
 import Grade from '@/components/common/Grade';
 import MyPageNubiImage from '@/assets/MyPage/mypagenubi.png';
 import BookmarkButton from '@/components/common/BookmarkButton';
@@ -7,12 +6,6 @@ import CouponButton from '@/components/common/CouponButton';
 import BackIcon from '@/assets/common/backIcon.svg?react';
 
 const MyPage = () => {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleLogout = () => {
     // 로그아웃 기능 구현
     console.log('로그아웃 실행');
@@ -20,7 +13,7 @@ const MyPage = () => {
 
   return (
     <>
-      <Header title="마이 페이지" onBack={handleBack} />
+      <Header title="마이 페이지" />
 
       {/* 사용자 정보 영역 */}
       <div className="w-full bg-white">

@@ -230,7 +230,7 @@ const SignUpPage = () => {
         if (result.codeName === 'INVALID_INPUT_VALUE' && result.data?.fieldErrors) {
           const fieldErrors = result.data.fieldErrors;
           let errorMessage = '입력값을 확인해주세요:\n';
-          Object.entries(fieldErrors).forEach(([field, message]) => {
+          Object.entries(fieldErrors).forEach(([, message]) => {
             errorMessage += `- ${message}\n`;
           });
           alert(errorMessage);
