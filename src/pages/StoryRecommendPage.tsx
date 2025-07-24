@@ -4,7 +4,7 @@ import StoryLayout from '@/components/story/StoryLayout';
 import BookmarkCard from '@/components/common/BookmarkCard';
 import PointNubiImage from '@/assets/story/pointNubi.png';
 // 타입 임포트
-import type { CategoryType } from '@/components/common/StoreTypeIcon';
+import type { CategoryType, StoreClassType, EventType } from '@/components/common/StoreTypeIcon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
 
 interface StoreInfo {
@@ -16,6 +16,8 @@ interface StoreInfo {
   category: CategoryType;
   status: StoreStatusType;
   isBookmarked: boolean;
+  storeClass: StoreClassType; // 매장 구분 타입
+  event: EventType; // 이벤트 타입
 }
 
 // 예시 매장 데이터
@@ -27,6 +29,8 @@ const sampleStores: StoreInfo[] = [
     distance: '500m',
     hours: '10:00 - 22:00',
     category: 'CAFE',
+    storeClass: 'FRANCHISE',
+    event: 'NONE',
     status: '영업중',
     isBookmarked: false,
   },
@@ -37,6 +41,8 @@ const sampleStores: StoreInfo[] = [
     distance: '1.2km',
     hours: '08:00 - 20:00',
     category: 'BAKERY',
+    storeClass: 'FRANCHISE',
+    event: 'GENERAL',
     status: '영업종료',
     isBookmarked: true,
   },
@@ -47,6 +53,8 @@ const sampleStores: StoreInfo[] = [
     distance: '2.5km',
     hours: '09:00 - 23:00',
     category: 'CAFE',
+    storeClass: 'LOCAL',
+    event: 'REQUIRE',
     status: '영업중',
     isBookmarked: false,
   },
@@ -57,6 +65,8 @@ const sampleStores: StoreInfo[] = [
     distance: '1.8km',
     hours: '11:00 - 21:00',
     category: 'FOOD',
+    storeClass: 'FRANCHISE',
+    event: 'NONE',
     status: '영업중',
     isBookmarked: false,
   },
@@ -67,6 +77,8 @@ const sampleStores: StoreInfo[] = [
     distance: '3.0km',
     hours: '07:00 - 19:00',
     category: 'BAKERY',
+    storeClass: 'FRANCHISE',
+    event: 'NONE',
     status: '영업중',
     isBookmarked: true,
   },

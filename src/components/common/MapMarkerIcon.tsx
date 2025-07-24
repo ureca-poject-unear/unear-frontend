@@ -9,30 +9,30 @@ import LifeIcon from '@/assets/common/life.svg?react';
 import ActivityIcon from '@/assets/common/activity.svg?react';
 import StoreIcon from '@/assets/common/store.svg?react';
 
-// 카테고리 타입 정의 (백엔드 PLACE_CATEGORY에 맞춤)
+// 카테고리 타입 정의 (백엔드 categoryCode에 맞춤)
 export type CategoryType =
-  | 'FOOD'       // 푸드
-  | 'ACTIVITY'   // 액티비티
-  | 'EDUCATION'  // 교육
-  | 'CULTURE'    // 문화/여가
-  | 'BAKERY'     // 베이커리
-  | 'LIFE'       // 생활/편의
-  | 'SHOPPING'   // 쇼핑
-  | 'CAFE'       // 카페
-  | 'BEAUTY'     // 뷰티/건강
-  | 'POPUP';     // 팝업스토어
+  | 'FOOD' // 푸드
+  | 'ACTIVITY' // 액티비티
+  | 'EDUCATION' // 교육
+  | 'CULTURE' // 문화/여가
+  | 'BAKERY' // 베이커리
+  | 'LIFE' // 생활/편의
+  | 'SHOPPING' // 쇼핑
+  | 'CAFE' // 카페
+  | 'BEAUTY' // 뷰티/건강
+  | 'POPUP'; // 팝업스토어
 
-// 매장 구분 타입 정의 (백엔드 PLACE_TYPE에 맞춤)
-export type StoreClassType = 
-  | 'LOCAL'      // 우리동네멤버십(소상공인)
-  | 'FRANCHISE'  // 프랜차이즈
-  | 'BASIC';     // 기본 (프랜차이즈와 동일한 효과)
+// 매장 구분 타입 정의 (백엔드 markerCode에 맞춤)
+export type StoreClassType =
+  | 'LOCAL' // 우리동네멤버십(소상공인)
+  | 'FRANCHISE' // 프랜차이즈
+  | 'BASIC'; // 기본 (프랜차이즈와 동일한 효과)
 
-// 이벤트 타입 정의 (백엔드 EVENT_TYPE에 맞춤)
-export type EventType = 
-  | 'NONE'       // 이벤트 아님
-  | 'GENERAL'    // 이벤트 (일반)
-  | 'REQUIRE';   // 이벤트 (필수)
+// 이벤트 타입 정의 (백엔드 eventCode에 맞춤)
+export type EventType =
+  | 'NONE' // 이벤트 아님
+  | 'GENERAL' // 이벤트 (일반)
+  | 'REQUIRE'; // 이벤트 (필수)
 
 // Props 인터페이스 정의
 interface MapMarkerIconProps {
@@ -96,7 +96,7 @@ const MapMarkerIcon: React.FC<MapMarkerIconProps> = ({
   // 크기 계산 (필수 이벤트는 더 크게)
   const getSize = () => {
     const isRequireEvent = event === 'REQUIRE';
-    
+
     if (isRequireEvent) {
       return isSelected ? { container: 42, icon: 18 } : { container: 35, icon: 15 };
     }
