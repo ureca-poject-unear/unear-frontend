@@ -1,5 +1,9 @@
 import type React from 'react';
-import StoreTypeIcon, { type CategoryType } from './StoreTypeIcon';
+import StoreTypeIcon, {
+  type CategoryType,
+  type StoreClassType,
+  type EventType,
+} from './StoreTypeIcon';
 import BookmarkStar from './BookmarkStar';
 import StoreStatus, { type StoreStatusType } from './StoreStatus';
 import MiniLocationButton from '@/components/common/MiniLocationButton';
@@ -17,6 +21,8 @@ interface StoreInfo {
   distance: string;
   hours: string;
   category: CategoryType;
+  storeClass: StoreClassType;
+  event: EventType;
   status: StoreStatusType;
   isBookmarked: boolean;
 }
@@ -58,7 +64,12 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     >
       {/* 매장 아이콘 */}
       <div className="absolute left-[19px] top-[19px]">
-        <StoreTypeIcon category={store.category} storeClass="franchise" size={50} />
+        <StoreTypeIcon
+          category={store.category}
+          storeClass={store.storeClass}
+          event={store.event}
+          size={50}
+        />
       </div>
 
       {/* 즐겨찾기 */}

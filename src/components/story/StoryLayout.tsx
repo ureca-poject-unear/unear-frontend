@@ -4,15 +4,15 @@ import Header from '@/components/common/Header';
 import StarBackgroundImage from '@/assets/story/starBackground.png';
 
 interface StoryLayoutProps {
+  headerTitle?: string;
   children: ReactNode;
   bgColorClass: string;
-  headerTitle?: string;
 }
 
 export default function StoryLayout({
+  headerTitle = '스토리',
   children,
   bgColorClass,
-  headerTitle = '스토리',
 }: StoryLayoutProps) {
   const [opacity, setOpacity] = useState(0.4);
 
@@ -43,7 +43,7 @@ export default function StoryLayout({
         }}
       />
 
-      {/* 콘텐츠 */}
+      {/* 컨텐츠 */}
       <div className="relative z-10 mx-5 flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
         {children}
       </div>

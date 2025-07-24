@@ -35,22 +35,22 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
       brand: '스타벅스',
       title: '아메리카노 10% 할인 쿠폰',
       validUntil: '2025.08.16',
-      category: 'cafe',
-      storeClass: 'franchise',
+      category: 'CAFE',
+      storeClass: 'FRANCHISE',
     },
     {
       brand: '이디야',
       title: '전 메뉴 1천원 할인',
       validUntil: '2025.08.10',
-      category: 'cafe',
-      storeClass: 'franchise',
+      category: 'CAFE',
+      storeClass: 'FRANCHISE',
     },
     {
       brand: '이디야',
       title: '전 메뉴 1천원 할인',
       validUntil: '2025.08.10',
-      category: 'cafe',
-      storeClass: 'franchise',
+      category: 'CAFE',
+      storeClass: 'FRANCHISE',
     },
   ];
 
@@ -61,7 +61,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
       address: '서울 강남구 테헤란로 152',
       distance: '0.2km',
       hours: '06:00 - 22:00',
-      category: 'cafe' as CategoryType,
+      category: 'CAFE' as CategoryType,
       status: '영업중' as StoreStatusType,
       isBookmarked: false,
       coupons: [
