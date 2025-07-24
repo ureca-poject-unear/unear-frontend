@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://dev.unear.site/api',
+  baseURL: 'https://dev.unear.site/api/app',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
 
 //토근 전역 상태관리 전까지 테스트용도
 axiosInstance.interceptors.request.use((config) => {
-  const token = 'token 정보';
+  const token = 'token값';
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
