@@ -258,7 +258,7 @@ const SignUpPage = () => {
           // 필드별 에러 메시지 표시
           const fieldErrors = result.data.fieldErrors;
           let errorMessage = '입력값을 확인해주세요:\n';
-          Object.entries(fieldErrors).forEach(([field, message]) => {
+          Object.entries(fieldErrors).forEach(([, message]) => {
             errorMessage += `- ${message}\n`;
           });
           alert(errorMessage);

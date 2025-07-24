@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import BackIcon from '@/assets/common/backIcon.svg?react';
 
 interface HeaderProps {
@@ -5,7 +6,7 @@ interface HeaderProps {
   bgColor?: string;
   textColor?: string;
   iconColor?: string;
-  onBack?: () => void;
+  onBack?: () => void; // 사용자 정의 시 우선
 }
 
 const Header = ({
@@ -15,6 +16,16 @@ const Header = ({
   iconColor = 'fill-black',
   onBack,
 }: HeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack(); // 사용자 정의 우선
+    } else {
+      navigate(-1); // 기본 뒤로가기
+    }
+  };
+
   return (
     <header
       className={`fixed top-0 inset-x-0 w-full max-w-[393px] h-[40px] mx-auto z-50 ${bgColor}`}
@@ -24,7 +35,7 @@ const Header = ({
         style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.15)' }}
       >
         <button
-          onClick={onBack}
+          onClick={handleBack}
           className={`mr-2 ${iconColor}`}
           aria-label="뒤로가기"
           type="button"
@@ -38,8 +49,3 @@ const Header = ({
 };
 
 export default Header;
-
-/* 
-import Header from '@/components/common/Header'; 상단에 이거랑
-스토리 페이지 제외 <Header title="메인페이지" /> 이거 한줄 타이틀과 함께 추가하면 됨
-*/
