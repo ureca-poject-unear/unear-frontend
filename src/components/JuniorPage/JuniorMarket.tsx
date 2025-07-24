@@ -47,7 +47,7 @@ const JuniorMarket = () => {
           expiryDate: '2025.08.16',
         },
       ],
-      event: 'REQUIRE',
+      event: 'GENERAL',
     },
     {
       id: 'store2',
@@ -59,7 +59,7 @@ const JuniorMarket = () => {
       status: '영업중',
       isBookmarked: true,
       coupons: [],
-      event: 'GENERAL',
+      event: 'REQUIRE',
     },
     {
       id: 'store3',

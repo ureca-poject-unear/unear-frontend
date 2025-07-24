@@ -10,6 +10,7 @@ const sampleStamps = [
   { name: '매장1', isStamped: true, date: '07.21' },
   { name: '매장1', isStamped: true, date: '07.21' },
   { name: '매장1', isStamped: true, date: '07.21' },
+  { name: '매장1', isStamped: true, date: '07.21' },
 ];
 
 const JuniorPage = () => {

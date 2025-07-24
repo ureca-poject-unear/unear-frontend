@@ -86,7 +86,7 @@ const ProbabilityRoulette = () => {
 
         {/* 룰렛 판 */}
         <div
-          className="absolute top-3 left-3 right-3 bottom-3 rounded-full border-4 border-pink-100 overflow-hidden transition-transform ease-out"
+          className="absolute top-3 left-3 right-3 bottom-3 rounded-full border-4 border-pink-200 overflow-hidden transition-transform ease-out"
           style={{
             transform: `rotate(${rotation}deg)`,
             transformOrigin: 'center',
@@ -119,7 +119,7 @@ const ProbabilityRoulette = () => {
           {prizeData.map((_, index) => (
             <div
               key={index}
-              className="absolute top-0 bottom-1/2 left-1/2 w-0.5 -ml-0.25 bg-gray-400"
+              className="absolute top-0 bottom-1/2 left-1/2 w-0.5 -ml-0.25 bg-pink-100"
               style={{
                 transform: `rotate(${index * sectionAngle}deg)`,
                 transformOrigin: 'bottom',
