@@ -27,7 +27,7 @@ const RecentUsageSection = ({
     <div className="w-full bg-white mt-3">
       <div className="px-5 py-6">
         {/* 헤더 */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-1">
           <span className="text-lm font-semibold text-black">최근 이용 내역</span>
           <button type="button" className="flex items-center" onClick={handleDetailClick}>
             <span className="text-m font-semibold text-black">자세히 보기</span>

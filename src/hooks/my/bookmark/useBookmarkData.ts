@@ -14,6 +14,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'NONE',
     status: '영업중',
     isBookmarked: true,
+    phoneNumber: '1544-1122',
   },
   {
     id: '2',
@@ -26,6 +27,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'NONE',
     status: '영업종료',
     isBookmarked: true,
+    phoneNumber: '02-1234-5678',
   },
   {
     id: '3',
@@ -38,6 +40,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'NONE',
     status: '영업중',
     isBookmarked: true,
+    phoneNumber: '02-987-6543',
   },
   {
     id: '4',
@@ -50,6 +53,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'NONE',
     status: '영업중',
     isBookmarked: true,
+    phoneNumber: '02-555-7777',
   },
   {
     id: '5',
@@ -62,6 +66,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'GENERAL',
     status: '이벤트 매장',
     isBookmarked: true,
+    // phoneNumber 없음 - 테스트용
   },
   {
     id: '6',
@@ -74,6 +79,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'REQUIRE',
     status: '필수 매장',
     isBookmarked: true,
+    phoneNumber: '1588-1234',
   },
   {
     id: '7',
@@ -86,6 +92,7 @@ const dummyBookmarkData: BookmarkStore[] = [
     event: 'NONE',
     status: '영업중',
     isBookmarked: true,
+    phoneNumber: '070-1234-5678',
   },
   {
     id: '8',
@@ -179,7 +186,6 @@ const dummyBookmarkData: BookmarkStore[] = [
     hours: '07:00 - 22:00',
     category: 'BAKERY',
     storeClass: 'FRANCHISE',
-    event: 'NONE',
     status: '영업중',
     isBookmarked: true,
   },

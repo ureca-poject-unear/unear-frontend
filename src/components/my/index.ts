@@ -8,6 +8,9 @@ export { default as RecentUsageSection } from './RecentUsageSection';
 // 통계 페이지 관련 컴포넌트들
 export * from './statistics';
 
+// 북마크 관련 컴포넌트들
+export * from './bookmark';
+
 // 이용내역 관련 컴포넌트들 (현재 사용되지 않으므로 주석 처리)
 // export { default as UsageHistoryItem } from './usagehistory/UsageHistoryItem';
 // export { default as UsageHistoryList } from './usagehistory/UsageHistoryList';

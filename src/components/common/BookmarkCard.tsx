@@ -1,4 +1,5 @@
 import type React from 'react';
+import { useState } from 'react';
 import StoreTypeIcon, {
   type CategoryType,
   type StoreClassType,
@@ -9,6 +10,7 @@ import StoreStatus, { type StoreStatusType } from './StoreStatus';
 import MiniLocationButton from '@/components/common/MiniLocationButton';
 import PhoneButton from '@/components/common/PhoneButton';
 import PhoneButtonDark from '@/components/common/PhoneButtonDark';
+import StorePhoneModal from '@/components/common/StorePhoneModal';
 import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import LocationWhiteIcon from '@/assets/common/locationWhiteIcon.svg?react';
@@ -28,6 +30,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   className = '',
   isDarkMode = false,
 }) => {
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const handleBookmarkToggle = (isBookmarked: boolean) => {
     onBookmarkToggle?.(store.id, isBookmarked);
   };
@@ -37,7 +40,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   };
 
   const handlePhoneClick = () => {
-    console.log('전화버튼클릭됨');
+    setIsPhoneModalOpen(true);
   };
 
   const bgColor = isDarkMode ? 'bg-[#251A49]' : 'bg-white';
@@ -99,6 +102,13 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
           <PhoneButton onClick={handlePhoneClick} />
         )}
       </div>
+
+      {/* 전화번호 모달 */}
+      <StorePhoneModal
+        isOpen={isPhoneModalOpen}
+        onClose={() => setIsPhoneModalOpen(false)}
+        store={store}
+      />
     </div>
   );
 };
@@ -108,8 +118,8 @@ export default BookmarkCard;
 /*
 - 사용법
   <BookmarkCard
-    store={{ ...sampleStore, isBookmarked }}
+    store={{ ...sampleStore, isBookmarked }} // phoneNumber는 store 데이터에 포함
     onBookmarkToggle={handleBookmarkToggle}
-    isDarkMode={false} //true 혹은 isDarkMode 생략시 라이트 모드
+    isDarkMode={false} // true 혹은 isDarkMode 생략시 라이트 모드
   />
 */

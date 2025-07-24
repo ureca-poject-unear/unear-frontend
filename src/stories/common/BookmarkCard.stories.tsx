@@ -29,6 +29,7 @@ const sampleStore: BookmarkStore = {
   event: 'NONE',
   status: '영업중',
   isBookmarked: false,
+  phoneNumber: '1544-1122',
 };
 
 export const 기본: Story = {

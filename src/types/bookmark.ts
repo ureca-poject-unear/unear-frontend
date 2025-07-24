@@ -13,6 +13,7 @@ export interface BookmarkStore {
   event: EventType;
   status: StoreStatusType;
   isBookmarked: boolean;
+  phoneNumber?: string;
 }
 
 export interface BookmarkPageState {
