@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import calendarIcon from '@/assets/my/calender.png';
+import CalendarIcon from '@/assets/my/calender.svg?react';
 import ArrowIcon from '@/assets/common/arrowUpIcon.svg?react';
 import '../statistics/animations.css'; // 애니메이션 CSS 임포트
 import FilterButton from '@/components/common/FilterButton';
@@ -35,9 +35,10 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
 
   const periodOptions: FilterOption[] = [
     { id: 'all', label: '전체', isActive: selectedPeriod === '전체' },
-    { id: 'today', label: '1주일', isActive: selectedPeriod === '1주일' },
+    { id: 'week', label: '1주일', isActive: selectedPeriod === '1주일' },
     { id: 'month', label: '1개월', isActive: selectedPeriod === '1개월' },
     { id: 'quarter', label: '3개월', isActive: selectedPeriod === '3개월' },
+    { id: 'year', label: '1년', isActive: selectedPeriod === '1년' },
   ];
 
   const handleCategorySelect = (option: FilterOption) => {
@@ -53,7 +54,7 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
   const toggleExpanded = () => setIsExpanded(!isExpanded);
 
   return (
-    <div className="bg-white px-4 pt-3">
+    <div className="bg-white px-5 pt-3">
       {/* 필터 버튼 */}
       <button
         onClick={toggleExpanded}
@@ -61,7 +62,10 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
         type="button"
       >
         <div className="flex items-center gap-2">
-          <img src={calendarIcon} alt="캘린더 아이콘" className="w-5 h-5" />
+          <CalendarIcon
+            className="w-5 h-5 text-gray-500"
+            style={{ fill: 'none', stroke: 'currentColor' }}
+          />
           <span className="text-sm font-semibold pt-[3px] text-black">
             {selectedPeriod} · {selectedCategory}
           </span>
@@ -94,17 +98,21 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
           </div>
         </div>
 
-        {/* 날짜 필터 (기존 flex-wrap) */}
+        {/* 날짜 필터 (카테고리처럼 스크롤 가능하게 변경) */}
         <div>
           <h4 className="text-sm font-semibold text-black mb-2">날짜</h4>
-          <div className="flex flex-wrap gap-3 pl-0.5 ">
+          <div
+            className="flex overflow-x-auto pl-0.5 gap-3 py-1 scrollbar-hide"
+            style={{ maxWidth: '100%', WebkitOverflowScrolling: 'touch' }}
+          >
             {periodOptions.map((option) => (
-              <FilterButton
-                key={option.id}
-                text={option.label}
-                onClick={() => handlePeriodSelect(option)}
-                isActive={option.isActive}
-              />
+              <div key={option.id} className="flex-shrink-0" style={{ width: 80 }}>
+                <FilterButton
+                  text={option.label}
+                  onClick={() => handlePeriodSelect(option)}
+                  isActive={option.isActive}
+                />
+              </div>
             ))}
           </div>
         </div>

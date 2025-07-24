@@ -14,7 +14,7 @@ const UsageHistoryItem = ({
 }: UsageHistoryItemProps) => {
   return (
     <div
-      className="h-[64px] flex items-center justify-between px-2 bg-white rounded-lg"
+      className="h-[64px] flex items-center justify-between bg-white rounded-lg px-2"
       style={{ boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.1)' }}
     >
       {/* 왼쪽: 아이콘 */}

@@ -23,7 +23,7 @@ const UsageHistoryList = ({
   }
 
   return (
-    <div className="bg-white space-y-2 px-4 pt-3 pb-3">
+    <div className="bg-white space-y-2 px-5 pt-3 pb-3">
       {items.map((item) => (
         <UsageHistoryItem
           key={item.id}
