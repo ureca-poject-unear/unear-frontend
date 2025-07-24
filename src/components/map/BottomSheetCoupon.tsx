@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import CouponCard from '@/components/common/CouponCard';
 import StoreCouponCard from '@/components/common/StoreCouponCard';
@@ -7,8 +7,11 @@ import MarkerIcon from '@/assets/map/mapCouponLocationIcon.svg?react';
 import MapCouponIcon from '@/assets/map/mapCouponSheetIcon.svg?react';
 import type { CategoryType } from '@/components/common/StoreTypeIcon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
-import type { CouponCardProps } from '@/components/common/CouponCard';
 import CouponModal from '@/components/common/CouponModal';
+import { getUserCoupons } from '@/apis/getUserCoupons';
+import { getUserCouponDetail } from '@/apis/getUserCouponDetail';
+import { isExpiringSoon } from '@/utils/isExpiringSoon';
+import type { UserCoupon, UserCouponDetail } from '@/types/coupon';
 
 interface BottomSheetCouponProps {
   isOpen: boolean;
@@ -17,12 +20,23 @@ interface BottomSheetCouponProps {
 
 const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
   const [activeTab, setActiveTab] = useState<'couponbox' | 'nearby'>('couponbox');
-  const [selectedCoupon, setSelectedCoupon] = useState<CouponCardProps | null>(null);
+  const [selectedCoupon, setSelectedCoupon] = useState<UserCouponDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [coupons, setCoupons] = useState<UserCoupon[]>([]);
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
 
-  const handleCardClick = (coupon: CouponCardProps) => {
-    setSelectedCoupon(coupon);
-    setIsModalOpen(true);
+  const handleCardClick = async (couponId: number) => {
+    try {
+      const brandName = coupons.find((c) => c.userCouponId === couponId)?.name ?? '';
+      setSelectedBrand(brandName);
+      const detail = await getUserCouponDetail(couponId);
+      if (detail) {
+        setSelectedCoupon(detail);
+        setIsModalOpen(true);
+      }
+    } catch (err) {
+      console.error('쿠폰 상세 불러오기 실패', err);
+    }
   };
 
   const handleCloseModal = () => {
@@ -30,29 +44,16 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
     setSelectedCoupon(null);
   };
 
-  const mockCoupons: CouponCardProps[] = [
-    {
-      brand: '스타벅스',
-      title: '아메리카노 10% 할인 쿠폰',
-      validUntil: '2025.08.16',
-      category: 'CAFE',
-      storeClass: 'FRANCHISE',
-    },
-    {
-      brand: '이디야',
-      title: '전 메뉴 1천원 할인',
-      validUntil: '2025.08.10',
-      category: 'CAFE',
-      storeClass: 'FRANCHISE',
-    },
-    {
-      brand: '이디야',
-      title: '전 메뉴 1천원 할인',
-      validUntil: '2025.08.10',
-      category: 'CAFE',
-      storeClass: 'FRANCHISE',
-    },
-  ];
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      const { coupons } = await getUserCoupons();
+      setCoupons(coupons);
+    };
+
+    fetchCoupons();
+  }, []);
+
+  const expiringSoonCoupons = Array.isArray(coupons) ? coupons.filter(isExpiringSoon) : [];
 
   const mockStores = [
     {
@@ -117,17 +118,21 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                     </span>
                     <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                       <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                        {mockCoupons.length}개
+                        {expiringSoonCoupons.length}개
                       </span>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    {mockCoupons.map((coupon, index) => (
+                    {expiringSoonCoupons.map((coupon) => (
                       <CouponCard
-                        key={`expire-${index}`}
-                        {...coupon}
-                        onClick={() => handleCardClick(coupon)}
+                        key={`soon-${coupon.userCouponId}`}
+                        brand={coupon.name}
+                        title={coupon.couponName}
+                        validUntil={coupon.couponEnd}
+                        category={coupon.categoryCode}
+                        storeClass={coupon.markerCode}
+                        onClick={() => handleCardClick(coupon.userCouponId)}
                       />
                     ))}
                   </div>
@@ -142,17 +147,21 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                     </span>
                     <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                       <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                        {mockCoupons.length}개
+                        {coupons.length}개
                       </span>
                     </div>
                   </div>
 
                   <div className="space-y-[14px]">
-                    {mockCoupons.map((coupon, index) => (
+                    {coupons.map((coupon) => (
                       <CouponCard
-                        key={`all-${index}`}
-                        {...coupon}
-                        onClick={() => handleCardClick(coupon)}
+                        key={`all-${coupon.userCouponId}`}
+                        brand={coupon.name}
+                        title={coupon.couponName}
+                        validUntil={coupon.couponEnd}
+                        category={coupon.categoryCode}
+                        storeClass={coupon.markerCode}
+                        onClick={() => handleCardClick(coupon.userCouponId)}
                       />
                     ))}
                   </div>
@@ -186,20 +195,28 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
 
       {selectedCoupon && isModalOpen && (
         <CouponModal
-          brand={selectedCoupon.brand}
-          title={selectedCoupon.title}
-          discountRate={'10%'}
-          expireDate={selectedCoupon.validUntil}
-          barcodeValue={'123456789012'}
-          usageCondition={'쿠폰은 1회만 사용 가능합니다.'}
+          brand={selectedBrand}
+          title={selectedCoupon.couponName}
+          discountRate={
+            selectedCoupon.discountCode === 'COUPON_PERCENT'
+              ? `${selectedCoupon.discountPercent}%`
+              : `${selectedCoupon.fixedDiscount?.toLocaleString() ?? 0}원`
+          }
+          expireDate={selectedCoupon.couponEnd}
+          barcodeValue={selectedCoupon.barcodeNumber}
+          usageCondition={
+            selectedCoupon.discountCode === 'COUPON_FIXED'
+              ? `최소 ${selectedCoupon.minPurchaseAmount?.toLocaleString() ?? 0}원 이상 구매 시`
+              : `최대 ${selectedCoupon.maxDiscountAmount?.toLocaleString() ?? 0}원 할인`
+          }
           usageGuide={[
-            '매장에서 결제전 사용자 바코드 제시',
-            '쿠폰 바코드 사용 유무를 알린 후 바코드 제시',
-            '할인 적용 확인 후 결제',
+            '매장에서 결제 전 바코드 제시',
+            '직원에게 쿠폰 사용 의사 전달',
+            '할인 적용 후 결제',
           ]}
           caution={[
             '다른 할인 쿠폰과 중복 사용 불가',
-            '쿠폰 사용 후 환불 불가',
+            '사용 후 환불 불가',
             '타인 양도 및 교환 불가',
             '유효기간 경과 시 자동 소멸',
           ]}
