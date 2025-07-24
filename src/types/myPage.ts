@@ -24,17 +24,6 @@ export interface ChartDataItem {
   highlight?: boolean;
 }
 
-// 이용 내역 관련 타입
-export interface UsageHistoryItem {
-  id: string;
-  storeName: string;
-  usedDate: string;
-  originalPrice: number;
-  discountPrice: number;
-  category: CategoryType;
-  storeClass: StoreClassType;
-}
-
 // StoreTypeIcon 관련 타입 (재사용)
 export type CategoryType =
   | 'FOOD'

@@ -1,13 +1,20 @@
 import BackIcon from '@/assets/common/backIcon.svg?react';
-import UsageHistoryItem from './UsageHistoryItem';
-import type { UsageHistoryItem as UsageHistoryItemType } from '@/types/myPage';
+import type { UsageHistoryItem } from '@/types/usageHistory';
+import UsageHistoryItemComponent from './usagehistory/UsageHistoryItem';
 
 interface RecentUsageSectionProps {
-  usageHistory: UsageHistoryItemType[];
+  usageHistory: UsageHistoryItem[];
   onDetailClick?: () => void;
+  maxItems?: number;
 }
 
-const RecentUsageSection = ({ usageHistory, onDetailClick }: RecentUsageSectionProps) => {
+const RecentUsageSection = ({
+  usageHistory,
+  onDetailClick,
+  maxItems = 3,
+}: RecentUsageSectionProps) => {
+  const displayedItems = usageHistory.slice(0, maxItems);
+
   const handleDetailClick = () => {
     if (onDetailClick) {
       onDetailClick();
@@ -28,10 +35,9 @@ const RecentUsageSection = ({ usageHistory, onDetailClick }: RecentUsageSectionP
           </button>
         </div>
 
-        {/* 이용 내역 리스트 */}
         <div className="-mx-5 px-5 space-y-1">
-          {usageHistory.map((item) => (
-            <UsageHistoryItem
+          {displayedItems.map((item) => (
+            <UsageHistoryItemComponent
               key={item.id}
               storeName={item.storeName}
               usedDate={item.usedDate}

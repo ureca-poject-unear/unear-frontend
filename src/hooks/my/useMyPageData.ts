@@ -1,11 +1,6 @@
 import { useState, useMemo } from 'react';
-import type {
-  UserProfile,
-  MembershipBenefit,
-  StatisticsData,
-  UsageHistoryItem,
-  ChartDataItem,
-} from '@/types/myPage';
+import type { UserProfile, MembershipBenefit, StatisticsData, ChartDataItem } from '@/types/myPage';
+import type { UsageHistoryItem } from '@/types/usageHistory';
 
 interface UseMyPageDataReturn {
   userProfile: UserProfile;
@@ -64,7 +59,7 @@ const useMyPageData = (): UseMyPageDataReturn => {
   const recentUsageHistory: UsageHistoryItem[] = useMemo(
     () => [
       {
-        id: 1,
+        id: '1',
         storeName: '스타벅스 강남점',
         usedDate: '7월 3일 17:29',
         originalPrice: 16000,
@@ -73,7 +68,7 @@ const useMyPageData = (): UseMyPageDataReturn => {
         storeClass: 'FRANCHISE',
       },
       {
-        id: 2,
+        id: '2',
         storeName: '스타벅스 강남점',
         usedDate: '7월 3일 17:29',
         originalPrice: 16000,
@@ -82,7 +77,7 @@ const useMyPageData = (): UseMyPageDataReturn => {
         storeClass: 'FRANCHISE',
       },
       {
-        id: 3,
+        id: '3',
         storeName: '스타벅스 강남점',
         usedDate: '7월 3일 17:29',
         originalPrice: 16000,
