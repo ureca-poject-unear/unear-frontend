@@ -27,7 +27,6 @@ const sampleStore: BookmarkStore = {
   category: 'CAFE',
   storeClass: 'FRANCHISE',
   event: 'NONE',
-  status: '영업중',
   isBookmarked: false,
   phoneNumber: '1544-1122',
 };
@@ -80,7 +79,6 @@ export const 이벤트매장_일반: Story = {
     store: {
       ...sampleStore,
       event: 'GENERAL',
-      status: '이벤트 매장',
     },
     isDarkMode: false,
     onBookmarkToggle: (storeId, isBookmarked) =>
@@ -93,23 +91,10 @@ export const 이벤트매장_필수: Story = {
     store: {
       ...sampleStore,
       event: 'REQUIRE',
-      status: '필수 매장',
     },
     isDarkMode: false,
     onBookmarkToggle: (storeId, isBookmarked) =>
       console.log(`[storybook] 필수 이벤트 매장 - ${storeId}: ${isBookmarked}`),
-  },
-};
-
-export const 영업종료: Story = {
-  args: {
-    store: {
-      ...sampleStore,
-      status: '영업종료',
-    },
-    isDarkMode: false,
-    onBookmarkToggle: (storeId, isBookmarked) =>
-      console.log(`[storybook] 영업종료 매장 - ${storeId}: ${isBookmarked}`),
   },
 };
 
@@ -118,11 +103,96 @@ export const 다크모드_이벤트매장: Story = {
     store: {
       ...sampleStore,
       event: 'GENERAL',
-      status: '이벤트 매장',
       isBookmarked: true,
     },
     isDarkMode: true,
     onBookmarkToggle: (storeId, isBookmarked) =>
       console.log(`[storybook] 다크모드 이벤트 매장 - ${storeId}: ${isBookmarked}`),
+  },
+};
+
+// 전화번호 없는 매장 테스트
+export const 전화번호없음: Story = {
+  args: {
+    store: {
+      ...sampleStore,
+      name: '동네 마트',
+      phoneNumber: undefined, // 전화번호 없음
+    },
+    isDarkMode: false,
+    onBookmarkToggle: (storeId, isBookmarked) =>
+      console.log(`[storybook] 전화번호 없는 매장 - ${storeId}: ${isBookmarked}`),
+  },
+};
+
+// 실시간 영업시간 테스트 스토리들
+export const 이십사시간매장: Story = {
+  args: {
+    store: {
+      ...sampleStore,
+      name: 'GS25 테헤란점',
+      hours: '24시간',
+      category: 'LIFE',
+    },
+    isDarkMode: false,
+    onBookmarkToggle: (storeId, isBookmarked) =>
+      console.log(`[storybook] 24시간 매장 - ${storeId}: ${isBookmarked}`),
+  },
+};
+
+export const 심야매장: Story = {
+  args: {
+    store: {
+      ...sampleStore,
+      name: '맥도날드 역삼점',
+      hours: '22:00 - 02:00', // 자정 넘어가는 시간
+      category: 'FOOD',
+    },
+    isDarkMode: false,
+    onBookmarkToggle: (storeId, isBookmarked) =>
+      console.log(`[storybook] 심야 매장 - ${storeId}: ${isBookmarked}`),
+  },
+};
+
+export const 현재시간테스트: Story = {
+  args: {
+    store: {
+      ...sampleStore,
+      name: '현재시간 테스트 매장',
+      hours: '08:00 - 20:00',
+    },
+    isDarkMode: false,
+    onBookmarkToggle: (storeId, isBookmarked) =>
+      console.log(`[storybook] 현재시간 테스트 - ${storeId}: ${isBookmarked}`),
+  },
+};
+
+// 다른 카테고리 테스트
+export const 뷰티매장: Story = {
+  args: {
+    store: {
+      ...sampleStore,
+      name: '올리브영 강남점',
+      category: 'BEAUTY',
+      hours: '10:00 - 22:00',
+    },
+    isDarkMode: false,
+    onBookmarkToggle: (storeId, isBookmarked) =>
+      console.log(`[storybook] 뷰티 매장 - ${storeId}: ${isBookmarked}`),
+  },
+};
+
+export const 문화매장: Story = {
+  args: {
+    store: {
+      ...sampleStore,
+      name: 'CGV 강남점',
+      category: 'CULTURE',
+      hours: '10:00 - 24:00',
+      event: 'REQUIRE',
+    },
+    isDarkMode: false,
+    onBookmarkToggle: (storeId, isBookmarked) =>
+      console.log(`[storybook] 문화 매장 - ${storeId}: ${isBookmarked}`),
   },
 };

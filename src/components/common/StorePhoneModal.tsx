@@ -4,6 +4,7 @@ import LocationButton from './LocationButton';
 import CallButton from './CallButton';
 import CopyIcon from '@/assets/my/copy.svg?react';
 import type { BookmarkStore } from '@/types/bookmark';
+import { getOperatingStatus } from '@/utils/operatingHours';
 
 interface StorePhoneModalProps {
   isOpen: boolean;
@@ -48,25 +49,8 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
     // 위치 보기 로직 구현
   };
 
-  const getStatusText = () => {
-    switch (store.status) {
-      case '영업중':
-        return '영업중';
-      case '영업종료':
-        return '영업종료';
-      case '필수 매장':
-        return '영업중';
-      case '이벤트 매장':
-        return '영업중';
-      default:
-        return '영업중';
-    }
-  };
-
-  const getStatusColor = () => {
-    const statusText = getStatusText();
-    return statusText === '영업중' ? 'text-green-500' : 'text-red-500';
-  };
+  // 실시간 영업 상태 계산
+  const operatingStatus = getOperatingStatus(store.hours);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
@@ -118,8 +102,8 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
               <div className="bg-gray-100 rounded-lg p-4 mb-4 text-center">
                 <p className="text-lm font-bold text-gray-600 mb-2">매장 전화번호</p>
                 <p className="text-xl font-semibold text-black mb-3">{phoneNumber}</p>
-                <p className={`text-sm font-regular ${getStatusColor()}`}>
-                  {getStatusText()} ({store.hours})
+                <p className={`text-sm font-regular ${operatingStatus.statusColor}`}>
+                  {operatingStatus.statusText} ({store.hours})
                 </p>
               </div>
 

@@ -16,6 +16,7 @@ import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import LocationWhiteIcon from '@/assets/common/locationWhiteIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
 import type { BookmarkStore } from '@/types/bookmark';
+import { getOperatingStatus } from '@/utils/operatingHours';
 
 interface BookmarkCardProps {
   store: BookmarkStore;
@@ -48,6 +49,10 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   const subTextColor = isDarkMode ? 'text-gray-300' : 'text-gray-400';
   const IconLocation = isDarkMode ? LocationWhiteIcon : LocationIcon;
   const IconTime = isDarkMode ? TimeWhiteIcon : TimeIcon;
+
+  // 실시간 영업 상태 계산
+  const operatingStatus = getOperatingStatus(store.hours);
+  const dynamicStatus: StoreStatusType = operatingStatus.statusText;
 
   return (
     <div
@@ -90,7 +95,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
             {store.hours}
           </span>
         </div>
-        <StoreStatus status={store.status} className="relative top-[1px]" />
+        <StoreStatus status={dynamicStatus} className="relative top-[1px]" />
       </div>
 
       {/* 하단 버튼 */}
