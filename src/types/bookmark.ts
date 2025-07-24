@@ -1,4 +1,6 @@
 import type { CategoryType, StoreClassType } from './myPage';
+import type { EventType } from '../components/common/StoreTypeIcon';
+import type { StoreStatusType } from '../components/common/StoreStatus';
 
 export interface BookmarkStore {
   id: string;
@@ -8,7 +10,8 @@ export interface BookmarkStore {
   hours: string;
   category: CategoryType;
   storeClass: StoreClassType;
-  status: '영업중' | '영업종료';
+  event: EventType;
+  status: StoreStatusType;
   isBookmarked: boolean;
 }
 

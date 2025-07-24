@@ -13,22 +13,10 @@ import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import LocationWhiteIcon from '@/assets/common/locationWhiteIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
-
-interface StoreInfo {
-  id: string;
-  name: string;
-  address: string;
-  distance: string;
-  hours: string;
-  category: CategoryType;
-  storeClass: StoreClassType;
-  event: EventType;
-  status: StoreStatusType;
-  isBookmarked: boolean;
-}
+import type { BookmarkStore } from '@/types/bookmark';
 
 interface BookmarkCardProps {
-  store: StoreInfo;
+  store: BookmarkStore;
   onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
   className?: string;
   isDarkMode?: boolean;
@@ -119,7 +107,7 @@ export default BookmarkCard;
 
 /*
 - 사용법
-  <StoreCouponCard
+  <BookmarkCard
     store={{ ...sampleStore, isBookmarked }}
     onBookmarkToggle={handleBookmarkToggle}
     isDarkMode={false} //true 혹은 isDarkMode 생략시 라이트 모드
