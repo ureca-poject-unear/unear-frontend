@@ -58,7 +58,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     >
       {/* 매장 아이콘 */}
       <div className="absolute left-[19px] top-[19px]">
-        <StoreTypeIcon category={store.category} storeClass="franchise" size={50} />
+        <StoreTypeIcon category={store.category} storeClass="FRANCHISE" size={50} />
       </div>
 
       {/* 즐겨찾기 */}
