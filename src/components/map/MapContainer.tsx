@@ -1,6 +1,6 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import type { KakaoMap, KakaoCustomOverlay } from '@/types/kakao';
+import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
 import axiosInstance from '@/apis/axiosInstance';
 import MapMarkerIcon from '../common/MapMarkerIcon';
@@ -25,9 +25,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const markersRef = useRef<KakaoCustomOverlay[]>([]);
     const currentLocationRef = useRef<{ lat: number; lng: number } | null>(null);
     const [isLocationShown, setIsLocationShown] = useState(false);
-
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
-
+    const staticCircleRef = useRef<KakaoCircle | null>(null);
     interface Place {
       id: number;
       latitude: number;
@@ -185,6 +184,19 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             const map = new window.kakao.maps.Map(container, options);
             mapInstanceRef.current = map;
 
+            const staticCircle = new window.kakao.maps.Circle({
+              center: new window.kakao.maps.LatLng(37.544581, 127.055961),
+              radius: 300,
+              strokeWeight: 5,
+              strokeColor: '#DFA2A2',
+              strokeOpacity: 1,
+              strokeStyle: 'shortdash',
+              fillColor: '#F316B0',
+              fillOpacity: 0.08,
+            });
+            staticCircle.setMap(map);
+            staticCircleRef.current = staticCircle;
+
             showCurrentLocation();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
@@ -198,6 +210,10 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
       return () => {
         document.head.removeChild(script);
+        // 정리
+        if (staticCircleRef.current) {
+          staticCircleRef.current.setMap(null);
+        }
       };
     }, [kakaoMapKey]);
 
