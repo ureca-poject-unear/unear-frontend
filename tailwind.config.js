@@ -40,6 +40,11 @@ export default {
         xxl: '2.25rem', //36px
       },
       keyframes: {
+        blinkPulse: {
+          '0%': { opacity: '0.1' },
+          '50%': { opacity: '0.8' },
+          '100%': { opacity: '0.1' },
+        },
         zoom: {
           '0%': { transform: 'scale(1)' },
           '100%': { transform: 'scale(1.1)' },
@@ -50,6 +55,7 @@ export default {
         },
       },
       animation: {
+        'blink-pulse': 'blinkPulse 2.5s ease-in-out infinite',
         zoom: 'zoom 6s ease-in-out forwards',
         slideLeft: 'slideLeft 20s linear infinite',
       },

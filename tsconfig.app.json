@@ -29,5 +29,5 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src", "./svg.d.ts"]
+  "include": ["src", "src/types/kakao.d.ts", "./svg.d.ts"]
 }

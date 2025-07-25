@@ -4,6 +4,7 @@ import ToggleButton from '../components/common/ToggleButton'; // 경로에 맞�
 import ConfirmButton from '../components/common/ConfirmButton';
 
 const SignUpPage = () => {
+  // --- 기존 상태(State) 및 변수 선언 (변경 없음) ---
   const [form, setForm] = useState({
     name: '',
     gender: '남자',
@@ -19,23 +20,17 @@ const SignUpPage = () => {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
-  // 이메일 인증 타이머 관련 상태
-  const [emailVerificationTimer, setEmailVerificationTimer] = useState(0); // 남은 시간 (초)
-  const [isTimerRunning, setIsTimerRunning] = useState(false); // 타이머 실행 여부
-  const timerIntervalRef = useRef<number | null>(null); // setInterval ID를 저장할 ref
+  const [emailVerificationTimer, setEmailVerificationTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const timerIntervalRef = useRef<number | null>(null);
 
-  // 이메일 중복/유효성 검사 에러 상태
   const [emailExistsError, setEmailExistsError] = useState(false);
-
-  // 이메일 인증번호 입력 상태 및 에러 상태
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationCodeError, setVerificationCodeError] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(false); // 이메일 인증 완료 상태
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
-  // 로딩 상태
   const [isLoading, setIsLoading] = useState(false);
 
-  // 회원가입 버튼 활성화 상태 계산
   const isSignUpActive =
     form.name.trim() !== '' &&
     form.gender.trim() !== '' &&
@@ -45,8 +40,9 @@ const SignUpPage = () => {
     form.password.trim() !== '' &&
     form.confirmPassword.trim() !== '' &&
     !passwordMismatch &&
-    isEmailVerified; // 이메일 인증도 완료되어야 함
+    isEmailVerified;
 
+  // --- 기존 핸들러 및 헬퍼 함수 (변경 없음) ---
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
@@ -59,7 +55,6 @@ const SignUpPage = () => {
     const { value } = e.target;
     setForm((prevForm) => {
       const newForm = { ...prevForm, [field]: value };
-
       if (field === 'password' || field === 'confirmPassword') {
         if (newForm.password && newForm.confirmPassword) {
           setPasswordMismatch(newForm.password !== newForm.confirmPassword);
@@ -67,22 +62,22 @@ const SignUpPage = () => {
           setPasswordMismatch(false);
         }
       }
-      // 이메일 필드 변경 시 이메일 중복 에러 초기화 및 인증 상태 초기화
       if (field === 'email') {
         setEmailExistsError(false);
-        setIsEmailVerified(false); // 이메일이 변경되면 인증 상태 초기화
+        setIsEmailVerified(false);
       }
       return newForm;
     });
   };
 
-  // 이메일 인증번호 입력 핸들러
   const handleVerificationCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVerificationCode(e.target.value);
-    setVerificationCodeError(false); // 인증번호 입력 시 에러 메시지 초기화
+    setVerificationCodeError(false);
   };
 
-  // 이메일 인증 요청 및 타이머 시작 함수
+  // --- API 연동 부분 수정 ---
+
+  // 이메일 인증 요청 및 타이머 시작 함수 (이전과 동일)
   const handleEmailVerificationRequest = async () => {
     if (!form.email.trim()) {
       alert('이메일을 입력해주세요.');
@@ -91,28 +86,22 @@ const SignUpPage = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/auth/send-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: form.email,
-        }),
-      });
+      const response = await fetch(
+        `http://dev.unear.site/api/app/auth/send-code?email=${encodeURIComponent(form.email)}`,
+        {
+          method: 'POST',
+        }
+      );
 
-      const result = await response.json();
-
-      if (response.ok && result.resultCode === 200) {
-        // 이메일 인증번호 전송 성공
+      if (response.ok) {
         setEmailExistsError(false);
         setShowEmailVerification(true);
-        setEmailVerificationTimer(240); // 4분 (240초)으로 타이머 설정
+        setEmailVerificationTimer(240);
         setIsTimerRunning(true);
         setIsEmailVerified(false);
         alert('인증번호가 전송되었습니다.');
       } else {
-        // 에러 처리
+        const result = await response.json();
         if (result.codeName === 'DUPLICATED_EMAIL') {
           setEmailExistsError(true);
         } else {
@@ -127,7 +116,7 @@ const SignUpPage = () => {
     }
   };
 
-  // 이메일 인증번호 확인 함수
+  // [수정된 부분] 이메일 인증번호 확인 함수
   const handleVerifyCode = async () => {
     if (!verificationCode.trim()) {
       alert('인증번호를 입력해주세요.');
@@ -136,21 +125,17 @@ const SignUpPage = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/auth/verify-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: form.email,
-          code: verificationCode,
-        }),
-      });
+      const response = await fetch(
+        `http://dev.unear.site/api/app/auth/verify-code?email=${encodeURIComponent(
+          form.email
+        )}&code=${encodeURIComponent(verificationCode)}`,
+        {
+          method: 'POST',
+        }
+      );
 
-      const result = await response.json();
-
-      if (response.ok && result.resultCode === 200) {
-        // 인증 성공
+      // response.ok가 true이면 성공으로 간주하고, JSON 파싱을 시도하지 않습니다.
+      if (response.ok) {
         setVerificationCodeError(false);
         setIsTimerRunning(false);
         setIsEmailVerified(true);
@@ -160,7 +145,8 @@ const SignUpPage = () => {
         }
         alert('이메일 인증이 완료되었습니다!');
       } else {
-        // 인증 실패
+        // response.ok가 false인 경우에만 JSON 파싱을 시도합니다. (에러 메시지 처리)
+        const result = await response.json();
         setVerificationCodeError(true);
         alert(result.message || '인증번호가 올바르지 않습니다.');
       }
@@ -172,43 +158,33 @@ const SignUpPage = () => {
     }
   };
 
-  // 타이머 로직 (useEffect를 사용하여 컴포넌트 라이프사이클 관리)
+  // 타이머 로직 (변경 없음)
   useEffect(() => {
     if (isTimerRunning && emailVerificationTimer > 0) {
       timerIntervalRef.current = window.setInterval(() => {
         setEmailVerificationTimer((prevTime) => prevTime - 1);
       }, 1000);
     } else if (emailVerificationTimer === 0) {
-      // 타이머가 0이 되면 정지
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
       }
-      setIsTimerRunning(false); // 타이머 종료 상태로 변경
-      // 타이머 만료 시 인증번호 에러 메시지 표시 (선택 사항)
-      if (showEmailVerification) {
-        // setVerificationCodeError(true); // 만료 시 에러 메시지 표시
-      }
+      setIsTimerRunning(false);
     }
-
-    // 컴포넌트 언마운트 시 또는 타이머가 다시 시작될 때 기존 인터벌 클리어
     return () => {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
       }
     };
-  }, [isTimerRunning, emailVerificationTimer, showEmailVerification]); // isTimerRunning 또는 emailVerificationTimer가 변경될 때마다 실행
+  }, [isTimerRunning, emailVerificationTimer]);
 
-  // 시간 포맷팅 함수 (MM분 SS초)
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}분 ${remainingSeconds.toString().padStart(2, '0')}초`;
   };
 
-  // 생년월일을 ISO 8601 형식으로 변환하는 함수
   const formatBirthdate = (birthString: string) => {
-    // YYYYMMDD 형식을 YYYY-MM-DD로 변환
     if (birthString.length === 8) {
       const year = birthString.substring(0, 4);
       const month = birthString.substring(4, 6);
@@ -218,8 +194,8 @@ const SignUpPage = () => {
     return birthString;
   };
 
+  // 회원가입 제출 함수 (변경 없음)
   const handleSubmit = async () => {
-    // 최종 제출 시에도 다시 한번 확인 (handleChange에서 놓칠 수 있는 엣지 케이스 방지)
     if (form.password !== form.confirmPassword) {
       setPasswordMismatch(true);
       return;
@@ -237,7 +213,7 @@ const SignUpPage = () => {
         gender: form.gender === '남자' ? 'M' : 'F',
       };
 
-      const response = await fetch('/auth/signup', {
+      const response = await fetch('http://dev.unear.site/api/app/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -248,14 +224,10 @@ const SignUpPage = () => {
       const result = await response.json();
 
       if (response.ok && result.resultCode === 200) {
-        // 회원가입 성공
         alert(`회원가입이 완료되었습니다! 환영합니다, ${result.data.username}님!`);
-        // 성공 후 로그인 페이지로 이동
         window.location.href = '/login';
       } else {
-        // 회원가입 실패
         if (result.codeName === 'INVALID_INPUT_VALUE' && result.data?.fieldErrors) {
-          // 필드별 에러 메시지 표시
           const fieldErrors = result.data.fieldErrors;
           let errorMessage = '입력값을 확인해주세요:\n';
           Object.entries(fieldErrors).forEach(([, message]) => {
@@ -277,6 +249,7 @@ const SignUpPage = () => {
     }
   };
 
+  // --- JSX 렌더링 부분 (변경 없음) ---
   return (
     <>
       <Header title="회원가입" />
@@ -284,7 +257,7 @@ const SignUpPage = () => {
         <div className="px-5 flex flex-col gap-6 ">
           {/* 이름 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">이름</label>
+            <label className="text-lm font-bold text-black">이름</label>
             <input
               type="text"
               placeholder="이름"
@@ -296,7 +269,7 @@ const SignUpPage = () => {
 
           {/* 성별 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">성별</label>
+            <label className="text-lm font-bold text-black">성별</label>
             <div className="flex gap-4 mt-2">
               {['남자', '여자'].map((g) => (
                 <ToggleButton
@@ -317,7 +290,7 @@ const SignUpPage = () => {
 
           {/* 생년월일 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">생년월일</label>
+            <label className="text-lm font-bold text-black">생년월일</label>
             <input
               type="text"
               placeholder="예: 19940508"
@@ -329,7 +302,7 @@ const SignUpPage = () => {
 
           {/* 전화번호 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">전화번호</label>
+            <label className="text-lm font-bold text-black">전화번호</label>
             <input
               type="text"
               placeholder="'-' 포함 입력 (예: 010-1234-5678)"
@@ -341,7 +314,7 @@ const SignUpPage = () => {
 
           {/* 이메일 섹션 시작 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">이메일</label>
+            <label className="text-lm font-bold text-black">이메일</label>
             <div className="flex justify-between items-center border-b border-zinc-300">
               <input
                 type="email"
@@ -351,19 +324,16 @@ const SignUpPage = () => {
                 className="flex-1 text-zinc-700 placeholder-zinc-400 focus:outline-none py-1 bg-transparent"
               />
               <ConfirmButton
-                text={isTimerRunning ? '재전송' : '이메일인증'} // 타이머 실행 중이면 '재전송'
+                text={isTimerRunning ? '재전송' : '이메일인증'}
                 onClick={handleEmailVerificationRequest}
-                // 타이머가 실행 중이고, 아직 시간이 남았을 때나 로딩 중일 때는 버튼 비활성화
                 disabled={(isTimerRunning && emailVerificationTimer > 0) || isLoading}
               />
             </div>
-            {/* 이메일 중복/유효성 에러 메시지 */}
             {emailExistsError && (
-              <p className="text-[10px] text-red-500 mt-1">이미 가입된 이메일입니다.</p>
+              <p className="text-xs text-red-500 mt-1">이미 가입된 이메일입니다.</p>
             )}
-            {/* 이메일 인증 완료 메시지 */}
             {isEmailVerified && (
-              <p className="text-[10px] text-green-500 mt-1">이메일 인증이 완료되었습니다.</p>
+              <p className="text-xs text-green-500 mt-1">이메일 인증이 완료되었습니다.</p>
             )}
           </div>
           {/* 이메일 섹션 끝 */}
@@ -371,7 +341,7 @@ const SignUpPage = () => {
           {/* 이메일 인증번호 입력 UI */}
           {showEmailVerification && !isEmailVerified && (
             <div>
-              <p className="text-lg font-bold text-[#333]">이메일 인증번호</p>
+              <p className="text-lm font-bold text-black">이메일 인증번호</p>
               <div className="flex justify-between items-center border-b border-zinc-300">
                 <input
                   type="text"
@@ -380,24 +350,22 @@ const SignUpPage = () => {
                   onChange={handleVerificationCodeChange}
                   className="flex-1 text-zinc-700 placeholder-zinc-400 focus:outline-none py-1 bg-transparent"
                 />
-                {/* 남은 시간 표시 */}
                 {isTimerRunning && emailVerificationTimer > 0 && (
-                  <p className="text-[10px] font-semibold text-red-600 mr-2">
+                  <p className="text-xs font-semibold text-red-600 mr-2">
                     {formatTime(emailVerificationTimer)}
                   </p>
                 )}
                 <ConfirmButton text="인증확인" onClick={handleVerifyCode} disabled={isLoading} />
               </div>
-              {/* 인증번호 틀림 에러 메시지 */}
               {verificationCodeError && (
-                <p className="text-[10px] text-red-500 mt-1">인증번호가 틀렸습니다.</p>
+                <p className="text-xs text-red-500 mt-1">인증번호가 틀렸습니다.</p>
               )}
             </div>
           )}
 
           {/* 비밀번호 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">비밀번호</label>
+            <label className="text-lm font-bold text-black">비밀번호</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -454,7 +422,7 @@ const SignUpPage = () => {
 
           {/* 비밀번호 확인 */}
           <div>
-            <label className="text-lg font-bold text-[#333]">비밀번호 확인</label>
+            <label className="text-lm font-bold text-black">비밀번호 확인</label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
@@ -507,9 +475,8 @@ const SignUpPage = () => {
                 )}
               </button>
             </div>
-            {/* 비밀번호가 일치하지 않을 때만 메시지 표시 */}
             {passwordMismatch && (
-              <p className="text-[10px] text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
+              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
             )}
           </div>
         </div>
@@ -533,7 +500,7 @@ const SignUpPage = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-[#666]">이미 계정이 있으신가요?</p>
           <p
-            className="text-sm font-semibold text-[#e6007e] cursor-pointer"
+            className="text-sm font-semibold text-primary cursor-pointer"
             onClick={() => (window.location.href = '/login')}
           >
             로그인

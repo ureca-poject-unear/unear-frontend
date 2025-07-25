@@ -1,5 +1,6 @@
 import StoreTypeIcon from '@/components/common/StoreTypeIcon';
 import CouponBackground from '@/assets/common/coupon.svg?react';
+import { formatDateToKorean } from '@/utils/formatDate';
 
 export interface CouponCardProps {
   brand: string;
@@ -52,7 +53,7 @@ const CouponCard = ({
           <p className="text-sm font-semibold text-black">{title}</p>
 
           {/* 유효기한 */}
-          <p className="text-sm font-regular text-gray-400">{validUntil}까지</p>
+          <p className="text-s font-regular text-gray-400">{formatDateToKorean(validUntil)}까지</p>
         </div>
       </div>
     </div>
