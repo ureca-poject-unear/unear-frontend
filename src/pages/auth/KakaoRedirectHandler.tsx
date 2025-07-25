@@ -4,7 +4,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // 환경변수에서 API 도메인 가져오기
-const API_DOMAIN = import.meta.env.VITE_API_DOMAIN || 'https://dev.unear.site';
+const API_DOMAIN = import.meta.env.VITE_API_BASE_URL || 'https://dev.unear.site';
 
 // API 응답 타입 정의
 interface KakaoLoginResponse {
