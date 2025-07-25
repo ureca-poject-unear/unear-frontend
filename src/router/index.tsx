@@ -11,6 +11,11 @@ import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
+
+import KakaoRedirectHandler from '@/pages/auth/KakaoRedirectHandler';
+import CompleteProfilePage from '@/pages/CompleteProfilePage';
+import GoogleRedirectHandler from '@/pages/auth/GoogleRedirectHandler';
+
 import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
 import UsageHistoryPage from '@/pages/UsageHistoryPage';
 import BookmarkPage from '@/pages/BookmarkPage';
@@ -35,6 +40,9 @@ const router = createBrowserRouter([
       { path: '/my/coupons', element: <CouponPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
+      { path: '/login/oauth2/code/kakao', element: <KakaoRedirectHandler /> },
+      { path: '/complete-profile', element: <CompleteProfilePage /> },
+      { path: '/login/oauth2/code/google', element: <GoogleRedirectHandler /> },
     ],
   },
 ]);
