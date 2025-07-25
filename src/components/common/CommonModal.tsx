@@ -23,7 +23,6 @@ const CommonModal: React.FC<CommonModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
-      {/* 배경 블러 - 지도페이지 방식 적용 */}
       <div className="relative w-full max-w-[393px]">
         <div
           className="absolute inset-0 bottom-[65px] bg-black bg-opacity-40"

@@ -2,6 +2,15 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
 
+// BottomSheetBarcode props 타입 정의
+interface BottomSheetBarcodeProps {
+  userName?: string;
+  userGrade?: 'VIP' | 'VVIP' | '우수';
+  barcodeValue?: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 const meta: Meta<typeof BottomSheetBarcode> = {
   title: 'Common/BottomSheetBarcode',
   component: BottomSheetBarcode,
@@ -77,7 +86,7 @@ export default meta;
 type Story = StoryObj<typeof BottomSheetBarcode>;
 
 // 상태 관리를 포함한 래퍼 컴포넌트
-const BottomSheetBarcodeWithState = (props: any) => {
+const BottomSheetBarcodeWithState = (props: Partial<BottomSheetBarcodeProps>) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

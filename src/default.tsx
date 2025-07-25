@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import BottomNavigator from '@/components/common/BottomNavigator';
 import { useLocation } from 'react-router-dom';
+import useScrollToTop from './hooks/useScrollToTop';
 
 const Default = () => {
   const { pathname } = useLocation();
@@ -11,6 +12,8 @@ const Default = () => {
   // Check if it's the login or signup page
   const isAuthPage =
     pathname === '/login' || pathname === '/signup' || pathname === '/complete-profile';
+
+  useScrollToTop();
 
   return (
     <div

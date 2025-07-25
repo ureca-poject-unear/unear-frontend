@@ -11,9 +11,15 @@ import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
+
 import KakaoRedirectHandler from '@/pages/auth/KakaoRedirectHandler';
 import CompleteProfilePage from '@/pages/CompleteProfilePage';
 import GoogleRedirectHandler from '@/pages/auth/GoogleRedirectHandler';
+
+import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
+import UsageHistoryPage from '@/pages/UsageHistoryPage';
+import BookmarkPage from '@/pages/BookmarkPage';
+import CouponPage from '@/pages/CouponPage';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +34,10 @@ const router = createBrowserRouter([
       { path: '/story/recommend', element: <StoryRecommendPage /> },
       { path: '/junior', element: <JuniorPage /> },
       { path: '/my', element: <MyPage /> },
+      { path: '/my/statistics', element: <StatisticsDetailPage /> },
+      { path: '/my/usage-history', element: <UsageHistoryPage /> },
+      { path: '/my/bookmarks', element: <BookmarkPage /> },
+      { path: '/my/coupons', element: <CouponPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
       { path: '/login/oauth2/code/kakao', element: <KakaoRedirectHandler /> },
