@@ -19,7 +19,6 @@ export interface StoreInfo {
   id: string;
   name: string;
   address: string;
-  distance: string;
   hours: string;
   category: CategoryType;
   storeClass: StoreClassType;
@@ -108,10 +107,6 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
       </div>
       <div className="absolute left-[19px] right-[15px] top-[80px] mb-[10px] flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
-          <IconLocation />
-          <span className={`font-regular text-sm ${subTextColor} relative top-[2px]`}>
-            {store.distance}
-          </span>
           <IconTime />
           <span className={`font-regular text-sm ${subTextColor} relative top-[2px]`}>
             {store.hours}

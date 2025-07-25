@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // [추가] useNavigate 훅 임포트
 import MiniButton from '@/components/common/MiniButton';
 import CommonModal from '@/components/common/CommonModal';
 import ProbabilityRoulette from '@/components/JuniorPage/ProbabilityRoulette';
@@ -11,12 +12,20 @@ type Stamp = {
 
 type Props = {
   stamps: Stamp[]; // 최대 4개
-  onRouletteClick: () => void;
-  hasAlreadySpun: boolean; // 사용자가 이미 룰렛을 돌렸는지 여부
 };
 
-const StampRouletteCard: React.FC<Props> = ({ stamps, onRouletteClick, hasAlreadySpun }) => {
+const StampRouletteCard: React.FC<Props> = ({ stamps }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate(); // [추가] navigate 함수 사용 준비
+
+  // 룰렛 참여 여부를 localStorage에서 가져와 초기 상태로 설정
+  const [isRouletteSpun, setIsRouletteSpun] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('hasSpunRoulette') === 'true';
+    }
+    return false;
+  });
+
   const displayStamps: Stamp[] = [...stamps];
 
   // 부족한 스탬프를 빈 슬롯으로 채우기
@@ -27,23 +36,33 @@ const StampRouletteCard: React.FC<Props> = ({ stamps, onRouletteClick, hasAlread
   // 모든 스탬프가 찍혔는지 여부
   const isAllStamped = displayStamps.every((stamp) => stamp.isStamped);
 
-  // [수정] 버튼 활성화 조건: 모든 스탬프가 찍혀있고, 아직 룰렛을 돌리지 않았어야 함
-  const isButtonActive = isAllStamped && !hasAlreadySpun;
+  // 버튼 활성화 조건: 모든 스탬프가 찍혀있고, 아직 룰렛을 돌리지 않았어야 함
+  const isButtonActive = isAllStamped && !isRouletteSpun;
 
-  // [수정] 룰렛 참여 여부에 따라 버튼 텍스트 변경
-  const buttonText = hasAlreadySpun ? '참여 완료' : '룰렛 돌리기';
+  // 룰렛 참여 여부에 따라 버튼 텍스트 변경
+  const buttonText = isRouletteSpun ? '참여 완료' : '룰렛 돌리기';
 
-  // 룰렛 버튼 클릭 시 모달 열기
+  // [수정] 룰렛 버튼 클릭 시 로그인 상태 확인
   const handleRouletteClick = () => {
-    // 활성화 상태일 때만 모달 열기 및 콜백 함수 실행
     if (isButtonActive) {
-      setIsModalOpen(true);
-      onRouletteClick();
+      // 로컬 스토리지에서 accessToken(로그인 토큰)을 확인
+      const token = localStorage.getItem('accessToken');
+
+      if (token) {
+        // 토큰이 있으면(로그인 상태), 룰렛 모달을 엶
+        setIsModalOpen(true);
+        localStorage.setItem('hasSpunRoulette', 'true');
+        setIsRouletteSpun(true);
+      } else {
+        // 토큰이 없으면(로그아웃 상태), 알림을 띄우고 로그인 페이지로 이동
+        alert('룰렛을 돌리려면 로그인이 필요합니다.');
+        navigate('/login');
+      }
     }
   };
 
   return (
-    <div className="relative w-[393px] h-[210px] mx-auto bg-white  p-5">
+    <div className="relative w-[393px] h-[210px] mx-auto bg-white p-5">
       <h2 className="absolute left-5 top-3 text-lm font-bold text-black">스탬프</h2>
 
       <div className="w-[353px] h-36 rounded-xl bg-zinc-100 absolute left-[19.5px] top-[50px] flex flex-col justify-between p-4">
@@ -170,7 +189,6 @@ const StampRouletteCard: React.FC<Props> = ({ stamps, onRouletteClick, hasAlread
 
         {/* 버튼 */}
         <div className="flex justify-center mt-0">
-          {/* [수정] 버튼 텍스트와 활성화 상태를 새로운 변수로 제어 */}
           <MiniButton text={buttonText} onClick={handleRouletteClick} isActive={isButtonActive} />
         </div>
       </div>

@@ -1,20 +1,26 @@
-import React from 'react';
-import MapContainer from '@/components/JuniorPage/MapContainer';
+// src/components/JuniorPage/JuniorMap.tsx
 
-const JuniorMap = () => {
+import React from 'react';
+import MapContainer from './MapContainer';
+import type { StoreType } from '@/types/Junior'; // [수정] 임포트 경로 변경
+
+// 부모로부터 받을 props 타입 정의
+interface JuniorMapProps {
+  stores: StoreType[];
+  onBookmarkToggle: (storeId: string) => void;
+}
+
+const JuniorMap = ({ stores, onBookmarkToggle }: JuniorMapProps) => {
   return (
-    <div className="relative w-[393px] h-[351px] bg-white  ">
-      {/* 타이틀 */}
-      <div className="absolute top-[15px] left-[20px] w-auto h-auto">
-        <p className="text-lm font-bold text-left text-black">이번주니어 지역</p>
+    <div className="px-5  bg-white">
+      {/* 지도 위쪽 텍스트 */}
+      <div className="m-4">
+        <p className="text-lm font-bold text-black">이번주니어 지역</p>
       </div>
 
-      {/* 지도 영역 - 타이틀 아래 적당한 간격으로 배치 */}
-      <div
-        className="absolute top-[50px] left-5 right-5 bottom-5"
-        style={{ borderRadius: '12px', overflow: 'hidden' }}
-      >
-        <MapContainer />
+      {/* 지도 */}
+      <div className="relative h-[280px] w-[352px] mb-4">
+        <MapContainer stores={stores} onBookmarkToggle={onBookmarkToggle} />
       </div>
     </div>
   );
