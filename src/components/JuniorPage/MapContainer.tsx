@@ -102,7 +102,7 @@ const MapContainer = () => {
     );
 
     const gapOffset = 0.001;
-    const infoWindowCenterOffset = 0.0007;
+    const infoWindowCenterOffset = 0.0008;
 
     const newInfoOverlay = new window.kakao.maps.CustomOverlay({
       content: contentNode,
