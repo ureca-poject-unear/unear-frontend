@@ -38,3 +38,29 @@ export interface CouponPageHandlers {
   onCouponClick: (coupon: CouponItem) => void;
   onBack: () => void;
 }
+
+export interface UserCoupon {
+  userCouponId: number;
+  couponName: string;
+  couponEnd: string;
+  barcodeNumber: string;
+  name: string; // 브랜드명
+  categoryCode: CategoryType;
+  markerCode: StoreClassType;
+  couponStatusCode: 'UNUSED' | 'USED' | 'EXPIRED';
+  createdAt: string;
+}
+
+export interface UserCouponDetail {
+  userCouponId: number;
+  couponName: string;
+  couponEnd: string;
+  barcodeNumber: string;
+  discountCode: 'COUPON_PERCENT' | 'COUPON_FIXED';
+  discountPercent?: number;
+  fixedDiscount?: number;
+  minPurchaseAmount?: number;
+  maxDiscountAmount?: number;
+  couponStatusCode: 'UNUSED' | 'USED' | 'EXPIRED';
+  createdAt: string;
+}
