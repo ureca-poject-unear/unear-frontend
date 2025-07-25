@@ -24,7 +24,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (accessToken: string, refreshToken?: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   checkAuthStatus: () => Promise<boolean>;
   refreshAccessToken: () => Promise<boolean>;
   userInfo: UserInfo | null;
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         showToast?.('인증 오류가 발생했습니다.');
       }
 
-      logout();
+      await logout();
       return false;
     }
   };
@@ -169,7 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       console.error('❌ AuthProvider: 토큰 검증 실패:', error);
-      logout();
+      await logout();
       return false;
     }
   };
@@ -216,8 +216,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // 로그아웃 함수
-  const logout = (): void => {
+  const logout = async (): Promise<void> => {
     console.log('🚪 AuthProvider: 로그아웃 처리 중...');
+
+    try {
+      // 1. 서버에 로그아웃 API 호출 (HttpOnly 쿠키 삭제)
+      console.log('🌐 서버 로그아웃 요청 중...');
+      await axiosInstance.post(
+        '/auth/logout',
+        {},
+        {
+          withCredentials: true, // HttpOnly 쿠키 포함해서 전송
+        }
+      );
+      console.log('✅ 서버 로그아웃 완료 - HttpOnly 쿠키 삭제됨');
+    } catch (error) {
+      console.warn('⚠️ 서버 로그아웃 실패 (클라이언트 정리는 계속 진행):', error);
+      // 서버 로그아웃 실패해도 클라이언트 정리는 계속 진행
+    }
+
+    // 2. 클라이언트 상태 정리 (메모리, sessionStorage, localStorage)
     storeLogout();
     console.log('✅ AuthProvider: 로그아웃 완료');
   };

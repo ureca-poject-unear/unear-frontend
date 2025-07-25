@@ -16,13 +16,19 @@ const UserProfileSection = ({
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const confirmLogout = window.confirm('정말 로그아웃하시겠습니까?');
 
     if (confirmLogout) {
-      logout(); // AuthProvider의 logout 함수 직접 사용
-      console.log('로그아웃 실행');
-      navigate('/login', { replace: true });
+      try {
+        await logout(); // AuthProvider의 logout 함수 직접 사용
+        console.log('로그아웃 실행 완료');
+        navigate('/login', { replace: true });
+      } catch (error) {
+        console.error('로그아웃 오류:', error);
+        // 오류가 발생해도 로그인 페이지로 이동
+        navigate('/login', { replace: true });
+      }
     }
   };
 
