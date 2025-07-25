@@ -10,8 +10,10 @@ import type { StoreStatusType } from '@/components/common/StoreStatus';
 import CouponModal from '@/components/common/CouponModal';
 import { getUserCoupons } from '@/apis/getUserCoupons';
 import { getUserCouponDetail } from '@/apis/getUserCouponDetail';
+import { getNearbyStores } from '@/apis/getNearbyStores';
 import { isExpiringSoon } from '@/utils/isExpiringSoon';
 import type { UserCoupon, UserCouponDetail } from '@/types/coupon';
+import type { NearbyStore, NearbyCoupon } from '@/types/store';
 
 interface BottomSheetCouponProps {
   isOpen: boolean;
@@ -24,6 +26,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [coupons, setCoupons] = useState<UserCoupon[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [nearbyStores, setNearbyStores] = useState<NearbyStore[]>([]);
 
   const handleCardClick = async (couponId: number) => {
     try {
@@ -53,27 +56,37 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
     fetchCoupons();
   }, []);
 
-  const expiringSoonCoupons = Array.isArray(coupons) ? coupons.filter(isExpiringSoon) : [];
+  useEffect(() => {
+    if (activeTab !== 'nearby') return;
 
-  const mockStores = [
-    {
-      id: 'store1',
-      name: '스타벅스 강남점',
-      address: '서울 강남구 테헤란로 152',
-      distance: '0.2km',
-      hours: '06:00 - 22:00',
-      category: 'CAFE' as CategoryType,
-      status: '영업중' as StoreStatusType,
-      isBookmarked: false,
-      coupons: [
-        {
-          id: 'coupon1',
-          title: '아메리카노 10% 할인 쿠폰',
-          expiryDate: '2025.08.16',
-        },
-      ],
-    },
-  ];
+    const fetchNearbyStores = async () => {
+      try {
+        if (!navigator.geolocation) {
+          alert('위치 정보를 사용할 수 없습니다.');
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log('현재 위치:', latitude, longitude);
+            const stores = await getNearbyStores(latitude, longitude);
+            setNearbyStores(stores);
+          },
+          (err) => {
+            console.error('위치 정보 실패:', err);
+            alert('위치 정보를 가져올 수 없습니다.');
+          }
+        );
+      } catch (e) {
+        console.error('근처 매장 불러오기 실패:', e);
+      }
+    };
+
+    fetchNearbyStores();
+  }, [activeTab]);
+
+  const expiringSoonCoupons = Array.isArray(coupons) ? coupons.filter(isExpiringSoon) : [];
 
   return (
     <>
@@ -178,13 +191,30 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                   </span>
                   <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                     <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                      {mockStores.length}개
+                      {nearbyStores.length}개
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-[23px]">
-                  {mockStores.map((store) => (
-                    <StoreCouponCard key={store.id} store={store} />
+                  {nearbyStores.map((store) => (
+                    <StoreCouponCard
+                      key={store.placeId}
+                      store={{
+                        id: String(store.placeId),
+                        name: store.name,
+                        address: store.address,
+                        distance: `${store.distanceKm}km`,
+                        hours: `${store.startTime}:00 - ${store.endTime}:00`,
+                        category: store.categoryCode as CategoryType,
+                        status: '영업중' as StoreStatusType,
+                        isBookmarked: store.favorite,
+                        coupons: store.coupons.map((coupon: NearbyCoupon) => ({
+                          id: String(coupon.couponTemplateId),
+                          title: coupon.couponName,
+                          expiryDate: coupon.couponEnd.split('T')[0].replace(/-/g, '.'),
+                        })),
+                      }}
+                    />
                   ))}
                 </div>
               </div>

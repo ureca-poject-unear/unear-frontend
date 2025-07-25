@@ -57,6 +57,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          console.log('현재 위치:', { latitude, longitude });
           currentLocationRef.current = { lat: latitude, lng: longitude };
           renderCurrentLocation(latitude, longitude);
           mapInstanceRef.current?.setCenter(new window.kakao.maps.LatLng(latitude, longitude));
