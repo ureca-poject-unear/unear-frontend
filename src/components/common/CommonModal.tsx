@@ -72,9 +72,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
             </div>
 
             {/* 컨텐츠 영역 - 스크롤 가능 */}
-            <div className="pt-3 pb-5 pr-5 pl-5 flex-1 overflow-y-auto scrollbar-hide">
-              {children}
-            </div>
+            <div className="pt-3 pb-5 pr-5 pl-5 flex-1 overflow-y-auto">{children}</div>
           </div>
         </div>
       </div>

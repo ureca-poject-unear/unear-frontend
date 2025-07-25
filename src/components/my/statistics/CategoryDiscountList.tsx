@@ -110,8 +110,8 @@ const CategoryDiscountList = ({
               </span>
               <BackIcon
                 className={`
-                  w-5 h-5 transform transition-transform duration-300 ease-out
-                  ${showAllCategories ? '-rotate-90 mb-2' : 'rotate-90 '}
+                  w-5 h-5 transform transition-transform duration-300 ease-out mb-2
+                  ${showAllCategories ? 'rotate-90 mt-[10px]' : '-rotate-90'}
                 `}
               />
             </button>

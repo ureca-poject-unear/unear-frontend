@@ -21,32 +21,140 @@ import UsageHistoryPage from '@/pages/UsageHistoryPage';
 import BookmarkPage from '@/pages/BookmarkPage';
 import CouponPage from '@/pages/CouponPage';
 
+import { AuthProvider } from '@/providers/AuthProvider';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
+
 const router = createBrowserRouter([
   {
     element: <Default />,
     children: [
-      { path: '/', element: <MainPage /> },
-      { path: '/map', element: <MapPage /> },
-      { path: '/story', element: <StoryPage /> },
-      { path: '/story/diagnosis', element: <StoryDiagnosisPage /> },
-      { path: '/story/detail', element: <StoryDetailPage /> },
-      { path: '/story/end', element: <StoryEndPage /> },
-      { path: '/story/recommend', element: <StoryRecommendPage /> },
-      { path: '/junior', element: <JuniorPage /> },
-      { path: '/my', element: <MyPage /> },
-      { path: '/my/statistics', element: <StatisticsDetailPage /> },
-      { path: '/my/usage-history', element: <UsageHistoryPage /> },
-      { path: '/my/bookmarks', element: <BookmarkPage /> },
-      { path: '/my/coupons', element: <CouponPage /> },
+      // 보호된 라우트들 (로그인 필요)
+      {
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <MainPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/map',
+        element: (
+          <ProtectedRoute>
+            <MapPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story',
+        element: (
+          <ProtectedRoute>
+            <StoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/diagnosis',
+        element: (
+          <ProtectedRoute>
+            <StoryDiagnosisPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/detail',
+        element: (
+          <ProtectedRoute>
+            <StoryDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/end',
+        element: (
+          <ProtectedRoute>
+            <StoryEndPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/recommend',
+        element: (
+          <ProtectedRoute>
+            <StoryRecommendPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/junior',
+        element: (
+          <ProtectedRoute>
+            <JuniorPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my',
+        element: (
+          <ProtectedRoute>
+            <MyPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/statistics',
+        element: (
+          <ProtectedRoute>
+            <StatisticsDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/usage-history',
+        element: (
+          <ProtectedRoute>
+            <UsageHistoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/bookmarks',
+        element: (
+          <ProtectedRoute>
+            <BookmarkPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/coupons',
+        element: (
+          <ProtectedRoute>
+            <CouponPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/complete-profile',
+        element: (
+          <ProtectedRoute>
+            <CompleteProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+
+      // 공개 라우트들 (로그인 불필요)
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
       { path: '/login/oauth2/code/kakao', element: <KakaoRedirectHandler /> },
-      { path: '/complete-profile', element: <CompleteProfilePage /> },
       { path: '/login/oauth2/code/google', element: <GoogleRedirectHandler /> },
     ],
   },
 ]);
 
 export default function Router() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }

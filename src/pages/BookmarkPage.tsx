@@ -1,5 +1,5 @@
 import Header from '@/components/common/Header';
-import LoadingScreen from '@/components/common/LoadingScreen';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import EmptyState from '@/components/common/EmptyState';
 import { BookmarkHeader, BookmarkList } from '@/components/my/bookmark';
 import { useBookmarkData, useBookmarkHandlers, useInfiniteScroll } from '@/hooks/my/bookmark';
@@ -38,7 +38,14 @@ const BookmarkPage = () => {
     return (
       <>
         <Header title="즐겨찾기" onBack={handleBack} />
-        <LoadingScreen message="즐겨찾기 목록을 불러오는 중..." />
+        <div className="bg-background">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <LoadingSpinner size="lg" />
+            <p className="mt-4 text-sm font-regular text-gray-600">
+              즐겨찾기 목록을 불러오는 중...
+            </p>
+          </div>
+        </div>
       </>
     );
   }
