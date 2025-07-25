@@ -2,8 +2,8 @@ import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 're
 import ReactDOMServer from 'react-dom/server';
 import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
-import axiosInstance from '@/apis/axiosInstance';
 import MapMarkerIcon from '../common/MapMarkerIcon';
+import { getPlaces } from '@/apis/getPlaces';
 
 export interface MapContainerRef {
   showCurrentLocation: () => void;
@@ -27,31 +27,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const [isLocationShown, setIsLocationShown] = useState(false);
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
     const staticCircleRef = useRef<KakaoCircle | null>(null);
-    interface Place {
-      id: number;
-      latitude: number;
-      longitude: number;
-      categoryCode: CategoryType;
-      markerCode: StoreClassType;
-      eventCode: EventType;
-      benefitCategory: string;
-      favorite: boolean;
-    }
-
-    type CategoryType =
-      | 'FOOD'
-      | 'ACTIVITY'
-      | 'EDUCATION'
-      | 'CULTURE'
-      | 'BAKERY'
-      | 'LIFE'
-      | 'SHOPPING'
-      | 'CAFE'
-      | 'BEAUTY'
-      | 'POPUP';
-
-    type StoreClassType = 'LOCAL' | 'FRANCHISE' | 'BASIC';
-    type EventType = 'NONE' | 'GENERAL' | 'REQUIRE';
 
     const renderCurrentLocation = (lat: number, lng: number) => {
       const currentLatLng = new window.kakao.maps.LatLng(lat, lng);
@@ -108,19 +83,15 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         const ne = bounds.getNorthEast();
 
         try {
-          const res = await axiosInstance.get('/places', {
-            params: {
-              southWestLatitude: sw.getLat(),
-              southWestLongitude: sw.getLng(),
-              northEastLatitude: ne.getLat(),
-              northEastLongitude: ne.getLng(),
-              isFavorite: isBookmarkOnly ? 'true' : undefined,
-              categoryCode: categoryCode ?? undefined,
-              benefitCategory: benefitCategory ?? undefined,
-            },
+          const places = await getPlaces({
+            swLat: sw.getLat(),
+            swLng: sw.getLng(),
+            neLat: ne.getLat(),
+            neLng: ne.getLng(),
+            isFavorite: isBookmarkOnly,
+            categoryCode,
+            benefitCategory,
           });
-
-          const places: Place[] = res.data?.data || [];
 
           markersRef.current.forEach((marker) => marker.setMap(null));
           markersRef.current = [];
