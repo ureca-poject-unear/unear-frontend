@@ -1,22 +1,28 @@
 import Grade from '@/components/common/Grade';
 import MyPageNubiImage from '@/assets/my/mypagenubi.png';
+import { useAuth } from '@/providers/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 import type { UserProfile } from '@/types/myPage';
 
 interface UserProfileSectionProps extends UserProfile {
-  onLogout?: () => void;
+  onLogout?: () => void; // 기존 호환성을 위해 유지하지만 사용하지 않음
 }
 
 const UserProfileSection = ({
   name,
   grade,
   greeting = '오늘도 알뜰한 하루 되세요! ✨',
-  onLogout,
 }: UserProfileSectionProps) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
+    const confirmLogout = window.confirm('정말 로그아웃하시겠습니까?');
+
+    if (confirmLogout) {
+      logout(); // AuthProvider의 logout 함수 직접 사용
       console.log('로그아웃 실행');
+      navigate('/login', { replace: true });
     }
   };
 
@@ -41,7 +47,7 @@ const UserProfileSection = ({
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-s font-regular text-gray-400 underline"
+                  className="text-s font-regular text-gray-400 underline hover:text-gray-600 transition-colors"
                   type="button"
                 >
                   로그아웃

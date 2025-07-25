@@ -1,4 +1,5 @@
 import BookmarkCard from '@/components/common/BookmarkCard';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { BookmarkStore } from '@/types/bookmark';
 
 interface BookmarkListProps {
@@ -16,9 +17,11 @@ const BookmarkList = ({ bookmarks, onBookmarkToggle, isLoadingMore }: BookmarkLi
         ))}
       </div>
 
+      {/* 무한스크롤 로딩 - 작은 핑크색 스피너 */}
       {isLoadingMore && (
-        <div className="flex justify-center items-center py-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="flex justify-center items-center py-4 mt-4">
+          <LoadingSpinner size="sm" />
+          <span className="ml-2 text-xs text-gray-500">더 불러오는 중...</span>
         </div>
       )}
     </>
