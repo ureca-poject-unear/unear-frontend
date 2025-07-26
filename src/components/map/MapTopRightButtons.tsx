@@ -7,18 +7,18 @@ interface Props {
   onToggleFilter: () => void;
   onToggleBookmark: () => void;
   isBookmarkOnly: boolean;
-  categoryCode: string | null;
-  benefitCategory: string | null;
+  categoryCodes: string[];
+  benefitCategories: string[];
 }
 
 const MapTopRightButtons = ({
   onToggleFilter,
   onToggleBookmark,
   isBookmarkOnly,
-  categoryCode,
-  benefitCategory,
+  categoryCodes,
+  benefitCategories,
 }: Props) => {
-  const isFilterActive = Boolean(categoryCode || benefitCategory);
+  const isFilterActive = categoryCodes.length > 0 || benefitCategories.length > 0;
   return (
     <div className="absolute top-[84px] right-[10px] z-10 flex flex-col gap-[10px] items-end">
       {/* 필터 버튼 */}

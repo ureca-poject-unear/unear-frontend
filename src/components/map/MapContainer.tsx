@@ -12,13 +12,13 @@ export interface MapContainerRef {
 
 interface MapContainerProps {
   isBookmarkOnly: boolean;
-  categoryCode: string | null;
-  benefitCategory: string | null;
+  categoryCodes: string[];
+  benefitCategories: string[];
   shouldRestoreLocation: boolean;
 }
 
 const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
-  ({ isBookmarkOnly, categoryCode, benefitCategory, shouldRestoreLocation }, ref) => {
+  ({ isBookmarkOnly, categoryCodes, benefitCategories, shouldRestoreLocation }, ref) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
     const mapInstanceRef = useRef<KakaoMap | null>(null);
@@ -98,8 +98,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             neLat: ne.getLat(),
             neLng: ne.getLng(),
             isFavorite: isBookmarkOnly,
-            categoryCode,
-            benefitCategory,
+            categoryCodes,
+            benefitCategories,
           });
 
           markersRef.current.forEach((marker) => marker.setMap(null));
@@ -137,7 +137,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           console.error('장소 가져오기 실패:', error);
         }
       };
-    }, [isBookmarkOnly, categoryCode, benefitCategory, isLocationShown]);
+    }, [isBookmarkOnly, categoryCodes, benefitCategories, isLocationShown]);
 
     useEffect(() => {
       if (!kakaoMapKey) {
@@ -200,7 +200,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       if (mapInstanceRef.current) {
         fetchPlacesInViewportRef.current();
       }
-    }, [isBookmarkOnly, categoryCode, benefitCategory]);
+    }, [isBookmarkOnly, categoryCodes, benefitCategories]);
 
     useEffect(() => {
       if (shouldRestoreLocation && mapInstanceRef.current && currentLocationRef.current) {

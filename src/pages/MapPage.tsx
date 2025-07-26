@@ -15,11 +15,14 @@ const MapPage = () => {
     const stored = localStorage.getItem('isBookmarkOnly');
     return stored ? JSON.parse(stored) : false;
   });
-  const [categoryCode, setCategoryCode] = useState<string | null>(() => {
-    return localStorage.getItem('categoryCode');
+  const [categoryCodes, setCategoryCodes] = useState<string[]>(() => {
+    const stored = localStorage.getItem('categoryCodes');
+    return stored ? JSON.parse(stored) : [];
   });
-  const [benefitCategory, setBenefitCategory] = useState<string | null>(() => {
-    return localStorage.getItem('benefitCategory');
+
+  const [benefitCategories, setBenefitCategories] = useState<string[]>(() => {
+    const stored = localStorage.getItem('benefitCategories');
+    return stored ? JSON.parse(stored) : [];
   });
   const mapRef = useRef<MapContainerRef | null>(null);
 
@@ -27,26 +30,39 @@ const MapPage = () => {
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
   const [isCouponOpen, setIsCouponOpen] = useState(false);
+  const ALL_CATEGORY_CODES = [
+    'FOOD',
+    'CAFE',
+    'BAKERY',
+    'LIFE',
+    'ACTIVITY',
+    'EDUCATION',
+    'CULTURE',
+    'SHOPPING',
+    'CAFE',
+    'BEAUTY',
+  ];
+  const ALL_BENEFIT_CODES = ['할인', '적립', '무료서비스', '상품 증정'];
 
   useEffect(() => {
     localStorage.setItem('isBookmarkOnly', JSON.stringify(isBookmarkOnly));
   }, [isBookmarkOnly]);
 
   useEffect(() => {
-    if (categoryCode) {
-      localStorage.setItem('categoryCode', categoryCode);
+    if (categoryCodes.length === 0 || categoryCodes.length === ALL_CATEGORY_CODES.length) {
+      localStorage.removeItem('categoryCodes');
     } else {
-      localStorage.removeItem('categoryCode');
+      localStorage.setItem('categoryCodes', JSON.stringify(categoryCodes));
     }
-  }, [categoryCode]);
+  }, [categoryCodes]);
 
   useEffect(() => {
-    if (benefitCategory) {
-      localStorage.setItem('benefitCategory', benefitCategory);
+    if (benefitCategories.length === 0 || benefitCategories.length === ALL_BENEFIT_CODES.length) {
+      localStorage.removeItem('benefitCategories');
     } else {
-      localStorage.removeItem('benefitCategory');
+      localStorage.setItem('benefitCategories', JSON.stringify(benefitCategories));
     }
-  }, [benefitCategory]);
+  }, [benefitCategories]);
 
   const handleCurrentLocation = () => {
     mapRef.current?.showCurrentLocation();
@@ -58,8 +74,8 @@ const MapPage = () => {
       <MapContainer
         ref={mapRef}
         isBookmarkOnly={isBookmarkOnly}
-        categoryCode={categoryCode}
-        benefitCategory={benefitCategory}
+        categoryCodes={categoryCodes}
+        benefitCategories={benefitCategories}
         shouldRestoreLocation={false}
       />
 
@@ -82,8 +98,8 @@ const MapPage = () => {
         onToggleFilter={() => setIsFilterOpen(true)}
         onToggleBookmark={() => setIsBookmarkOnly((prev) => !prev)}
         isBookmarkOnly={isBookmarkOnly}
-        categoryCode={categoryCode}
-        benefitCategory={benefitCategory}
+        categoryCodes={categoryCodes}
+        benefitCategories={benefitCategories}
       />
       <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
       <BottomSheetCoupon
@@ -101,12 +117,12 @@ const MapPage = () => {
       <BottomSheetFilter
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
-        onApply={(category, benefit) => {
-          setCategoryCode(category);
-          setBenefitCategory(benefit);
+        onApply={(categories, benefits) => {
+          setCategoryCodes(categories);
+          setBenefitCategories(benefits);
         }}
-        selectedCategoryCode={categoryCode}
-        selectedBenefitCategory={benefitCategory}
+        selectedCategoryCodes={categoryCodes}
+        selectedBenefitCategories={benefitCategories}
       />
     </div>
   );
