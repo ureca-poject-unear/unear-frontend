@@ -7,8 +7,8 @@ interface GetPlacesParams {
   neLat: number;
   neLng: number;
   isFavorite?: boolean;
-  categoryCode?: string | null;
-  benefitCategory?: string | null;
+  categoryCodes?: string[];
+  benefitCategories?: string[];
 }
 
 export const getPlaces = async ({
@@ -17,8 +17,8 @@ export const getPlaces = async ({
   neLat,
   neLng,
   isFavorite,
-  categoryCode,
-  benefitCategory,
+  categoryCodes,
+  benefitCategories,
 }: GetPlacesParams): Promise<Place[]> => {
   try {
     const res = await axiosInstance.get('/places', {
@@ -28,14 +28,16 @@ export const getPlaces = async ({
         northEastLatitude: neLat,
         northEastLongitude: neLng,
         isFavorite: isFavorite ? 'true' : undefined,
-        categoryCode: categoryCode ?? undefined,
-        benefitCategory: benefitCategory ?? undefined,
+        categoryCode: categoryCodes,
+        benefitCategory: benefitCategories,
       },
     });
 
     return res.data?.data || [];
   } catch (error) {
     console.error('장소 가져오기 실패:', error);
+    console.log('[getPlaces] categoryCodes:', categoryCodes);
+    console.log('[getPlaces] benefitCategories:', benefitCategories);
     throw error;
   }
 };
