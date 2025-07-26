@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Default from '../default';
 import MainPage from '@/pages/MainPage';
+import MembershipPage from '@/pages/MembershipPage';
+import MembershipDetailPage from '@/pages/MembershipDetailPage';
 import MapPage from '@/pages/MapPage';
 import StoryPage from '@/pages/StoryPage';
 import StoryDiagnosisPage from '@/pages/StoryDiagnosisPage';
@@ -17,6 +19,8 @@ const router = createBrowserRouter([
     element: <Default />,
     children: [
       { path: '/', element: <MainPage /> },
+      { path: '/membership', element: <MembershipPage /> },
+      { path: '/membership/detail/:name', element: <MembershipDetailPage /> },
       { path: '/map', element: <MapPage /> },
       { path: '/story', element: <StoryPage /> },
       { path: '/story/diagnosis', element: <StoryDiagnosisPage /> },
