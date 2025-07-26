@@ -1,13 +1,45 @@
+import { useEffect, useState } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import FilterButton from '@/components/common/FilterButton';
 import MiniButton from '@/components/common/MiniButton';
-import { useState } from 'react';
 
 interface BottomSheetFilterProps {
   isOpen: boolean;
   onClose: () => void;
+  onApply: (categoryCode: string | null, benefitCategory: string | null) => void;
+  selectedCategoryCode: string | null;
+  selectedBenefitCategory: string | null;
 }
 
+const reverseCategoryCode = (code: string | null): string => {
+  const map: Record<string, string> = {
+    CAFE: '카페',
+    FOOD: '푸드',
+    SHOPPING: '쇼핑',
+    EDUCATION: '교육',
+    CULTURE: '문화/여가',
+    BAKERY: '베이커리',
+    BEAUTY: '뷰티/건강',
+    LIFE: '생활/편의',
+    ACTIVITY: '액티비티',
+  };
+  return code && map[code] ? map[code] : '전체';
+};
+
+const mapCategoryCode = (name: string): string | null => {
+  const map: Record<string, string> = {
+    카페: 'CAFE',
+    푸드: 'FOOD',
+    쇼핑: 'SHOPPING',
+    교육: 'EDUCATION',
+    '문화/여가': 'CULTURE',
+    베이커리: 'BAKERY',
+    '뷰티/건강': 'BEAUTY',
+    '생활/편의': 'LIFE',
+    액티비티: 'ACTIVITY',
+  };
+  return name === '전체' ? null : map[name];
+};
 const CATEGORY_LIST = [
   '전체',
   '카페',
@@ -22,10 +54,24 @@ const CATEGORY_LIST = [
 ];
 const BENEFIT_LIST = ['전체', '할인', '적립', '무료서비스', '상품 증정'];
 
-export default function BottomSheetFilter({ isOpen, onClose }: BottomSheetFilterProps) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(['전체']);
-  const [selectedBenefits, setSelectedBenefits] = useState<string[]>(['전체']);
+export default function BottomSheetFilter({
+  isOpen,
+  onClose,
+  onApply,
+  selectedCategoryCode,
+  selectedBenefitCategory,
+}: BottomSheetFilterProps) {
+  const initialCategory = reverseCategoryCode(selectedCategoryCode);
+  const initialBenefit = selectedBenefitCategory ?? '전체';
 
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([initialCategory]);
+  const [selectedBenefits, setSelectedBenefits] = useState<string[]>([initialBenefit]);
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCategories([reverseCategoryCode(selectedCategoryCode)]);
+      setSelectedBenefits([selectedBenefitCategory ?? '전체']);
+    }
+  }, [isOpen, selectedCategoryCode, selectedBenefitCategory]);
   const toggleSelection = (
     value: string,
     list: string[],
@@ -50,8 +96,9 @@ export default function BottomSheetFilter({ isOpen, onClose }: BottomSheetFilter
   };
 
   const handleApply = () => {
-    console.log('적용할 업종:', selectedCategories);
-    console.log('적용할 혜택:', selectedBenefits);
+    const category = mapCategoryCode(selectedCategories[0]);
+    const benefit = selectedBenefits.includes('전체') ? null : selectedBenefits[0];
+    onApply(category, benefit);
     onClose();
   };
 

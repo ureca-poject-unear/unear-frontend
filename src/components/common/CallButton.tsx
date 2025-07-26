@@ -5,7 +5,7 @@ type CallButtonProps = {
 const CallButton: React.FC<CallButtonProps> = ({ onClick }) => {
   return (
     <button
-      className="group w-[169px] h-[46px] relative bg-white hover:bg-green-50 transition-colors duration-200 rounded-lg"
+      className="group w-full max-w-[146px] h-[46px] relative bg-white hover:bg-green-50 transition-colors duration-200 rounded-lg"
       onClick={onClick}
     >
       {/* 테두리 박스 */}

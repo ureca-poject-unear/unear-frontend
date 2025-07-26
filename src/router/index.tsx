@@ -14,27 +14,165 @@ import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
 
+import KakaoRedirectHandler from '@/pages/auth/KakaoRedirectHandler';
+import CompleteProfilePage from '@/pages/CompleteProfilePage';
+import GoogleRedirectHandler from '@/pages/auth/GoogleRedirectHandler';
+
+import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
+import UsageHistoryPage from '@/pages/UsageHistoryPage';
+import BookmarkPage from '@/pages/BookmarkPage';
+import CouponPage from '@/pages/CouponPage';
+
+import { AuthProvider } from '@/providers/AuthProvider';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
+
 const router = createBrowserRouter([
   {
     element: <Default />,
     children: [
-      { path: '/', element: <MainPage /> },
-      { path: '/membership', element: <MembershipPage /> },
-      { path: '/membership/detail/:name', element: <MembershipDetailPage /> },
-      { path: '/map', element: <MapPage /> },
-      { path: '/story', element: <StoryPage /> },
-      { path: '/story/diagnosis', element: <StoryDiagnosisPage /> },
-      { path: '/story/detail', element: <StoryDetailPage /> },
-      { path: '/story/end', element: <StoryEndPage /> },
-      { path: '/story/recommend', element: <StoryRecommendPage /> },
-      { path: '/junior', element: <JuniorPage /> },
-      { path: '/my', element: <MyPage /> },
+      // 보호된 라우트들 (로그인 필요)
+      {
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <MainPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/membership',
+        element: (
+          <ProtectedRoute>
+            <MembershipPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/membership/detail/:name',
+        element: (
+          <ProtectedRoute>
+            <MembershipDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/map',
+        element: (
+          <ProtectedRoute>
+            <MapPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story',
+        element: (
+          <ProtectedRoute>
+            <StoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/diagnosis',
+        element: (
+          <ProtectedRoute>
+            <StoryDiagnosisPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/detail',
+        element: (
+          <ProtectedRoute>
+            <StoryDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/end',
+        element: (
+          <ProtectedRoute>
+            <StoryEndPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/story/recommend',
+        element: (
+          <ProtectedRoute>
+            <StoryRecommendPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/junior',
+        element: (
+          <ProtectedRoute>
+            <JuniorPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my',
+        element: (
+          <ProtectedRoute>
+            <MyPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/statistics',
+        element: (
+          <ProtectedRoute>
+            <StatisticsDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/usage-history',
+        element: (
+          <ProtectedRoute>
+            <UsageHistoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/bookmarks',
+        element: (
+          <ProtectedRoute>
+            <BookmarkPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/coupons',
+        element: (
+          <ProtectedRoute>
+            <CouponPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/complete-profile',
+        element: (
+          <ProtectedRoute>
+            <CompleteProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+
+      // 공개 라우트들 (로그인 불필요)
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
+      { path: '/login/oauth2/code/kakao', element: <KakaoRedirectHandler /> },
+      { path: '/login/oauth2/code/google', element: <GoogleRedirectHandler /> },
     ],
   },
 ]);
 
 export default function Router() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }

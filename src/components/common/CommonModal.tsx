@@ -23,7 +23,6 @@ const CommonModal: React.FC<CommonModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
-      {/* 배경 블러 - 지도페이지 방식 적용 */}
       <div className="relative w-full max-w-[393px]">
         <div
           className="absolute inset-0 bottom-[65px] bg-black bg-opacity-40"
@@ -73,9 +72,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
             </div>
 
             {/* 컨텐츠 영역 - 스크롤 가능 */}
-            <div className="pt-3 pb-5 pr-5 pl-5 flex-1 overflow-y-auto scrollbar-hide">
-              {children}
-            </div>
+            <div className="pt-3 pb-5 pr-5 pl-5 flex-1 overflow-y-auto">{children}</div>
           </div>
         </div>
       </div>

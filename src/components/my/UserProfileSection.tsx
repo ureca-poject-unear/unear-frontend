@@ -1,0 +1,73 @@
+import Grade from '@/components/common/Grade';
+import MyPageNubiImage from '@/assets/my/mypagenubi.png';
+import { useAuth } from '@/providers/AuthProvider';
+import { useNavigate } from 'react-router-dom';
+import type { UserProfile } from '@/types/myPage';
+
+interface UserProfileSectionProps extends UserProfile {
+  onLogout?: () => void; // 기존 호환성을 위해 유지하지만 사용하지 않음
+}
+
+const UserProfileSection = ({
+  name,
+  grade,
+  greeting = '오늘도 알뜰한 하루 되세요! ✨',
+}: UserProfileSectionProps) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm('정말 로그아웃하시겠습니까?');
+
+    if (confirmLogout) {
+      try {
+        await logout(); // AuthProvider의 logout 함수 직접 사용
+        console.log('로그아웃 실행 완료');
+        navigate('/login', { replace: true });
+      } catch (error) {
+        console.error('로그아웃 오류:', error);
+        // 오류가 발생해도 로그인 페이지로 이동
+        navigate('/login', { replace: true });
+      }
+    }
+  };
+
+  return (
+    <div className="w-full bg-white">
+      <div className="px-5 py-6">
+        <div className="flex">
+          {/* 캐릭터와 사용자 정보 */}
+          <div className="flex gap-4 w-full">
+            {/* 마이페이지 누비 캐릭터 */}
+            <img src={MyPageNubiImage} alt="마이페이지 누비" className="w-[89px] h-[89px]" />
+
+            {/* 사용자 정보 */}
+            <div className="flex flex-col gap-2 mt-4 w-full">
+              {/* 이름, 등급, 로그아웃 한 줄 */}
+              <div className="flex justify-between w-full">
+                <div className="flex gap-2">
+                  <h2 className="text-lm font-semibold text-black">{name}님</h2>
+                  <div className="mt-0.5">
+                    <Grade grade={grade} />
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="text-s font-regular text-gray-400 underline hover:text-gray-600 transition-colors"
+                  type="button"
+                >
+                  로그아웃
+                </button>
+              </div>
+
+              {/* 인사말 */}
+              <p className="text-m font-regular text-gray-400">{greeting}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UserProfileSection;

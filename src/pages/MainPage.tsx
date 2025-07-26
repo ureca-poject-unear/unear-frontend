@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/auth';
 import BarcodeIcon from '@/assets/common/barcode.svg?react';
 import InformationIcon from '@/assets/common/information.svg?react';
 import MainNubiImage from '@/assets/main/mainnubi.png';
@@ -8,13 +11,23 @@ import Grade from '@/components/common/Grade';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
 import MembershipBrandBanner from '@/components/main/MembershipBrandBanner';
 import MembershipBenefitModal from '@/components/main/MembershipBenefitModal';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
   const [isBarcodeSheetOpen, setIsBarcodeSheetOpen] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Zustand 스토어에서 사용자 정보 가져오기
+  const { userInfo, getUserDisplayName, getUserGrade, getBarcodeNumber } = useAuthStore();
+
+  // 컴포넌트 마운트 시 사용자 정보 확인
+  useEffect(() => {
+    if (userInfo) {
+      console.log('🔍 현재 사용자 정보:', userInfo);
+    } else {
+      console.log('⚠️ 사용자 정보가 없습니다. AuthProvider에서 자동으로 로드됩니다.');
+    }
+  }, [userInfo]);
 
   const handleBarcodeClick = () => {
     setIsBarcodeSheetOpen(true);
@@ -31,6 +44,14 @@ const MainPage = () => {
   const handleStoryClick = () => {
     navigate('/story'); // 스토리 페이지로 이동
   };
+
+  // 사용자 표시명, 등급, 바코드 번호 가져오기
+  const displayName = getUserDisplayName();
+  const userGrade = getUserGrade();
+  const barcodeNumber = getBarcodeNumber();
+
+  // 등급을 Grade 컴포넌트에 맞는 형식으로 변환
+  const gradeForComponent = userGrade === 'BASIC' ? 'VIP' : userGrade;
 
   return (
     <>
@@ -60,14 +81,14 @@ const MainPage = () => {
           style={{ boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
         >
           <div className="flex flex-col gap-3">
-            {/* 사용자 인사말 */}
+            {/* 사용자 인사말 - 동적으로 사용자 이름 표시 */}
             <h2 className="text-black font-semibold text-lm leading-[18px]">
-              유니어님 안녕하세요!
+              {displayName}님 안녕하세요!
             </h2>
 
-            {/* 사용자 등급과 정보 아이콘 */}
+            {/* 사용자 등급과 정보 아이콘 - 동적으로 사용자 등급 표시 */}
             <div className="flex items-center gap-2">
-              <Grade grade="VVIP" />
+              <Grade grade={gradeForComponent} />
               <button
                 onClick={handleInformationClick}
                 className="text-gray-400"
@@ -138,11 +159,11 @@ const MainPage = () => {
         <MembershipBrandBanner />
       </main>
 
-      {/* 바코드 바텀시트 */}
+      {/* 바코드 바텀시트 - 동적으로 사용자 정보 전달 */}
       <BottomSheetBarcode
-        userName="유니어"
-        userGrade="VVIP"
-        barcodeValue="123456789"
+        userName={displayName}
+        userGrade={gradeForComponent}
+        barcodeValue={barcodeNumber}
         isOpen={isBarcodeSheetOpen}
         onClose={() => setIsBarcodeSheetOpen(false)}
       />
