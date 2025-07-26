@@ -7,6 +7,7 @@ import { getPlaces } from '@/apis/getPlaces';
 
 export interface MapContainerRef {
   showCurrentLocation: () => void;
+  setCenter: (lat: number, lng: number) => void;
 }
 
 interface MapContainerProps {
@@ -72,6 +73,13 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     useImperativeHandle(ref, () => ({
       showCurrentLocation,
+      setCenter: (lat: number, lng: number) => {
+        const map = mapInstanceRef.current;
+        if (map) {
+          const newCenter = new window.kakao.maps.LatLng(lat, lng);
+          map.setCenter(newCenter);
+        }
+      },
     }));
 
     useEffect(() => {
@@ -182,7 +190,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
       return () => {
         document.head.removeChild(script);
-        // 정리
         if (staticCircleRef.current) {
           staticCircleRef.current.setMap(null);
         }

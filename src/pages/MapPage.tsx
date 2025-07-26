@@ -21,12 +21,12 @@ const MapPage = () => {
   const [benefitCategory, setBenefitCategory] = useState<string | null>(() => {
     return localStorage.getItem('benefitCategory');
   });
+  const mapRef = useRef<MapContainerRef | null>(null);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
   const [isCouponOpen, setIsCouponOpen] = useState(false);
-  const mapRef = useRef<MapContainerRef>(null);
 
   useEffect(() => {
     localStorage.setItem('isBookmarkOnly', JSON.stringify(isBookmarkOnly));
@@ -86,7 +86,11 @@ const MapPage = () => {
         benefitCategory={benefitCategory}
       />
       <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
-      <BottomSheetCoupon isOpen={isCouponOpen} onClose={() => setIsCouponOpen(false)} />
+      <BottomSheetCoupon
+        isOpen={isCouponOpen}
+        onClose={() => setIsCouponOpen(false)}
+        mapRef={mapRef}
+      />
       <BottomSheetBarcode
         userName="김누비"
         userGrade="VIP"

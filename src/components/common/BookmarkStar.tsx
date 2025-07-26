@@ -33,7 +33,7 @@ const BookmarkStar: React.FC<BookmarkStarProps> = ({
   };
 
   const sizeClasses = getSizeClasses(size);
-
+  console.log('⭐️ BookmarkStar 렌더됨:', isBookmarked);
   return (
     <button
       onClick={handleClick}

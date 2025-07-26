@@ -11,22 +11,27 @@ import CouponModal from '@/components/common/CouponModal';
 import { getUserCoupons } from '@/apis/getUserCoupons';
 import { getUserCouponDetail } from '@/apis/getUserCouponDetail';
 import { getNearbyStores } from '@/apis/getNearbyStores';
+import { toggleFavorite } from '@/apis/toggleFavorite';
 import { isExpiringSoon } from '@/utils/isExpiringSoon';
 import type { UserCoupon, UserCouponDetail } from '@/types/coupon';
 import type { NearbyStore, NearbyCoupon } from '@/types/store';
+import type { MapContainerRef } from '@/components/map/MapContainer';
+import type { RefObject } from 'react';
 
 interface BottomSheetCouponProps {
   isOpen: boolean;
   onClose: () => void;
+  mapRef: RefObject<MapContainerRef | null>;
 }
 
-const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
+const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) => {
   const [activeTab, setActiveTab] = useState<'couponbox' | 'nearby'>('couponbox');
   const [selectedCoupon, setSelectedCoupon] = useState<UserCouponDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [coupons, setCoupons] = useState<UserCoupon[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [nearbyStores, setNearbyStores] = useState<NearbyStore[]>([]);
+  const [shouldRefreshNearby, setShouldRefreshNearby] = useState(false);
 
   const handleCardClick = async (couponId: number) => {
     try {
@@ -40,6 +45,39 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
     } catch (err) {
       console.error('쿠폰 상세 불러오기 실패', err);
     }
+  };
+
+  const handleBookmarkToggle = async (storeId: string, isBookmarked: boolean) => {
+    setNearbyStores((prev) =>
+      prev.map((store) =>
+        String(store.placeId) === storeId ? { ...store, favorite: !isBookmarked } : store
+      )
+    );
+
+    try {
+      await toggleFavorite(Number(storeId));
+    } catch (error) {
+      console.error('즐겨찾기 변경 실패:', error);
+      alert('즐겨찾기 변경에 실패했습니다.');
+      // 실패했으므로 원래대로 롤백
+      setNearbyStores((prev) =>
+        prev.map((store) =>
+          String(store.placeId) === storeId ? { ...store, favorite: isBookmarked } : store
+        )
+      );
+    }
+  };
+
+  const handleClose = () => {
+    setShouldRefreshNearby(true);
+    onClose();
+  };
+
+  const handleTabChange = (tab: 'couponbox' | 'nearby') => {
+    if (tab === 'couponbox') {
+      setShouldRefreshNearby(true);
+    }
+    setActiveTab(tab);
   };
 
   const handleCloseModal = () => {
@@ -57,7 +95,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
   }, []);
 
   useEffect(() => {
-    if (activeTab !== 'nearby') return;
+    if (activeTab !== 'nearby' || !isOpen) return;
 
     const fetchNearbyStores = async () => {
       try {
@@ -67,11 +105,10 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
         }
 
         navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            console.log('현재 위치:', latitude, longitude);
-            const stores = await getNearbyStores(latitude, longitude);
+          async ({ coords }) => {
+            const stores = await getNearbyStores(coords.latitude, coords.longitude);
             setNearbyStores(stores);
+            setShouldRefreshNearby(false);
           },
           (err) => {
             console.error('위치 정보 실패:', err);
@@ -83,20 +120,22 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
       }
     };
 
-    fetchNearbyStores();
-  }, [activeTab]);
+    if (shouldRefreshNearby || nearbyStores.length === 0) {
+      fetchNearbyStores();
+    }
+  }, [activeTab, isOpen, shouldRefreshNearby]);
 
   const expiringSoonCoupons = Array.isArray(coupons) ? coupons.filter(isExpiringSoon) : [];
 
   return (
     <>
-      <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding={true}>
+      <BottomSheet isOpen={isOpen} onClose={handleClose} disablePadding={true}>
         <div className="w-full h-[520px] flex flex-col">
           {/* 탭 바 영역: 고정 */}
           <div className="shrink-0 pt-4 bg-white z-10">
             <div className="flex text-m font-semibold text-center">
               <button
-                onClick={() => setActiveTab('couponbox')}
+                onClick={() => handleTabChange('couponbox')}
                 className={`flex-1 pb-1 -mb-[1px] ${
                   activeTab === 'couponbox'
                     ? 'text-black border-b-2 border-black'
@@ -106,7 +145,7 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                 쿠폰함
               </button>
               <button
-                onClick={() => setActiveTab('nearby')}
+                onClick={() => handleTabChange('nearby')}
                 className={`flex-1 pb-1 -mb-[1px] ${
                   activeTab === 'nearby'
                     ? 'text-black border-b-2 border-black'
@@ -196,26 +235,45 @@ const BottomSheetCoupon = ({ isOpen, onClose }: BottomSheetCouponProps) => {
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-[23px]">
-                  {nearbyStores.map((store) => (
-                    <StoreCouponCard
-                      key={store.placeId}
-                      store={{
-                        id: String(store.placeId),
-                        name: store.name,
-                        address: store.address,
-                        distance: `${store.distanceKm}km`,
-                        hours: `${store.startTime}:00 - ${store.endTime}:00`,
-                        category: store.categoryCode as CategoryType,
-                        status: '영업중' as StoreStatusType,
-                        isBookmarked: store.favorite,
-                        coupons: store.coupons.map((coupon: NearbyCoupon) => ({
-                          id: String(coupon.couponTemplateId),
-                          title: coupon.couponName,
-                          expiryDate: coupon.couponEnd.split('T')[0].replace(/-/g, '.'),
-                        })),
-                      }}
-                    />
-                  ))}
+                  {nearbyStores.map((store) => {
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    const openHour = Number(store.startTime);
+                    const closeHour = Number(store.endTime);
+
+                    const isOpen = currentHour >= openHour && currentHour < closeHour;
+                    const status: StoreStatusType = isOpen ? '영업중' : '영업종료';
+
+                    return (
+                      <StoreCouponCard
+                        key={`${store.placeId}-${store.favorite}`}
+                        store={{
+                          id: String(store.placeId),
+                          name: store.name,
+                          address: store.address,
+                          distance: `${store.distanceKm}km`,
+                          hours: `${store.startTime}:00 - ${store.endTime}:00`,
+                          category: store.categoryCode as CategoryType,
+                          status,
+                          isBookmarked: store.favorite,
+                          latitude: store.latitude,
+                          longitude: store.longitude,
+                          tel: store.tel,
+                          coupons: store.coupons.map((coupon: NearbyCoupon) => ({
+                            id: String(coupon.couponTemplateId),
+                            title: coupon.couponName,
+                            expiryDate: coupon.couponEnd.split('T')[0].replace(/-/g, '.'),
+                          })),
+                        }}
+                        onLocationClick={(lat, lng) => {
+                          if (!mapRef.current) return;
+                          mapRef.current.setCenter(lat, lng);
+                          onClose();
+                        }}
+                        onBookmarkToggle={handleBookmarkToggle}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
