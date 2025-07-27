@@ -10,6 +10,9 @@ import MapLocationButton from '@/components/map/MapLocationButton';
 import BottomSheetFilter from '@/components/map/BottomSheetFilter';
 import BottomSheetCoupon from '@/components/map/BottomSheetCoupon';
 import { useAuthStore } from '@/store/auth';
+import BottomSheetLocationDetail from '@/components/map/BottomSheetLocationDetail';
+import { getPlaceDetail } from '@/apis/getPlaceDetail';
+import type { StoreData } from '@/types/storeDetail';
 
 const MapPage = () => {
   const [isBookmarkOnly, setIsBookmarkOnly] = useState<boolean>(() => {
@@ -31,6 +34,9 @@ const MapPage = () => {
   const [isEventOpen, setIsEventOpen] = useState(false);
   const [isBarcodeOpen, setIsBarcodeOpen] = useState(false);
   const [isCouponOpen, setIsCouponOpen] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<StoreData | null>(null);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
   const ALL_CATEGORY_CODES = [
     'FOOD',
     'CAFE',
@@ -74,6 +80,16 @@ const MapPage = () => {
     mapRef.current?.showCurrentLocation();
   };
 
+  const handleMarkerClick = async (placeId: number, latitude: string, longitude: string) => {
+    try {
+      const storeDetail = await getPlaceDetail(placeId, latitude, longitude);
+      setSelectedStore(storeDetail);
+      setIsBottomSheetOpen(true);
+    } catch (error) {
+      console.error('상세 정보 불러오기 실패:', error);
+    }
+  };
+
   return (
     <div className="relative w-full h-[calc(100vh-65px)] bg-white">
       {/* 지도 영역 */}
@@ -83,6 +99,7 @@ const MapPage = () => {
         categoryCodes={categoryCodes}
         benefitCategories={benefitCategories}
         shouldRestoreLocation={false}
+        onMarkerClick={handleMarkerClick}
       />
 
       {/* 상단 검색바 */}
@@ -131,6 +148,17 @@ const MapPage = () => {
         selectedCategoryCodes={categoryCodes}
         selectedBenefitCategories={benefitCategories}
       />
+
+      {/* 바텀시트 - store가 있을 때만 렌더 */}
+      {selectedStore && (
+        <BottomSheetLocationDetail
+          store={selectedStore}
+          isOpen={isBottomSheetOpen}
+          onClose={() => setIsBottomSheetOpen(false)}
+          isExpanded={false}
+          onToggleExpand={() => {}}
+        />
+      )}
     </div>
   );
 };

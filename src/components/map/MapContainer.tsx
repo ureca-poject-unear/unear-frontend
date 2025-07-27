@@ -15,10 +15,14 @@ interface MapContainerProps {
   categoryCodes: string[];
   benefitCategories: string[];
   shouldRestoreLocation: boolean;
+  onMarkerClick: (placeId: number, latitude: string, longitude: string) => void;
 }
 
 const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
-  ({ isBookmarkOnly, categoryCodes, benefitCategories, shouldRestoreLocation }, ref) => {
+  (
+    { isBookmarkOnly, categoryCodes, benefitCategories, shouldRestoreLocation, onMarkerClick },
+    ref
+  ) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
     const mapInstanceRef = useRef<KakaoMap | null>(null);
@@ -108,20 +112,39 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           places.forEach((place) => {
             const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
 
-            const markerHTML = ReactDOMServer.renderToString(
-              <MapMarkerIcon
-                category={place.categoryCode}
-                storeClass={place.markerCode}
-                event={place.eventCode}
-              />
-            );
-
+            // HTML 요소 생성
             const el = document.createElement('div');
-            el.innerHTML = markerHTML;
+            el.innerHTML = ReactDOMServer.renderToString(
+              <div style={{ cursor: 'pointer' }}>
+                <MapMarkerIcon
+                  category={place.categoryCode}
+                  storeClass={place.markerCode}
+                  event={place.eventCode}
+                />
+              </div>
+            );
+            const markerElement = el.firstElementChild;
+            if (markerElement) {
+              markerElement.setAttribute('data-place-id', String(place.placeId));
+              markerElement.setAttribute('data-lat', String(place.latitude));
+              markerElement.setAttribute('data-lng', String(place.longitude));
+
+              markerElement.addEventListener('click', () => {
+                const placeId = markerElement.getAttribute('data-place-id');
+                const lat = markerElement.getAttribute('data-lat');
+                const lng = markerElement.getAttribute('data-lng');
+
+                if (placeId && lat && lng) {
+                  onMarkerClick(Number(placeId), lat, lng);
+                } else {
+                  console.error('❌ 마커 클릭: dataset 값이 올바르지 않음');
+                }
+              });
+            }
 
             const overlay = new window.kakao.maps.CustomOverlay({
               position,
-              content: el.firstElementChild as Node,
+              content: markerElement as Node,
               yAnchor: 1,
               zIndex: 1,
             });
@@ -137,7 +160,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           console.error('장소 가져오기 실패:', error);
         }
       };
-    }, [isBookmarkOnly, categoryCodes, benefitCategories, isLocationShown]);
+    }, [isBookmarkOnly, categoryCodes, benefitCategories, isLocationShown, onMarkerClick]);
 
     useEffect(() => {
       if (!kakaoMapKey) {
