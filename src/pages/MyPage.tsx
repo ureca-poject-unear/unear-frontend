@@ -1,5 +1,5 @@
 import Header from '@/components/common/Header';
-import LoadingScreen from '@/components/common/LoadingScreen';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import UserProfileSection from '@/components/my/UserProfileSection';
 import MembershipBenefitSection from '@/components/my/MembershipBenefitSection';
 import StatisticsSection from '@/components/my/StatisticsSection';
@@ -12,30 +12,30 @@ const MyPage = () => {
   const { userProfile, membershipBenefit, statisticsData, recentUsageHistory, isLoading } =
     useMyPageData();
 
-  // 액션 핸들러
-  const {
-    handleBack,
-    onLogout,
-    onCouponClick,
-    onBookmarkClick,
-    onStatisticsDetail,
-    onUsageHistoryDetail,
-  } = useMyPageHandlers();
+  // 액션 핸들러 (로그아웃 제외)
+  const { handleBack, onCouponClick, onBookmarkClick, onStatisticsDetail, onUsageHistoryDetail } =
+    useMyPageHandlers();
 
   return (
     <>
       <Header title="마이 페이지" onBack={handleBack} />
 
       {isLoading ? (
-        <LoadingScreen message="마이페이지 데이터를 불러오는 중..." />
+        <div className="bg-background">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <LoadingSpinner size="lg" />
+            <p className="mt-4 text-sm font-regular text-gray-600">
+              마이페이지 데이터를 불러오는 중...
+            </p>
+          </div>
+        </div>
       ) : (
         <>
-          {/* 사용자 정보 영역 */}
+          {/* 사용자 정보 영역 - 로그아웃은 컴포넌트 내부에서 처리 */}
           <UserProfileSection
             name={userProfile.name}
             grade={userProfile.grade}
             greeting={userProfile.greeting}
-            onLogout={onLogout}
           />
 
           {/* 멤버십 혜택 영역 */}
