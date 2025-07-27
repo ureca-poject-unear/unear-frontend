@@ -9,6 +9,7 @@ import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
 import MapLocationButton from '@/components/map/MapLocationButton';
 import BottomSheetFilter from '@/components/map/BottomSheetFilter';
 import BottomSheetCoupon from '@/components/map/BottomSheetCoupon';
+import { useAuthStore } from '@/store/auth';
 
 const MapPage = () => {
   const [isBookmarkOnly, setIsBookmarkOnly] = useState<boolean>(() => {
@@ -43,6 +44,11 @@ const MapPage = () => {
     'BEAUTY',
   ];
   const ALL_BENEFIT_CODES = ['할인', '적립', '무료서비스', '상품 증정'];
+  const { getUserDisplayName, getUserGrade, getBarcodeNumber } = useAuthStore();
+  const displayName = getUserDisplayName();
+  const userGrade = getUserGrade();
+  const barcodeValue = getBarcodeNumber();
+  const gradeForComponent = userGrade === 'BASIC' ? 'VIP' : userGrade;
 
   useEffect(() => {
     localStorage.setItem('isBookmarkOnly', JSON.stringify(isBookmarkOnly));
@@ -108,12 +114,13 @@ const MapPage = () => {
         mapRef={mapRef}
       />
       <BottomSheetBarcode
-        userName="김누비"
-        userGrade="VIP"
-        barcodeValue="123456789"
+        userName={displayName}
+        userGrade={gradeForComponent}
+        barcodeValue={barcodeValue}
         isOpen={isBarcodeOpen}
         onClose={() => setIsBarcodeOpen(false)}
       />
+
       <BottomSheetFilter
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
