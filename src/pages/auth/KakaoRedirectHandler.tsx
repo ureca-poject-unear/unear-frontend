@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
-import LoadingScreen from '@/components/common/LoadingScreen';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // 환경변수에서 API 도메인 가져오기
 const API_DOMAIN = import.meta.env.VITE_API_BASE_URL || 'https://dev.unear.site';
@@ -138,14 +138,16 @@ const KakaoRedirectHandler: React.FC = () => {
 
   // 카카오 로그인 처리 중 로딩 화면 표시
   return (
-    <div className="w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative bg-white">
-      <LoadingScreen 
-        message={loadingMessage} 
-        color={hasError ? 'gray' : 'primary'}
-        size="xl"
-        fullHeight={true}
-      />
-    </div>
+    <>
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600" style={{ color: hasError ? '#6B7280' : '#6B7280' }}>
+            {loadingMessage}
+          </p>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -23,9 +23,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     const checkOAuthTransition = () => {
       const referrer = document.referrer;
-      const isFromOAuth = referrer.includes('/login/oauth2/code/') || 
-                          sessionStorage.getItem('oauth_redirect_in_progress') === 'true';
-      
+      const isFromOAuth =
+        referrer.includes('/login/oauth2/code/') ||
+        sessionStorage.getItem('oauth_redirect_in_progress') === 'true';
+
       if (isFromOAuth) {
         setIsOAuthTransition(true);
         // 2초 후 전환 상태 해제
@@ -35,7 +36,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         }, 2000);
       }
     };
-    
+
     if (!isLoading) {
       checkOAuthTransition();
     }
@@ -100,21 +101,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
   }, [location.pathname, isLoading, isAuthenticated, refreshAccessToken, getStoredAccessToken]);
 
-  // 로딩 중이거나 OAuth 전환 중일 때 (향상된 로딩 UI)
+  // 로딩 중이거나 OAuth 전환 중일 때
   if (isLoading || isCheckingToken || isOAuthTransition) {
+    const loadingMessage = isLoading
+      ? '애플리케이션 초기화 중...'
+      : isOAuthTransition
+        ? '로그인 완료 처리 중...'
+        : '토큰 유효성 확인 중...';
+
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <LoadingSpinner size="lg" />
-        <p className="mt-4 text-sm font-regular text-gray-600">
-          {isLoading 
-            ? '애플리케이션 초기화 중...' 
-            : isOAuthTransition
-            ? '로그인 완료 처리 중...'
-            : '토큰 유효성 확인 중...'
-          }
-        </p>
-        <div className="mt-2 w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full bg-blue-500 rounded-full animate-pulse"></div>
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600">
+            {loadingMessage}
+          </p>
         </div>
       </div>
     );

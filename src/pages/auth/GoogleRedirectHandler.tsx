@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
-import LoadingScreen from '@/components/common/LoadingScreen';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // 사용자 정보 타입 정의
 interface UserInfo {
@@ -136,14 +136,16 @@ console.log('🔍 Google OAuth 토큰 확인:', {
 
   // 구글 로그인 처리 중 로딩 화면 표시
   return (
-    <div className="w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative bg-white">
-      <LoadingScreen 
-        message={loadingMessage} 
-        color={hasError ? 'gray' : 'primary'}
-        size="xl"
-        fullHeight={true}
-      />
-    </div>
+    <>
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600" style={{ color: hasError ? '#6B7280' : '#6B7280' }}>
+            {loadingMessage}
+          </p>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -26,6 +26,7 @@ interface AuthContextType {
   login: (accessToken: string, refreshToken?: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<boolean>;
+  refreshAccessToken: () => Promise<boolean>;
   userInfo: UserInfo | null;
 }
 
@@ -47,7 +48,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const {
     userInfo,
     setAccessToken,
-    setRefreshToken,
     setAuthenticated,
     isAuthenticated,
     performManualLogout,
@@ -70,7 +70,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const newAccessToken = response.data.data.newAccessToken;
 
         setAccessToken(newAccessToken);
-        setRefreshToken('httponly-cookie');
         setStoredTokens(newAccessToken, 'httponly-cookie');
         setAuthenticated(true);
 
@@ -164,6 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // 로그인
   const login = async (accessToken: string, refreshToken?: string): Promise<void> => {
+    const { setRefreshToken } = useAuthStore.getState();
     setAccessToken(accessToken);
     if (refreshToken) {
       setRefreshToken(refreshToken);
@@ -255,9 +255,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <LoadingSpinner size="xl" />
-        <p className="mt-6 text-base font-regular text-gray-700">U:NEAR에 연결하는 중...</p>
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600">
+            U:NEAR에 연결하는 중...
+          </p>
+        </div>
       </div>
     );
   }
@@ -268,6 +272,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     checkAuthStatus,
+    refreshAccessToken,
     userInfo,
   };
 
