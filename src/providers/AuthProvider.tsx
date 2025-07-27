@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // OAuth 리다이렉트 페이지인 경우 초기 인증 상태 확인을 건너뜀
         const currentPath = window.location.pathname;
         const isOAuthRedirect = currentPath.includes('/login/oauth2/code/');
-        
+
         if (isOAuthRedirect) {
           console.log('🔄 OAuth 리다이렉트 감지 - 초기 인증 확인 건너뜀');
           setAuthenticated(false); // 기본값으로 설정
@@ -255,12 +255,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-background">
+      <div className="w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative bg-background">
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-sm font-regular text-gray-600">
-            U:NEAR에 연결하는 중...
-          </p>
+          <p className="mt-4 text-sm font-regular text-gray-600">U:NEAR에 연결하는 중...</p>
         </div>
       </div>
     );
