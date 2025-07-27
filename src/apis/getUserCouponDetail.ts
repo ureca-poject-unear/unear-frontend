@@ -84,37 +84,3 @@ export const getUserCouponDetail = async (
     return null;
   }
 };
-
-/**
- * 쿠폰 사용 가능 여부 확인
- * @param coupon - 쿠폰 상세 정보 (CouponItem 기반)
- * @returns 사용 가능 여부와 불가능한 이유
- */
-export const checkCouponUsability = (
-  coupon: UserCouponDetail
-): {
-  canUse: boolean;
-  reason?: string;
-} => {
-  if (coupon.isUsed) {
-    return { canUse: false, reason: '이미 사용된 쿠폰입니다.' };
-  }
-
-  if (coupon.isExpired) {
-    return { canUse: false, reason: '만료된 쿠폰입니다.' };
-  }
-
-  const now = new Date();
-  const validFrom = new Date(coupon.validFrom);
-  const validUntil = new Date(coupon.validUntil);
-
-  if (now < validFrom) {
-    return { canUse: false, reason: '아직 사용할 수 없는 쿠폰입니다.' };
-  }
-
-  if (now > validUntil) {
-    return { canUse: false, reason: '만료된 쿠폰입니다.' };
-  }
-
-  return { canUse: true };
-};
