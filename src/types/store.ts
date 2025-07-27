@@ -1,7 +1,13 @@
 export interface NearbyCoupon {
   couponTemplateId: number;
   couponName: string;
+  discountCode: 'COUPON_FIXED' | 'COUPON_PERCENT';
+  membershipCode: string;
+  discountInfo: string | null;
+  couponStart: string;
   couponEnd: string;
+  userCouponId: number | null;
+  downloaded: boolean;
 }
 
 export interface NearbyStore {
@@ -18,6 +24,8 @@ export interface NearbyStore {
   markerCode: string;
   eventTypeCode: string;
   tel: string;
-  benefitDesc: string;
+  discountPolicyDetailId: number | null;
+  franchiseId: number | null;
+  benefitDesc: string | null;
   coupons: NearbyCoupon[];
 }
