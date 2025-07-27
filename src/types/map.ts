@@ -15,7 +15,8 @@ export type StoreClassType = 'LOCAL' | 'FRANCHISE' | 'BASIC';
 export type EventType = 'NONE' | 'GENERAL' | 'REQUIRE';
 
 export interface Place {
-  id: number;
+  placeId: number;
+  placeName: string;
   latitude: number;
   longitude: number;
   categoryCode: CategoryType;
