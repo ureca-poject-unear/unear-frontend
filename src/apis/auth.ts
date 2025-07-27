@@ -1,132 +1,128 @@
-import axios from 'axios';
-import { showErrorToast, showSuccessToast } from '@/utils/toast';
+import axiosInstance from './axiosInstance';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-// Axios 에러 타입 정의
-interface AxiosError {
-  response?: {
-    status?: number;
-    data?: {
-      message?: string;
-    };
-  };
-  code?: string;
-  message?: string;
+// 백엔드 API 응답 구조에 맞춘 타입 정의
+interface ApiResponse<T> {
+  resultCode: number;
+  codeName: string;
+  message: string;
+  data: T;
 }
 
-// 로그인 요청 인터페이스
-interface LoginCredentials {
-  username: string;
+// 로그인 관련 타입
+interface LoginRequestDto {
+  email: string;
   password: string;
 }
 
-// 로그인 응답 인터페이스
-interface LoginResponse {
-  success: boolean;
-  data: {
-    accessToken: string;
-    refreshToken?: string;
-    user: {
-      id: string;
-      email: string;
-      name: string;
-    };
-  };
+interface LoginResponseDto {
+  userId: number;
+  accessToken: string;
+  email: string;
+  username: string;
+  membershipCode: 'BASIC' | 'VIP' | 'VVIP';
+  barcodeNumber: string;
+  isProfileComplete: boolean;
+  provider?: 'GOOGLE' | 'KAKAO' | 'NAVER';
+}
+
+interface LogoutResponseDto {
+  userId: number;
+}
+
+// 회원가입 관련 타입
+interface SignupRequestDto {
+  email: string;
+  password: string;
+  username: string;
+  gender?: 'M' | 'F';
+  birthdate?: string;
+  tel?: string;
+}
+
+interface SignupResponseDto {
+  userId: number;
+  email: string;
+  username: string;
   message: string;
 }
 
-/**
- * 사용자 로그인
- * @param credentials 로그인 자격 증명
- * @returns 로그인 응답 데이터
- */
-export const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
-  try {
-    console.log('🔑 로그인 요청 시작...');
+// 리프레시 토큰 관련 타입
+interface RefreshResponseDto {
+  userId: number;
+  newAccessToken: string;
+}
 
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials, {
-      timeout: 10000, // 10초 타임아웃
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+// OAuth 프로필 완성 관련 타입
+interface CompleteProfileRequestDto {
+  username: string;
+  gender: 'M' | 'F';
+  birthdate: string;
+  tel: string;
+}
 
-    if (response.data.success) {
-      console.log('✅ 로그인 성공');
-      showSuccessToast('로그인되었습니다.');
-    }
+interface ProfileUpdateResponseDto {
+  userId: number;
+  message: string;
+  isProfileComplete: boolean;
+}
 
+export const authApi = {
+  // 로그인
+  login: async (loginData: LoginRequestDto): Promise<ApiResponse<LoginResponseDto>> => {
+    const response = await axiosInstance.post('/auth/login', loginData);
     return response.data;
-  } catch (error: unknown) {
-    console.error('❌ 로그인 실패:', error);
+  },
 
-    const axiosError = error as AxiosError;
+  // 회원가입
+  signup: async (signupData: SignupRequestDto): Promise<ApiResponse<SignupResponseDto>> => {
+    const response = await axiosInstance.post('/auth/signup', signupData);
+    return response.data;
+  },
 
-    // 세분화된 에러 처리
-    if (axiosError.response) {
-      const status = axiosError.response?.status;
-      const message = axiosError.response?.data?.message;
+  // 리프레시 토큰으로 액세스 토큰 갱신
+  refresh: async (): Promise<ApiResponse<RefreshResponseDto>> => {
+    const response = await axiosInstance.post('/auth/refresh');
+    return response.data;
+  },
 
-      switch (status) {
-        case 400:
-          showErrorToast(message || '잘못된 요청입니다.');
-          throw new Error(message || 'Invalid credentials');
-        case 401:
-          showErrorToast('이메일 또는 비밀번호가 일치하지 않습니다.');
-          throw new Error('Invalid email or password');
-        case 403:
-          showErrorToast('계정이 비활성화되었습니다. 관리자에게 문의하세요.');
-          throw new Error('Account is disabled');
-        case 429:
-          showErrorToast('너무 많은 로그인 시도입니다. 잠시 후 다시 시도해주세요.');
-          throw new Error('Too many login attempts');
-        case 500:
-          showErrorToast('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-          throw new Error('Internal server error');
-        default:
-          if (axiosError.code === 'NETWORK_ERROR' || !axiosError.response) {
-            showErrorToast('네트워크 연결을 확인해주세요.');
-            throw new Error('Network connection failed');
-          } else {
-            showErrorToast(message || '로그인에 실패했습니다.');
-            throw new Error(message || 'Login failed');
-          }
-      }
-    }
+  // 로그아웃 (사용자 수동 로그아웃 시에만 사용)
+  logout: async (): Promise<ApiResponse<LogoutResponseDto>> => {
+    const response = await axiosInstance.post('/auth/logout');
+    return response.data;
+  },
 
-    // 예상치 못한 오류
-    showErrorToast('예상치 못한 오류가 발생했습니다.');
-    throw new Error('An unexpected error occurred');
-  }
+  // OAuth 프로필 완성
+  completeOAuthProfile: async (
+    profileData: CompleteProfileRequestDto
+  ): Promise<ApiResponse<ProfileUpdateResponseDto>> => {
+    const response = await axiosInstance.post('/auth/oauth/complete-profile', profileData);
+    return response.data;
+  },
+
+  // 이메일 인증 코드 전송
+  sendVerificationCode: async (email: string): Promise<string> => {
+    const response = await axiosInstance.post('/auth/send-code', null, {
+      params: { email },
+    });
+    return response.data;
+  },
+
+  // 이메일 인증 코드 확인
+  verifyCode: async (email: string, code: string): Promise<string> => {
+    const response = await axiosInstance.post('/auth/verify-code', null, {
+      params: { email, code },
+    });
+    return response.data;
+  },
+
+  // 비밀번호 재설정
+  resetPassword: async (resetData: {
+    email: string;
+    newPassword: string;
+  }): Promise<ApiResponse<string>> => {
+    const response = await axiosInstance.post('/auth/reset-password', resetData);
+    return response.data;
+  },
 };
 
-/**
- * 로그아웃 (서버에 로그아웃 요청)
- * @param refreshToken 리프레시 토큰
- */
-export const logout = async (refreshToken?: string): Promise<void> => {
-  try {
-    if (refreshToken) {
-      console.log('🚪 서버 로그아웃 요청...');
-
-      await axios.post(
-        `${API_BASE_URL}/auth/logout`,
-        {
-          refreshToken,
-        },
-        {
-          timeout: 5000,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      console.log('✅ 서버 로그아웃 완료');
-    }
-  } catch (error: unknown) {
-    // 로그아웃 요청 실패는 치명적이지 않음 (클라이언트 로그아웃은 계속 진행)
-    console.warn('⚠️ 서버 로그아웃 요청 실패 (클라이언트 로그아웃은 계속 진행):', error);
-  }
-};
+export default authApi;

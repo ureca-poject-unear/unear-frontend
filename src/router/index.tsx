@@ -23,6 +23,7 @@ import CouponPage from '@/pages/CouponPage';
 
 import { AuthProvider } from '@/providers/AuthProvider';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
+import ErrorBoundary from '@/components/error/ErrorBoundary';
 
 const router = createBrowserRouter([
   {
@@ -153,8 +154,10 @@ const router = createBrowserRouter([
 
 export default function Router() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
