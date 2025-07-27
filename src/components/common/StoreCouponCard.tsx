@@ -12,12 +12,17 @@ import DownloadIcon from '@/assets/common/downloadIcon.svg?react';
 import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
 import ArrowUpIcon from '@/assets/common/arrowUpIcon.svg?react';
 import { Loader2 } from 'lucide-react';
+import { postDownloadCoupon } from '@/apis/postDownloadCoupon';
 
 interface Coupon {
   id: string;
   title: string;
   expiryDate: string;
   downloaded?: boolean;
+  userCouponId: number | null;
+  discountCode: 'COUPON_FIXED' | 'COUPON_PERCENT';
+  membershipCode: string;
+  discountInfo: string | null;
 }
 
 interface StoreInfo {
@@ -39,6 +44,7 @@ interface StoreCouponCardProps {
   store: StoreInfo;
   onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
   onLocationClick?: (lat: number, lng: number) => void;
+  onCouponDownloaded?: () => void;
   className?: string;
 }
 
@@ -46,6 +52,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
   store,
   onBookmarkToggle,
   onLocationClick,
+  onCouponDownloaded,
   className = '',
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -56,6 +63,32 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
   useEffect(() => {
     setLocalBookmarked(store.isBookmarked);
   }, [store.isBookmarked]);
+
+  const handleCouponDownload = async (couponId: string) => {
+    setDownloadingCoupons((prev) => new Set(prev).add(couponId));
+
+    try {
+      const downloaded = await postDownloadCoupon(Number(couponId));
+      console.log('다운로드 완료:', downloaded);
+
+      // UI 상태 갱신
+      setDownloadedCoupons((prev) => new Set(prev).add(couponId));
+      store.coupons = store.coupons.map((coupon) =>
+        coupon.id === couponId ? { ...coupon, downloaded: true } : coupon
+      );
+
+      onCouponDownloaded?.();
+    } catch (err) {
+      console.error('쿠폰 다운로드 실패:', err);
+      alert('쿠폰 다운로드에 실패했습니다.');
+    } finally {
+      setDownloadingCoupons((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(couponId);
+        return newSet;
+      });
+    }
+  };
 
   const handleBookmarkToggle = (next: boolean) => {
     setLocalBookmarked(next);
@@ -76,21 +109,6 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
     } else {
       alert('전화번호가 없습니다.');
     }
-  };
-
-  const handleCouponDownload = (couponId: string) => {
-    setDownloadingCoupons((prev) => new Set(prev).add(couponId));
-    console.log('다운로드 시작됨');
-
-    setTimeout(() => {
-      setDownloadingCoupons((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(couponId);
-        return newSet;
-      });
-      setDownloadedCoupons((prev) => new Set(prev).add(couponId));
-      console.log('다운로드 완료됨');
-    }, 1000); // 1초 지연
   };
 
   return (

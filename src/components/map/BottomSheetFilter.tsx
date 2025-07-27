@@ -61,9 +61,6 @@ export default function BottomSheetFilter({
   selectedCategoryCodes,
   selectedBenefitCategories,
 }: BottomSheetFilterProps) {
-  // const initialCategory = reverseCategoryCode(selectedCategoryCodes);
-  // const initialBenefit = selectedBenefitCategories ?? '전체';
-
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
 

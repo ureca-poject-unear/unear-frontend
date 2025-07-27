@@ -11,7 +11,7 @@ import CouponModal from '@/components/common/CouponModal';
 import { getUserCoupons } from '@/apis/getUserCoupons';
 import { getUserCouponDetail } from '@/apis/getUserCouponDetail';
 import { getNearbyStores } from '@/apis/getNearbyStores';
-import { toggleFavorite } from '@/apis/toggleFavorite';
+import { toggleFavorite } from '@/apis/postFavorite';
 import { isExpiringSoon } from '@/utils/isExpiringSoon';
 import type { UserCoupon, UserCouponDetail } from '@/types/coupon';
 import type { NearbyStore, NearbyCoupon } from '@/types/store';
@@ -66,6 +66,11 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
         )
       );
     }
+  };
+
+  const refreshUserCoupons = async () => {
+    const { coupons } = await getUserCoupons();
+    setCoupons(coupons);
   };
 
   const handleClose = () => {
@@ -263,6 +268,11 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
                             id: String(coupon.couponTemplateId),
                             title: coupon.couponName,
                             expiryDate: coupon.couponEnd.split('T')[0].replace(/-/g, '.'),
+                            downloaded: coupon.downloaded,
+                            userCouponId: coupon.userCouponId,
+                            discountCode: coupon.discountCode,
+                            membershipCode: coupon.membershipCode,
+                            discountInfo: coupon.discountInfo,
                           })),
                         }}
                         onLocationClick={(lat, lng) => {
@@ -271,6 +281,7 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
                           onClose();
                         }}
                         onBookmarkToggle={handleBookmarkToggle}
+                        onCouponDownloaded={refreshUserCoupons}
                       />
                     );
                   })}
