@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StoreTypeIcon, { type CategoryType } from './StoreTypeIcon';
 import BookmarkStar from './BookmarkStar';
 import StoreStatus, { type StoreStatusType } from './StoreStatus';
@@ -12,12 +12,17 @@ import DownloadIcon from '@/assets/common/downloadIcon.svg?react';
 import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
 import ArrowUpIcon from '@/assets/common/arrowUpIcon.svg?react';
 import { Loader2 } from 'lucide-react';
+import { postDownloadCoupon } from '@/apis/postDownloadCoupon';
 
 interface Coupon {
   id: string;
   title: string;
   expiryDate: string;
   downloaded?: boolean;
+  userCouponId: number | null;
+  discountCode: 'COUPON_FIXED' | 'COUPON_PERCENT';
+  membershipCode: string;
+  discountInfo: string | null;
 }
 
 interface StoreInfo {
@@ -29,49 +34,81 @@ interface StoreInfo {
   category: CategoryType;
   status: StoreStatusType;
   isBookmarked: boolean;
+  latitude: number;
+  longitude: number;
+  tel?: string;
   coupons: Coupon[];
 }
 
 interface StoreCouponCardProps {
   store: StoreInfo;
   onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
+  onLocationClick?: (lat: number, lng: number) => void;
+  onCouponDownloaded?: () => void;
   className?: string;
 }
 
 const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
   store,
   onBookmarkToggle,
+  onLocationClick,
+  onCouponDownloaded,
   className = '',
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [downloadedCoupons, setDownloadedCoupons] = useState<Set<string>>(new Set());
   const [downloadingCoupons, setDownloadingCoupons] = useState<Set<string>>(new Set());
+  const [localBookmarked, setLocalBookmarked] = useState(store.isBookmarked);
 
-  const handleBookmarkToggle = (isBookmarked: boolean) => {
-    onBookmarkToggle?.(store.id, isBookmarked);
-  };
+  useEffect(() => {
+    setLocalBookmarked(store.isBookmarked);
+  }, [store.isBookmarked]);
 
-  const handleLocationClick = () => {
-    console.log('위치보기버튼 클릭됨');
-  };
-
-  const handlePhoneClick = () => {
-    console.log('전화버튼클릭됨');
-  };
-
-  const handleCouponDownload = (couponId: string) => {
+  const handleCouponDownload = async (couponId: string) => {
     setDownloadingCoupons((prev) => new Set(prev).add(couponId));
-    console.log('다운로드 시작됨');
 
-    setTimeout(() => {
+    try {
+      const downloaded = await postDownloadCoupon(Number(couponId));
+      console.log('다운로드 완료:', downloaded);
+
+      // UI 상태 갱신
+      setDownloadedCoupons((prev) => new Set(prev).add(couponId));
+      store.coupons = store.coupons.map((coupon) =>
+        coupon.id === couponId ? { ...coupon, downloaded: true } : coupon
+      );
+
+      onCouponDownloaded?.();
+    } catch (err) {
+      console.error('쿠폰 다운로드 실패:', err);
+      alert('쿠폰 다운로드에 실패했습니다.');
+    } finally {
       setDownloadingCoupons((prev) => {
         const newSet = new Set(prev);
         newSet.delete(couponId);
         return newSet;
       });
-      setDownloadedCoupons((prev) => new Set(prev).add(couponId));
-      console.log('다운로드 완료됨');
-    }, 1000); // 1초 지연
+    }
+  };
+
+  const handleBookmarkToggle = (next: boolean) => {
+    setLocalBookmarked(next);
+    onBookmarkToggle?.(store.id, !next);
+  };
+
+  const handleLocationClick = () => {
+    if (store.latitude && store.longitude) {
+      onLocationClick?.(store.latitude, store.longitude);
+    } else {
+      console.warn('위치 정보가 없습니다.');
+    }
+  };
+
+  const handlePhoneClick = () => {
+    if (store.tel) {
+      window.location.href = `tel:${store.tel}`;
+    } else {
+      alert('전화번호가 없습니다.');
+    }
   };
 
   return (
@@ -94,7 +131,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
 
       {/* 즐겨찾기 */}
       <div className="absolute right-[15px] top-[14px]">
-        <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkToggle} />
+        <BookmarkStar isBookmarked={localBookmarked} onToggle={handleBookmarkToggle} />
       </div>
 
       {/* 매장명 */}
@@ -104,7 +141,9 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
 
       {/* 주소 */}
       <div className="absolute left-[85px] top-[46px]">
-        <p className="font-regular text-sm text-gray-400 leading-[19px]">{store.address}</p>
+        <p className="font-regular text-sm text-gray-400 leading-[19px]">
+          {store.address.length > 20 ? `${store.address.slice(0, 20)}...` : store.address}
+        </p>
       </div>
 
       {/* 거리 & 시간 & 상태 */}
@@ -154,8 +193,8 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
               </div>
               <div className="ml-8">
                 <h4 className="font-bold text-s text-black leading-[12px]">{coupon.title}</h4>
-                <p className="font-regular text-xs text-gray-400 leading-[13px]">
-                  {coupon.expiryDate}
+                <p className="font-regular text-xs text-gray-400 leading-[13px] mt-[2px]">
+                  {coupon.expiryDate} 까지
                 </p>
               </div>
               {!coupon.downloaded && !downloadedCoupons.has(coupon.id) && (
@@ -188,39 +227,9 @@ export default StoreCouponCard;
 
 /*
 - 사용법
-{
-      id: 'store1',
-      name: '스타벅스 강남점',
-      address: '서울 강남구 테헤란로 152',
-      distance: '0.2km',
-      hours: '06:00 - 22:00',
-      category: 'cafe' as const,
-      status: '영업중' as const,
-      isBookmarked: bookmarkStatus.store1 || false,
-      coupons: [
-        {
-          id: 'coupon1',
-          title: '아메리카노 10% 할인 쿠폰',
-          expiryDate: '2025. 08. 16까지',
-          downloaded: false,
-        },
-        {
-          id: 'coupon2',
-          title: '라떼 15% 할인 쿠폰',
-          expiryDate: '2025. 08. 16까지',
-          downloaded: false,
-        },
-      ],
-    }
-    다음과 같은 형태로 정적데이터를 마련할 수 있습니다.
-    따라서 api 연결을 하게 되면 해당 형식에 맞춰서 api로 받은 응답값을 이용하면 됩니다.
-    타입이 필요한 경우, 타입을 import해와도 되고 const처리해도 되며, 사용자의 편의대로
-    타입을 처리할 수 있습니다.
-
-    -사용예시
       <StoreCouponCard
         store={{
-          ...sampleStore, //데이터
+          ...Store, //데이터
           isBookmarked,
         }}
         onBookmarkToggle={handleBookmarkToggle}
