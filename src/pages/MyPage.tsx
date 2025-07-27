@@ -32,11 +32,7 @@ const MyPage = () => {
       ) : (
         <>
           {/* 사용자 정보 영역 - 로그아웃은 컴포넌트 내부에서 처리 */}
-          <UserProfileSection
-            name={userProfile.name}
-            grade={userProfile.grade}
-            greeting={userProfile.greeting}
-          />
+          <UserProfileSection greeting={userProfile.greeting} />
 
           {/* 멤버십 혜택 영역 */}
           <MembershipBenefitSection

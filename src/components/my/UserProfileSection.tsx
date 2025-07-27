@@ -1,20 +1,26 @@
 import Grade from '@/components/common/Grade';
 import MyPageNubiImage from '@/assets/my/mypagenubi.png';
 import { useAuth } from '@/providers/AuthProvider';
+import { useAuthStore } from '@/store/auth';
 import { useNavigate } from 'react-router-dom';
-import type { UserProfile } from '@/types/myPage';
 
-interface UserProfileSectionProps extends UserProfile {
-  onLogout?: () => void; // 기존 호환성을 위해 유지하지만 사용하지 않음
+interface UserProfileSectionProps {
+  greeting?: string; // 인사말만 props로 받고 나머지는 store에서 가져오기
 }
 
 const UserProfileSection = ({
-  name,
-  grade,
   greeting = '오늘도 알뜰한 하루 되세요! ✨',
 }: UserProfileSectionProps) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  // Zustand store에서 사용자 정보 가져오기
+  const { getUserDisplayName, getUserGrade } = useAuthStore();
+
+  // 사용자 이름과 등급 계산
+  const userName = getUserDisplayName();
+  const userGrade = getUserGrade();
+  const displayGrade = userGrade === 'BASIC' ? '우수' : (userGrade as 'VIP' | 'VVIP');
 
   const handleLogout = async () => {
     const confirmLogout = window.confirm('정말 로그아웃하시겠습니까?');
@@ -46,9 +52,9 @@ const UserProfileSection = ({
               {/* 이름, 등급, 로그아웃 한 줄 */}
               <div className="flex justify-between w-full">
                 <div className="flex gap-2">
-                  <h2 className="text-lm font-semibold text-black">{name}님</h2>
+                  <h2 className="text-lm font-semibold text-black">{userName}님</h2>
                   <div className="mt-0.5">
-                    <Grade grade={grade} />
+                    <Grade grade={displayGrade} />
                   </div>
                 </div>
                 <button

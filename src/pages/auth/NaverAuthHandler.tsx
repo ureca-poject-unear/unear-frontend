@@ -128,14 +128,17 @@ const NaverAuthHandler = () => {
 
   // 네이버 로그인 처리 중 로딩 화면 표시
   return (
-  <>
-  <div className="bg-background">
-  <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
-    <LoadingSpinner size="lg" />
-    <p className="mt-4 text-sm font-regular text-gray-600" style={{ color: hasError ? '#6B7280' : '#6B7280' }}>
-      {loadingMessage}
-      </p>
-      </div>
+    <>
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p
+            className="mt-4 text-sm font-regular text-gray-600"
+            style={{ color: hasError ? '#6B7280' : '#6B7280' }}
+          >
+            {loadingMessage}
+          </p>
+        </div>
       </div>
     </>
   );

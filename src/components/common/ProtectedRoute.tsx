@@ -113,9 +113,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       <div className="bg-background">
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-sm font-regular text-gray-600">
-            {loadingMessage}
-          </p>
+          <p className="mt-4 text-sm font-regular text-gray-600">{loadingMessage}</p>
         </div>
       </div>
     );
