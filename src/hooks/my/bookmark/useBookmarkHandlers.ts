@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toggleFavorite } from '@/apis/postFavorite';
 import type { BookmarkStore } from '@/types/bookmark';
 
 interface UseBookmarkHandlersProps {
@@ -15,7 +16,7 @@ interface UseBookmarkHandlersProps {
 
 interface UseBookmarkHandlersReturn {
   handleBack: () => void;
-  handleBookmarkToggle: (storeId: string, isBookmarked: boolean) => void;
+  handleBookmarkToggle: (storeId: string, _isBookmarked: boolean) => void;
   loadMoreData: () => void;
 }
 
@@ -35,15 +36,26 @@ const useBookmarkHandlers = ({
   const handleBack = () => navigate(-1);
 
   // 즐겨찾기 토글
-  const handleBookmarkToggle = (storeId: string, isBookmarked: boolean) => {
-    setBookmarks((prev) =>
-      prev.map((store) => (store.id === storeId ? { ...store, isBookmarked } : store))
-    );
-    setDisplayedBookmarks((prev) =>
-      prev.map((store) => (store.id === storeId ? { ...store, isBookmarked } : store))
-    );
+  const handleBookmarkToggle = async (storeId: string, _isBookmarked: boolean) => {
+    try {
+      // 실제 API 호출
+      const placeId = parseInt(storeId, 10);
+      const actualState = await toggleFavorite(placeId);
 
-    console.log(`즐겨찾기 ${isBookmarked ? '추가' : '제거'}:`, storeId);
+      // API 응답에 따라 UI 업데이트 (목록에서 제거하지 않고 상태만 변경)
+      const updateBookmarkState = (prev: BookmarkStore[]) =>
+        prev.map((store) =>
+          store.id === storeId ? { ...store, isBookmarked: actualState } : store
+        );
+
+      setBookmarks(updateBookmarkState);
+      setDisplayedBookmarks(updateBookmarkState);
+
+      console.log(`즐겨찾기 ${actualState ? '추가' : '제거'} 성공:`, storeId);
+    } catch (error) {
+      console.error('즐겨찾기 토글 실패:', error);
+      // 에러 발생 시 상태 유지
+    }
   };
 
   // 더 많은 데이터 로드
@@ -51,6 +63,8 @@ const useBookmarkHandlers = ({
     if (isLoadingMore || displayedBookmarks.length >= bookmarks.length) return;
 
     setIsLoadingMore(true);
+
+    // 시뮬레이션 딜레이 (실제로는 이미 모든 데이터를 가지고 있음)
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const nextPage = currentPage + 1;

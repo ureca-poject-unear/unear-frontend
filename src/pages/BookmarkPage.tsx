@@ -56,8 +56,8 @@ const BookmarkPage = () => {
 
       <div className="bg-background">
         {displayedBookmarks.length === 0 ? (
-          <div className="h-[calc(100vh-105px)] flex items-center justify-center">
-            <EmptyState />
+          <div className="flex items-center justify-center min-h-[calc(100vh-105px)]">
+            <EmptyState message="즐겨찾기한 장소가 없습니다" />
           </div>
         ) : (
           <div className="px-5 pt-5 pb-20">

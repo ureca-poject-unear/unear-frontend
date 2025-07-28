@@ -1,170 +1,7 @@
 import { useState, useEffect } from 'react';
+import { getFavoritePlaces } from '@/apis/getFavoritePlaces';
+import { convertFavoritePlacesToBookmarkStores } from '@/utils/bookmarkUtils';
 import type { BookmarkStore } from '@/types/bookmark';
-
-// 더미 데이터
-const dummyBookmarkData: BookmarkStore[] = [
-  {
-    id: '1',
-    name: '스타벅스 강남점',
-    address: '서울 강남구 테헤란로 152',
-    distance: '0.2km',
-    hours: '06:00 - 22:00',
-    category: 'CAFE',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-    phoneNumber: '1544-1122',
-  },
-  {
-    id: '2',
-    name: '맥도날드 역삼점',
-    address: '서울 강남구 강남대로 320',
-    distance: '0.3km',
-    hours: '22:00 - 02:00', // 심야 시간 테스트
-    category: 'FOOD',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-    phoneNumber: '02-1234-5678',
-  },
-  {
-    id: '3',
-    name: '올리브영 강남점',
-    address: '서울 강남구 테헤란로 158',
-    distance: '0.1km',
-    hours: '10:00 - 22:00',
-    category: 'BEAUTY',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-    phoneNumber: '02-987-6543',
-  },
-  {
-    id: '4',
-    name: 'GS25 테헤란점',
-    address: '서울 강남구 테헤란로 160',
-    distance: '0.1km',
-    hours: '24시간',
-    category: 'LIFE',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-    phoneNumber: '02-555-7777',
-  },
-  {
-    id: '5',
-    name: '투레쥬르 강남점',
-    address: '서울 강남구 강남대로 322',
-    distance: '0.4km',
-    hours: '07:00 - 23:00',
-    category: 'BAKERY',
-    storeClass: 'LOCAL',
-    event: 'GENERAL',
-    isBookmarked: true,
-    // phoneNumber 없음 - 테스트용
-  },
-  {
-    id: '6',
-    name: 'CGV 강남점',
-    address: '서울 강남구 강남대로 438',
-    distance: '0.5km',
-    hours: '10:00 - 24:00',
-    category: 'CULTURE',
-    storeClass: 'FRANCHISE',
-    event: 'REQUIRE',
-    isBookmarked: true,
-    phoneNumber: '1588-1234',
-  },
-  {
-    id: '7',
-    name: '이디야커피 역삼점',
-    address: '서울 강남구 테헤란로 164',
-    distance: '0.2km',
-    hours: '07:00 - 22:00',
-    category: 'CAFE',
-    storeClass: 'LOCAL',
-    event: 'NONE',
-    isBookmarked: true,
-    phoneNumber: '070-1234-5678',
-  },
-  {
-    id: '8',
-    name: '롯데리아 강남점',
-    address: '서울 강남구 강남대로 324',
-    distance: '0.3km',
-    hours: '24시간',
-    category: 'FOOD',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-  },
-  {
-    id: '9',
-    name: '아트박스 강남점',
-    address: '서울 강남구 테헤란로 166',
-    distance: '0.2km',
-    hours: '10:00 - 22:00',
-    category: 'SHOPPING',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-  },
-  {
-    id: '10',
-    name: '스포츠몬스터 강남점',
-    address: '서울 강남구 강남대로 326',
-    distance: '0.6km',
-    hours: '10:00 - 22:00',
-    category: 'ACTIVITY',
-    storeClass: 'BASIC',
-    event: 'GENERAL',
-    isBookmarked: true,
-  },
-  {
-    id: '11',
-    name: '컴포즈커피 역삼점',
-    address: '서울 강남구 테헤란로 168',
-    distance: '0.2km',
-    hours: '06:30 - 22:30',
-    category: 'CAFE',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-  },
-  {
-    id: '12',
-    name: '버거킹 강남점',
-    address: '서울 강남구 강남대로 328',
-    distance: '0.4km',
-    hours: '09:00 - 24:00',
-    category: 'FOOD',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-  },
-  {
-    id: '13',
-    name: '네일샵 강남점',
-    address: '서울 강남구 테헤란로 170',
-    distance: '0.3km',
-    hours: '10:00 - 21:00',
-    category: 'BEAUTY',
-    storeClass: 'LOCAL',
-    event: 'REQUIRE',
-    isBookmarked: true,
-  },
-  {
-    id: '14',
-    name: 'CU 역삼점',
-    address: '서울 강남구 테헤란로 172',
-    distance: '0.1km',
-    hours: '24시간',
-    category: 'LIFE',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-  },
-];
 
 interface UseBookmarkDataReturn {
   bookmarks: BookmarkStore[];
@@ -190,12 +27,24 @@ const useBookmarkData = (): UseBookmarkDataReturn => {
   useEffect(() => {
     const loadInitialData = async () => {
       setIsLoading(true);
-      // 실제로는 API에서 데이터를 가져옴
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      setBookmarks(dummyBookmarkData);
-      setDisplayedBookmarks(dummyBookmarkData.slice(0, itemsPerPage));
-      setIsLoading(false);
+      try {
+        // 실제 API에서 즐겨찾기 데이터 가져오기
+        const favoritePlaces = await getFavoritePlaces();
+
+        // 백엔드 데이터를 프론트엔드 형식으로 변환
+        const convertedBookmarks = convertFavoritePlacesToBookmarkStores(favoritePlaces);
+
+        setBookmarks(convertedBookmarks);
+        setDisplayedBookmarks(convertedBookmarks.slice(0, itemsPerPage));
+      } catch (error) {
+        console.error('즐겨찾기 데이터 로드 실패:', error);
+        // 에러 발생 시 빈 배열로 설정
+        setBookmarks([]);
+        setDisplayedBookmarks([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadInitialData();
