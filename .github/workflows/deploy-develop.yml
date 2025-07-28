@@ -30,6 +30,25 @@ jobs:
         run: yarn install
       - name: Pull LFS files
         run: git lfs pull
+      - name: Create missing assets (temporary fix)
+        run: |
+          mkdir -p src/assets/junior
+          # 실제 PNG 파일 생성
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" | base64 -d > src/assets/junior/banner.png
+          echo "Created placeholder banner.png"
+      - name: Debug - Check assets folder
+        run: |
+          echo "=== Checking assets structure ==="
+          find src/assets -type f -name "*.png" -o -name "*.jpg" -o -name "*.gif" 2>/dev/null || echo "No image files found"
+          echo "=== Checking junior folder specifically ==="
+          ls -la src/assets/junior/ 2>/dev/null || echo "junior folder not found"
+          echo "=== Checking banner file specifically ==="
+          ls -la src/assets/junior/banner.* 2>/dev/null || echo "No banner files found"
+          echo "=== File content check ==="
+          if [ -f "src/assets/junior/banner.png" ]; then
+            file src/assets/junior/banner.png
+            wc -c src/assets/junior/banner.png
+          fi
       - name: Build Vite project (Skip TypeCheck)
         run: npx vite build --mode production
         env:
