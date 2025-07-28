@@ -46,12 +46,12 @@ const StampRouletteCard: React.FC<Props> = ({ stamps }) => {
   const handleRouletteClick = () => {
     if (isButtonActive) {
       // 로컬 스토리지에서 accessToken(로그인 토큰)을 확인
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('temp_access_token');
 
       if (token) {
         // 토큰이 있으면(로그인 상태), 룰렛 모달을 엶
         setIsModalOpen(true);
-        localStorage.setItem('hasSpunRoulette', 'true');
+        sessionStorage.setItem('hasSpunRoulette', 'true');
         setIsRouletteSpun(true);
       } else {
         // 토큰이 없으면(로그아웃 상태), 알림을 띄우고 로그인 페이지로 이동

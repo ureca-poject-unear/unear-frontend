@@ -26,7 +26,7 @@ interface LoginError {
 }
 
 // 환경변수를 사용한 URL 설정
-const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}`;
+const KAKAO_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/kakao`;
 const GOOGLE_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`;
 const NAVER_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/naver`;
 

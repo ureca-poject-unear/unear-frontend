@@ -69,7 +69,7 @@ const ProbabilityRoulette = () => {
     setApiMessage('');
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('temp_access_token');
       if (!token) {
         throw new Error('로그인 정보가 없습니다. 다시 로그인해주세요.');
       }

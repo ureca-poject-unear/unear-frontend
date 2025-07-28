@@ -46,7 +46,7 @@ const TodayCouponSection: React.FC = () => {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('temp_access_token');
 
       if (!token) {
         setMessage('쿠폰을 받으려면 로그인이 필요합니다.');

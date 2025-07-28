@@ -97,7 +97,7 @@ const SignUpPage = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://dev.unear.site/api/app/auth/send-code?email=${encodeURIComponent(form.email)}`,
+        `https://dev.unear.site/api/app/auth/send-code?email=${encodeURIComponent(form.email)}`,
         {
           method: 'POST',
         }
@@ -136,7 +136,7 @@ const SignUpPage = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://dev.unear.site/api/app/auth/verify-code?email=${encodeURIComponent(
+        `https://dev.unear.site/api/app/auth/verify-code?email=${encodeURIComponent(
           form.email
         )}&code=${encodeURIComponent(verificationCode)}`,
         {
@@ -223,7 +223,7 @@ const SignUpPage = () => {
         gender: form.gender === '남자' ? 'M' : 'F',
       };
 
-      const response = await fetch('http://dev.unear.site/api/app/auth/signup', {
+      const response = await fetch('https://dev.unear.site/api/app/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
