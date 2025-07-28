@@ -1,21 +1,7 @@
 import type { CategoryType, StoreClassType } from './myPage';
 import type { EventType } from '../components/common/StoreTypeIcon';
 
-// 기존 BookmarkStore 타입 (UI용)
-export interface BookmarkStore {
-  id: string;
-  name: string;
-  address: string;
-  distance: string;
-  hours: string;
-  category: CategoryType;
-  storeClass: StoreClassType;
-  event: EventType;
-  isBookmarked: boolean;
-  phoneNumber?: string;
-}
-
-// 백엔드 API 응답용 타입
+// 백엔드 API 응답용 타입 (기존 getFavoritePlaces.ts와 통합)
 export interface FavoritePlace {
   placeId: number;
   placeName: string;
@@ -30,8 +16,23 @@ export interface FavoritePlace {
   markerCode: string;
   eventCode: string;
   franchiseName: string | null;
-  favorite: boolean; // isFavorite → favorite로 수정
+  tel: string; // 전화번호 필드 추가
+  favorite: boolean;
   distanceKm: number | null;
+}
+
+// 기존 BookmarkStore 타입 (UI용)
+export interface BookmarkStore {
+  id: string;
+  name: string;
+  address: string;
+  distance: string;
+  hours: string;
+  category: CategoryType;
+  storeClass: StoreClassType;
+  event: EventType;
+  isBookmarked: boolean;
+  phoneNumber?: string; // 전화번호 추가
 }
 
 export interface BookmarkPageState {
@@ -43,7 +44,7 @@ export interface BookmarkPageState {
 }
 
 export interface BookmarkHandlers {
-  onBookmarkToggle: (storeId: string, isBookmarked: boolean) => void;
+  onBookmarkToggle: (storeId: string) => void;
   onLoadMore: () => void;
 }
 

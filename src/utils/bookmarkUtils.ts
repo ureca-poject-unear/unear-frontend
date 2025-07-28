@@ -58,8 +58,8 @@ export const convertFavoritePlaceToBookmarkStore = (
     category: favoritePlace.categoryCode as CategoryType,
     storeClass: favoritePlace.markerCode as StoreClassType,
     event: mapEventCode(favoritePlace.eventCode),
-    isBookmarked: favoritePlace.favorite, // API에서 favorite 속성 사용
-    // phoneNumber는 API 응답에 없으므로 undefined
+    isBookmarked: favoritePlace.favorite,
+    phoneNumber: favoritePlace.tel,
   };
 };
 

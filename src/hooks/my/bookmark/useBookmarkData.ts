@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getFavoritePlaces } from '@/apis/getFavoritePlaces';
 import { convertFavoritePlacesToBookmarkStores } from '@/utils/bookmarkUtils';
-import { getCurrentLocation, calculateDistance, formatDistance } from '@/utils/distanceUtils';
-import type { BookmarkStore } from '@/types/bookmark';
-import type { FavoritePlace } from '@/apis/getFavoritePlaces';
+import { getCurrentLocation, calculateDistance } from '@/utils/distanceUtils';
+import type { BookmarkStore, FavoritePlace } from '@/types/bookmark';
 
 interface UseBookmarkDataReturn {
   bookmarks: BookmarkStore[];
