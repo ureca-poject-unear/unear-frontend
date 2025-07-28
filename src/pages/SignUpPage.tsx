@@ -50,7 +50,17 @@ const SignUpPage = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
   };
-
+  //  전화번호 자동 하이픈 추가 핸들러
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const formattedValue = value
+      .replace(/[^0-9]/g, '')
+      .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+    setForm((prevForm) => ({
+      ...prevForm,
+      phone: formattedValue,
+    }));
+  };
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setForm((prevForm) => {
@@ -305,9 +315,9 @@ const SignUpPage = () => {
             <label className="text-lm font-bold text-black">전화번호</label>
             <input
               type="text"
-              placeholder="'-' 포함 입력 (예: 010-1234-5678)"
+              placeholder="예: 010-1234-5678"
               value={form.phone}
-              onChange={handleChange('phone')}
+              onChange={handlePhoneChange}
               className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent"
             />
           </div>

@@ -75,7 +75,7 @@ const ProbabilityRoulette = () => {
       }
 
       const response = await fetch(
-        `http://dev.unear.site/api/app/roulette/spin/${ROULETTE_EVENT_ID}`,
+        `https://dev.unear.site/api/app/roulette/spin/${ROULETTE_EVENT_ID}`,
         {
           method: 'POST',
           headers: {

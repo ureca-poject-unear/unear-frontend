@@ -56,7 +56,7 @@ const TodayCouponSection: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://dev.unear.site/api/app/coupons/${couponTemplateId}/fcfs`,
+        `https://dev.unear.site/api/app/coupons/${couponTemplateId}/fcfs`,
         {
           method: 'POST',
           headers: {

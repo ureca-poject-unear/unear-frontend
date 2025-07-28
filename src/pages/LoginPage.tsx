@@ -219,7 +219,10 @@ const LoginPage = () => {
             alt="네이버 로그인"
           />
         </a>
-        <a href={KAKAO_AUTH_URL} aria-label="카카오 로그인">
+        <a
+          href="https://dev.unear.site/api/app/oauth2/authorization/kakao"
+          aria-label="카카오 로그인"
+        >
           <img
             src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Kakao.png"
             className="w-20 h-25 object-cover rounded-full"

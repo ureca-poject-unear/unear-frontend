@@ -32,7 +32,7 @@ const GoogleRedirectHandler: React.FC = () => {
     // 3. 저장된 토큰으로 /me API를 호출하여 프로필 완성 여부를 확인합니다.
     const checkProfileStatus = async () => {
       try {
-        const response = await fetch('http://dev.unear.site/api/app/users/me', {
+        const response = await fetch('https://dev.unear.site/api/app/users/me', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
