@@ -3,6 +3,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import UserProfileSection from '@/components/my/UserProfileSection';
 import MembershipBenefitSection from '@/components/my/MembershipBenefitSection';
 import StatisticsSection from '@/components/my/StatisticsSection';
+import AccountManagementSection from '@/components/my/AccountManagementSection';
 import RecentUsageSection from '@/components/my/RecentUsageSection';
 import useMyPageData from '@/hooks/my/useMyPageData';
 import useMyPageHandlers from '@/hooks/my/useMyPageHandlers';
@@ -13,8 +14,15 @@ const MyPage = () => {
     useMyPageData();
 
   // 액션 핸들러 (로그아웃 제외)
-  const { handleBack, onCouponClick, onBookmarkClick, onStatisticsDetail, onUsageHistoryDetail } =
-    useMyPageHandlers();
+  const {
+    handleBack,
+    onCouponClick,
+    onBookmarkClick,
+    onStatisticsDetail,
+    onUsageHistoryDetail,
+    onChangePassword,
+    onDeleteAccount,
+  } = useMyPageHandlers();
 
   return (
     <>
@@ -54,6 +62,12 @@ const MyPage = () => {
           <RecentUsageSection
             usageHistory={recentUsageHistory}
             onDetailClick={onUsageHistoryDetail}
+          />
+
+          {/* 계정 관리 영역 */}
+          <AccountManagementSection
+            onChangePassword={onChangePassword}
+            onDeleteAccount={onDeleteAccount}
           />
         </>
       )}

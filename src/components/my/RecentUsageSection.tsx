@@ -25,7 +25,7 @@ const RecentUsageSection = ({
 
   return (
     <div className="w-full bg-white mt-3">
-      <div className="px-5 py-6">
+      <div className="px-5 py-5">
         {/* 헤더 */}
         <div className="flex justify-between items-center mb-1">
           <span className="text-lm font-semibold text-black">최근 이용 내역</span>

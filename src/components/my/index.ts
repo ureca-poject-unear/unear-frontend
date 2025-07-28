@@ -3,6 +3,7 @@ export { default as UserProfileSection } from './UserProfileSection';
 export { default as MembershipBenefitSection } from './MembershipBenefitSection';
 export { default as StatisticsSection } from './StatisticsSection';
 export { default as StatisticsChart } from './StatisticsChart';
+export { default as AccountManagementSection } from './AccountManagementSection';
 export { default as RecentUsageSection } from './RecentUsageSection';
 
 // 통계 페이지 관련 컴포넌트들
