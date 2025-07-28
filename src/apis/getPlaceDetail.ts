@@ -1,7 +1,6 @@
 import axiosInstance from './axiosInstance';
 import type { StoreData } from '@/types/storeDetail';
 
-// API 응답 타입 정의
 export interface PlaceDetailResponse {
   placeId: number;
   name: string;
@@ -34,7 +33,7 @@ export interface PlaceDetailResponse {
 
 const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
   return {
-    id: String(data.placeId),
+    placeId: data.placeId,
     name: data.name,
     address: data.address,
     category: data.categoryCode,
@@ -48,14 +47,20 @@ const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
     benefitDesc: data.benefitDesc,
     eventTypeCode: data.eventTypeCode,
     coupons: data.coupons.map((c) => ({
-      id: String(c.couponTemplateId),
-      title: c.couponName,
-      expiryDate: c.couponEnd,
+      couponTemplateId: c.couponTemplateId,
+      couponName: c.couponName,
+      discountCode: c.discountCode,
+      membershipCode: c.membershipCode,
+      discountInfo: c.discountInfo,
+      couponStart: c.couponStart,
+      couponEnd: c.couponEnd,
+      userCouponId: c.userCouponId,
+      downloaded: c.downloaded,
     })),
   };
 };
 
-// 장소 상세 조회 API
+//  장소 상세 조회 API
 export const getPlaceDetail = async (
   placeId: number,
   latitude: string,
@@ -65,7 +70,7 @@ export const getPlaceDetail = async (
     params: { latitude, longitude },
   });
 
-  const data = response.data?.data;
+  const data: PlaceDetailResponse | undefined = response.data?.data;
 
   if (!data) {
     throw new Error('❌ 상세 정보 데이터가 없습니다 (data is null)');
