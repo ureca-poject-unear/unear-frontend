@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/common/Header';
 import ClosedEyeIcon from '@/assets/common/closedeye.svg?react';
 import OpenEyeIcon from '@/assets/common/openeye.svg?react';
+import { changePassword } from '@/apis/changePassword';
+import { AxiosError } from 'axios';
 
 const ChangePasswordPage = () => {
   const navigate = useNavigate();
@@ -19,19 +21,62 @@ const ChangePasswordPage = () => {
 
   const [currentPasswordError, setCurrentPasswordError] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [newPasswordError, setNewPasswordError] = useState('');
+  const [samePasswordError, setSamePasswordError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 모든 필드가 입력되고 비밀번호가 일치할 때만 버튼 활성화
+  // 비밀번호 유효성 검사 함수
+  const validatePassword = (password: string): string => {
+    if (password.length < 8) {
+      return '비밀번호는 8자리 이상이어야 합니다.';
+    }
+
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (!hasLetter || !hasNumber || !hasSpecial) {
+      return '영문, 숫자, 특수문자를 모두 포함해야 합니다.';
+    }
+
+    return '';
+  };
+
+  // 모든 필드가 입력되고 비밀번호가 일치하며 유효할 때만 버튼 활성화
   const isFormValid =
     form.currentPassword.trim() !== '' &&
     form.newPassword.trim() !== '' &&
     form.confirmNewPassword.trim() !== '' &&
-    !passwordMismatch;
+    !passwordMismatch &&
+    !newPasswordError &&
+    !samePasswordError;
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setForm((prevForm) => {
       const newForm = { ...prevForm, [field]: value };
+
+      // 새 비밀번호 유효성 검사
+      if (field === 'newPassword') {
+        const errorMessage = validatePassword(value);
+        setNewPasswordError(errorMessage);
+
+        // 현재 비밀번호와 새 비밀번호 비교
+        if (value && newForm.currentPassword && value === newForm.currentPassword) {
+          setSamePasswordError(true);
+        } else {
+          setSamePasswordError(false);
+        }
+      }
+
+      // 현재 비밀번호 변경 시에도 비교
+      if (field === 'currentPassword') {
+        if (value && newForm.newPassword && value === newForm.newPassword) {
+          setSamePasswordError(true);
+        } else {
+          setSamePasswordError(false);
+        }
+      }
 
       // 새 비밀번호와 확인 비밀번호 일치 검사
       if (field === 'newPassword' || field === 'confirmNewPassword') {
@@ -65,6 +110,13 @@ const ChangePasswordPage = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && isFormValid && !isLoading) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   const handleSubmit = async () => {
     if (!isFormValid) return;
 
@@ -72,24 +124,36 @@ const ChangePasswordPage = () => {
     setCurrentPasswordError(false);
 
     try {
-      // TODO: 실제 API 호출 구현
-      // 현재는 모의 검증
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
+      await changePassword({
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
 
-      // 모의 현재 비밀번호 검증 (실제로는 서버에서 처리)
-      const isCurrentPasswordValid = form.currentPassword === 'correct'; // 임시 검증
-
-      if (!isCurrentPasswordValid) {
-        setCurrentPasswordError(true);
-        return;
-      }
-
-      // 성공 시
       alert('비밀번호가 성공적으로 변경되었습니다.');
       navigate('/my');
     } catch (error) {
-      console.error('비밀번호 변경 실패:', error);
-      alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+      if (error instanceof AxiosError) {
+        const responseData = error.response?.data;
+        const codeName = responseData?.codeName;
+        const message = responseData?.message;
+
+        if (codeName === 'INVALID_PASSWORD') {
+          setCurrentPasswordError(true);
+        } else {
+          alert(message || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        const errorResponse = (error as any).response;
+        if (errorResponse && errorResponse.data) {
+          if (errorResponse.data.codeName === 'INVALID_PASSWORD') {
+            setCurrentPasswordError(true);
+          } else {
+            alert(errorResponse.data.message || '비밀번호 변경에 실패했습니다.');
+          }
+        } else {
+          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +177,7 @@ const ChangePasswordPage = () => {
                 placeholder="현재 비밀번호 입력"
                 value={form.currentPassword}
                 onChange={handleChange('currentPassword')}
+                onKeyDown={handleKeyDown}
                 className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
               />
               <button
@@ -142,6 +207,7 @@ const ChangePasswordPage = () => {
                 placeholder="8자리 이상, 영문/숫자/특수문자 조합"
                 value={form.newPassword}
                 onChange={handleChange('newPassword')}
+                onKeyDown={handleKeyDown}
                 className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
               />
               <button
@@ -157,6 +223,10 @@ const ChangePasswordPage = () => {
                 )}
               </button>
             </div>
+            {newPasswordError && <p className="text-xs text-red-500 mt-1">{newPasswordError}</p>}
+            {samePasswordError && (
+              <p className="text-xs text-red-500 mt-1">똑같은 비밀번호는 사용이 불가능합니다.</p>
+            )}
           </div>
 
           {/* 새로운 비밀번호 확인 */}
@@ -168,6 +238,7 @@ const ChangePasswordPage = () => {
                 placeholder="새로운 비밀번호 확인"
                 value={form.confirmNewPassword}
                 onChange={handleChange('confirmNewPassword')}
+                onKeyDown={handleKeyDown}
                 className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
               />
               <button
