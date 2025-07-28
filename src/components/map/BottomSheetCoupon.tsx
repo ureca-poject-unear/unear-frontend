@@ -288,6 +288,7 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
                         }}
                         onBookmarkToggle={handleBookmarkToggle}
                         onCouponDownloaded={refreshUserCoupons}
+                        onCouponClick={handleCardClick}
                       />
                     );
                   })}

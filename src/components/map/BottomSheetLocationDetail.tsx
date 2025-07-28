@@ -192,8 +192,10 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
                   onClick={() => {
                     if (isClickable) handleCouponClick(userCouponId);
                   }}
-                  className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-full h-[46px] ${
-                    isClickable ? 'cursor-pointer' : 'cursor-default'
+                  className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-[355px] h-[46px] ${
+                    coupon.userCouponId
+                      ? 'cursor-pointer hover:bg-gray-50 transition-colors'
+                      : 'cursor-default'
                   }`}
                 >
                   <div className="absolute left-3 top-3">
@@ -212,7 +214,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
                     !downloadedCoupons.has(String(coupon.couponTemplateId)) && (
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 상위 클릭 방지
+                          e.stopPropagation();
                           handleCouponDownload(String(coupon.couponTemplateId));
                         }}
                         className="absolute right-3 top-[13px] w-5 h-5 flex items-center justify-center"
