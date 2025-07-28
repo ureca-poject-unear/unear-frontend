@@ -1,11 +1,13 @@
 type CallButtonProps = {
   onClick?: () => void;
+  width?: number | string;
 };
 
-const CallButton: React.FC<CallButtonProps> = ({ onClick }) => {
+const CallButton: React.FC<CallButtonProps> = ({ onClick, width }) => {
+  const buttonWidthClass = typeof width === 'number' ? `w-[${width}px]` : (width ?? 'w-[146px]');
   return (
     <button
-      className="group w-full max-w-[146px] h-[46px] relative bg-white hover:bg-green-50 transition-colors duration-200 rounded-lg"
+      className={`group ${buttonWidthClass} h-[46px] relative bg-white hover:bg-green-50 transition-colors duration-200 rounded-lg flex-shrink-0`}
       onClick={onClick}
     >
       {/* 테두리 박스 */}

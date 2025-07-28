@@ -130,6 +130,12 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
     }
   }, [activeTab, isOpen, shouldRefreshNearby]);
 
+  useEffect(() => {
+    if (isOpen && activeTab === 'couponbox') {
+      refreshUserCoupons();
+    }
+  }, [isOpen, activeTab]);
+
   const expiringSoonCoupons = Array.isArray(coupons) ? coupons.filter(isExpiringSoon) : [];
 
   return (

@@ -2,6 +2,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { useAuthStore } from '@/store/auth';
 import { showErrorToast } from '@/utils/toast';
+import qs from 'qs';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,6 +31,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true, // HttpOnly 쿠키 전송
+  paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
 });
 
 // 토큰 갱신 중복 방지
