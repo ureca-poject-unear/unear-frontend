@@ -20,7 +20,7 @@ const UserProfileSection = ({
   // 사용자 이름과 등급 계산
   const userName = getUserDisplayName();
   const userGrade = getUserGrade();
-  const displayGrade = userGrade === 'BASIC' ? '우수' : (userGrade as 'VIP' | 'VVIP');
+  const displayGrade = userGrade === 'BASIC' ? '우수' : userGrade;
 
   const handleLogout = async () => {
     const confirmLogout = window.confirm('정말 로그아웃하시겠습니까?');
