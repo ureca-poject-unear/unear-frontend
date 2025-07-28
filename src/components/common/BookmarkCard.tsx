@@ -16,7 +16,7 @@ import { getOperatingStatus } from '@/utils/operatingHours';
 
 interface BookmarkCardProps {
   store: BookmarkStore;
-  onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
+  onBookmarkToggle?: (storeId: string) => void;
   className?: string;
   isDarkMode?: boolean;
 }
@@ -28,8 +28,8 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   isDarkMode = false,
 }) => {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const handleBookmarkToggle = (isBookmarked: boolean) => {
-    onBookmarkToggle?.(store.id, isBookmarked);
+  const handleBookmarkToggle = () => {
+    onBookmarkToggle?.(store.id);
   };
 
   const handleLocationClick = () => {

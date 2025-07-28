@@ -16,7 +16,7 @@ interface UseBookmarkHandlersProps {
 
 interface UseBookmarkHandlersReturn {
   handleBack: () => void;
-  handleBookmarkToggle: (storeId: string, _isBookmarked: boolean) => void;
+  handleBookmarkToggle: (storeId: string) => void;
   loadMoreData: () => void;
 }
 
@@ -36,7 +36,7 @@ const useBookmarkHandlers = ({
   const handleBack = () => navigate(-1);
 
   // 즐겨찾기 토글
-  const handleBookmarkToggle = async (storeId: string, _isBookmarked: boolean) => {
+  const handleBookmarkToggle = async (storeId: string) => {
     try {
       // 실제 API 호출
       const placeId = parseInt(storeId, 10);

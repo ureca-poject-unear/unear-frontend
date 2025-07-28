@@ -1,6 +1,7 @@
 import type { FavoritePlace, BookmarkStore } from '@/types/bookmark';
 import type { CategoryType, StoreClassType } from '@/types/myPage';
 import type { EventType } from '@/components/common/StoreTypeIcon';
+import { formatDistance } from '@/utils/distanceUtils';
 
 /**
  * 시간을 24시간 형식에서 12시간 형식 문자열로 변환
@@ -21,23 +22,6 @@ const formatOperatingHours = (startTime: number, endTime: number): string => {
   };
 
   return `${formatTime(startTime)} - ${formatTime(endTime)}`;
-};
-
-/**
- * 거리를 문자열로 포맷팅
- * @param distanceKm - 거리 (km)
- * @returns 거리 문자열
- */
-const formatDistance = (distanceKm: number | null): string => {
-  if (distanceKm === null || distanceKm === undefined) {
-    return '-';
-  }
-
-  if (distanceKm < 1) {
-    return `${Math.round(distanceKm * 1000)}m`;
-  }
-
-  return `${distanceKm.toFixed(1)}km`;
 };
 
 /**

@@ -4,7 +4,7 @@ import type { BookmarkStore } from '@/types/bookmark';
 
 interface BookmarkListProps {
   bookmarks: BookmarkStore[];
-  onBookmarkToggle: (storeId: string, isBookmarked: boolean) => void;
+  onBookmarkToggle: (storeId: string) => void;
   isLoadingMore: boolean;
 }
 
