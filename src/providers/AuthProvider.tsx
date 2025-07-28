@@ -84,15 +84,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // 리프레시 토큰 만료
       if (status === 401 || status === 403) {
         showToast?.('세션이 만료되었습니다. 다시 로그인해주세요.');
-        await logout();
+        performManualLogout(); // 직접 호출하여 추가 API 호출 방지
       } else if (status && status >= 500) {
         showToast?.('서버 오류가 발생했습니다.');
-        await logout();
+        performManualLogout();
       } else if (axiosError.code === 'NETWORK_ERROR') {
         console.warn('네트워크 에러로 인한 리프레시 실패 - 로그아웃하지 않음');
         // 네트워크 에러는 로그아웃하지 않음
       } else {
-        await logout();
+        performManualLogout();
       }
 
       return false;
@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // 다른 에러의 경우에만 로그아웃
-      await logout();
+      performManualLogout(); // 직접 호출하여 추가 API 호출 방지
       return false;
     }
   };
