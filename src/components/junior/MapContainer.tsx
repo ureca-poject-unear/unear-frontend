@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 import type { CategoryType, StoreClassType, EventType } from '@/components/common/MapMarkerIcon';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
-import BookmarkCard, { type StoreInfo } from '@/components/JuniorPage/BookmarkCard';
+import BookmarkCard, { type StoreInfo } from '@/components/junior/BookmarkCard';
 
 // 타입 정의
 type MarkerStoreData = StoreInfo & {
