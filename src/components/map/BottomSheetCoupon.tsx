@@ -68,6 +68,11 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
     }
   };
 
+  const handleCouponDownloaded = async () => {
+    await refreshUserCoupons();
+    setShouldRefreshNearby(true);
+  };
+
   const refreshUserCoupons = async () => {
     const { coupons } = await getUserCoupons();
     setCoupons(coupons);
@@ -287,7 +292,7 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
                           onClose();
                         }}
                         onBookmarkToggle={handleBookmarkToggle}
-                        onCouponDownloaded={refreshUserCoupons}
+                        onCouponDownloaded={handleCouponDownloaded}
                         onCouponClick={handleCardClick}
                       />
                     );
