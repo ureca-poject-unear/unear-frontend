@@ -43,7 +43,7 @@ const CouponModal = ({
             <p className="text-sm font-regular px-[27px]">{brand}</p>
             <h2 className="text-lm font-semibold mt-1 px-6">{title}</h2>
             <p className="text-lg font-bold mt-2 text-center">{discountRate}</p>
-            <p className="text-lm font-semibold text-gray-400 mt-1 text-center">
+            <p className="text-lm font-regular text-gray-400 mt-1 text-center">
               {formatDateToKorean(expireDate)}까지
             </p>
           </div>
@@ -72,11 +72,12 @@ const CouponModal = ({
             <span className="w-2 h-2 rounded-full bg-primary mt-[6px]" />
             <div className="ml-[-8px]">
               <p className="text-m font-semibold text-black mb-1 ml-[6px]">사용 조건</p>
-              <div className="flex">
-                <span className="w-[3px] h-[3px] mt-[6px] bg-black rounded-full shrink-0 mr-[5px]" />
-                <p className="text-sm font-regular text-black leading-[19px]">{usageCondition}</p>
+              <div className="relative pl-[10px]">
+                <span className="absolute w-[3px] h-[3px] bg-black rounded-full top-[6px] left-0" />
+                <p className="text-sm font-regular text-black leading-[19px] indent-[-10px] pl-[13px]">
+                  {usageCondition}
+                </p>
               </div>
-              {/* ))} */}
             </div>
           </div>
 
@@ -85,9 +86,12 @@ const CouponModal = ({
             <span className="w-2 h-2 rounded-full bg-blue-400 mt-[6px]" />
             <div className="ml-[-8px]">
               <p className="text-m font-semibold text-black mb-1 ml-[6px]">사용 방법</p>
-              <ul className="text-sm font-regular text-black list-decimal list-inside leading-[15px] space-y-[4px]">
+              <ul className="text-sm font-regular text-black leading-[19px] space-y-[4px] list-none">
                 {usageGuide.map((guide, idx) => (
-                  <li key={idx}>{guide}</li>
+                  <li key={idx} className="relative pl-[14px]">
+                    <span className="absolute w-[3px] h-[3px] bg-black rounded-full top-[6px] left-0" />
+                    <p className="indent-[-14px] pl-[17px]">{guide}</p>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -99,9 +103,11 @@ const CouponModal = ({
             <div className="ml-[-8px]">
               <p className="text-m font-semibold text-black mb-1 ml-[6px]">주의 사항</p>
               {caution.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-[6px]">
-                  <span className="w-[3px] h-[3px] mt-[6px] bg-black rounded-full shrink-0" />
-                  <p className="text-sm font-regular text-black leading-[19px]">{item}</p>
+                <div key={idx} className="relative pl-[14px] mb-[4px]">
+                  <span className="absolute w-[3px] h-[3px] bg-black rounded-full top-[6px] left-0" />
+                  <p className="text-sm font-regular text-black leading-[19px] indent-[-14px] pl-[17px]">
+                    {item}
+                  </p>
                 </div>
               ))}
             </div>

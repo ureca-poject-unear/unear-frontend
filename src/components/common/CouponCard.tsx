@@ -49,11 +49,13 @@ const CouponCard = ({
           {/* 브랜드명 */}
           <p className="text-s font-regular text-black">{brand}</p>
 
-          {/* 쿠폰 타이틀 */}
-          <p className="text-sm font-semibold text-black">{title}</p>
+          {/* 쿠폰 타이틀 - 타이틀이 길 경우 150px이상부터는 개행되도록 함 */}
+          <p className="text-sm font-semibold text-black break-words max-w-[150px] leading-snug">
+            {title}
+          </p>
 
           {/* 유효기한 */}
-          <p className="text-s font-semibold text-gray-400">{formatDateToKorean(validUntil)}까지</p>
+          <p className="text-s font-regular text-gray-400">{formatDateToKorean(validUntil)}까지</p>
         </div>
       </div>
     </div>

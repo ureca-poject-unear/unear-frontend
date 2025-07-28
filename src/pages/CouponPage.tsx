@@ -1,5 +1,5 @@
 import Header from '@/components/common/Header';
-import LoadingScreen from '@/components/common/LoadingScreen';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import EmptyState from '@/components/common/EmptyState';
 import CouponModal from '@/components/common/CouponModal';
 import { CouponList } from '@/components/my/coupon';
@@ -12,7 +12,17 @@ const CouponPage = () => {
     useCouponHandlers();
 
   if (isLoading) {
-    return <LoadingScreen message="쿠폰 정보를 불러오는 중..." />;
+    return (
+      <>
+        <Header title="쿠폰" onBack={onBack} />
+        <div className="bg-background">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <LoadingSpinner size="lg" />
+            <p className="mt-4 text-sm font-regular text-gray-600">쿠폰 정보를 불러오는 중...</p>
+          </div>
+        </div>
+      </>
+    );
   }
 
   const hasAnyCoupons = couponData.totalCount > 0;
@@ -21,9 +31,9 @@ const CouponPage = () => {
     <>
       <Header title="쿠폰" onBack={onBack} />
 
-      <div className="px-5 py-4">
+      <div className="px-5 py-4 bg-background min-h-[calc(100vh-105px)]">
         {!hasAnyCoupons ? (
-          <div className="h-[calc(100vh-105px)] flex items-center justify-center">
+          <div className="h-full flex items-center justify-center">
             <EmptyState message="보유한 쿠폰이 없습니다" />
           </div>
         ) : (

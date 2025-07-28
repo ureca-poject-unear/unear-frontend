@@ -35,6 +35,11 @@ export interface KakaoEvent {
   ): void;
 }
 
+export interface KakaoCircle {
+  setMap(map: KakaoMap | null): void;
+  getBounds(): KakaoMapBounds;
+}
+
 declare global {
   interface Window {
     kakao: {
@@ -51,11 +56,26 @@ declare global {
           yAnchor?: number;
           zIndex?: number;
         }) => KakaoCustomOverlay;
+        Circle: new (options: {
+          center: KakaoLatLng;
+          radius: number;
+          strokeWeight?: number;
+          strokeColor?: string;
+          strokeOpacity?: number;
+          strokeStyle?:
+            | 'solid'
+            | 'shortdash'
+            | 'shortdot'
+            | 'shortdashdot'
+            | 'longdash'
+            | 'longdashdot';
+          fillColor?: string;
+          fillOpacity?: number;
+        }) => KakaoCircle;
         event: KakaoEvent;
         load(callback: () => void): void;
       };
     };
   }
 }
-
 export {};

@@ -1,10 +1,6 @@
 import type React from 'react';
 import { useState } from 'react';
-import StoreTypeIcon, {
-  type CategoryType,
-  type StoreClassType,
-  type EventType,
-} from './StoreTypeIcon';
+import StoreTypeIcon from './StoreTypeIcon';
 import BookmarkStar from './BookmarkStar';
 import StoreStatus, { type StoreStatusType } from './StoreStatus';
 import MiniLocationButton from '@/components/common/MiniLocationButton';
