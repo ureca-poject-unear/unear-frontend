@@ -74,9 +74,11 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
         <h3 className={`font-semibold text-lm ${textColor}`}>{store.name}</h3>
       </div>
 
-      {/* 주소 */}
+      {/* 주소 - 주소가 길 경우 180px 이후는 ...으로 표시 */}
       <div className="absolute left-[85px] top-[46px]">
-        <p className={`font-regular text-sm ${subTextColor} leading-[19px]`}>{store.address}</p>
+        <p className={`font-regular text-sm ${subTextColor} truncate max-w-[220px]`}>
+          {store.address}
+        </p>
       </div>
 
       {/* 거리 & 시간 & 상태 */}
