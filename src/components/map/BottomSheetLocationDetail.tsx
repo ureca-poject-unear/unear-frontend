@@ -56,14 +56,20 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
 
   const handleBookmarkToggle = async () => {
     const prev = isBookmarked;
-    setIsBookmarked(!prev); // 💡 낙관적 UI 처리
+    const next = !prev;
+    setIsBookmarked(next); // 낙관적 UI
 
     try {
       await toggleFavorite(store.placeId);
+
+      // 즐겨찾기 ON 상태에서 해제했다면 목록 갱신 요청
+      if (prev === true && next === false && localStorage.getItem('isBookmarkOnly') === 'true') {
+        window.dispatchEvent(new Event('refreshMapStores'));
+      }
     } catch (err) {
       console.error('즐겨찾기 변경 실패:', err);
       alert('즐겨찾기 변경에 실패했습니다.');
-      setIsBookmarked(prev); // 실패 시 롤백
+      setIsBookmarked(prev);
     }
   };
 

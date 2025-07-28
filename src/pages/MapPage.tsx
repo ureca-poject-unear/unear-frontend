@@ -76,6 +76,18 @@ const MapPage = () => {
     }
   }, [benefitCategories]);
 
+  useEffect(() => {
+    const handleRefreshStores = () => {
+      console.log('🔄 [refreshMapStores] 이벤트 수신됨 - 지도 재요청');
+      mapRef.current?.fetchPlaces();
+    };
+
+    window.addEventListener('refreshMapStores', handleRefreshStores);
+    return () => {
+      window.removeEventListener('refreshMapStores', handleRefreshStores);
+    };
+  }, []);
+
   const handleCurrentLocation = () => {
     mapRef.current?.showCurrentLocation();
   };
