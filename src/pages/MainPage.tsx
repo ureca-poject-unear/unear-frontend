@@ -51,7 +51,7 @@ const MainPage = () => {
   const barcodeNumber = getBarcodeNumber();
 
   // 등급을 Grade 컴포넌트에 맞는 형식으로 변환
-  const gradeForComponent = userGrade === 'BASIC' ? 'VIP' : userGrade;
+  const gradeForComponent = userGrade === 'BASIC' ? '우수' : userGrade;
 
   return (
     <>

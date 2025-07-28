@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useAuthStore } from '@/store/auth';
 import type { UserProfile, MembershipBenefit, StatisticsData, ChartDataItem } from '@/types/myPage';
 import type { UsageHistoryItem } from '@/types/usageHistory';
 import useCouponCount from './useCouponCount';
@@ -16,15 +17,20 @@ const useMyPageData = (): UseMyPageDataReturn => {
   const [isLoading, setIsLoading] = useState(false); // true로 변경하면 로딩 테스트 가능
   const couponCount = useCouponCount();
 
-  // 사용자 프로필 데이터 (실제로는 API에서 받아올 데이터)
-  const userProfile: UserProfile = useMemo(
-    () => ({
-      name: '유니어',
-      grade: 'VVIP',
+  // Zustand store에서 사용자 정보 가져오기
+  const { getUserDisplayName, getUserGrade } = useAuthStore();
+
+  // 사용자 프로필 데이터 - Zustand store 사용
+  const userProfile: UserProfile = useMemo(() => {
+    const userGrade = getUserGrade();
+    const mappedGrade = userGrade === 'BASIC' ? '우수' : (userGrade as 'VIP' | 'VVIP');
+
+    return {
+      name: getUserDisplayName(),
+      grade: mappedGrade,
       greeting: '오늘도 알뜰한 하루 되세요! ✨',
-    }),
-    []
-  );
+    };
+  }, [getUserDisplayName, getUserGrade]);
 
   // 멤버십 혜택 데이터
   const membershipBenefit: MembershipBenefit = useMemo(

@@ -48,82 +48,65 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const {
     userInfo,
     setAccessToken,
-    setRefreshToken,
     setAuthenticated,
     isAuthenticated,
-    logout: storeLogout,
+    performManualLogout,
     getStoredAccessToken,
-    getStoredRefreshToken,
     setStoredTokens,
   } = useAuthStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Refresh Token으로 Access Token 갱신
+  // 리프레시 토큰으로 액세스 토큰 갱신
   const refreshAccessToken = async (): Promise<boolean> => {
-    const refreshToken = getStoredRefreshToken();
-
-    if (!refreshToken) {
-      console.warn('⚠️ Refresh Token이 없습니다.');
-      return false;
-    }
-
     try {
-      console.log('🔄 AuthProvider: Access Token 갱신 시도...');
+      const response = await axiosInstance.post('/auth/refresh');
 
-      const response = await axiosInstance.post('/auth/refresh', {
-        refreshToken: refreshToken,
-      });
+      if (
+        response.status === 200 &&
+        response.data.resultCode === 200 &&
+        response.data.data?.newAccessToken
+      ) {
+        const newAccessToken = response.data.data.newAccessToken;
 
-      if (response.status === 200 && response.data.data?.accessToken) {
-        const newAccessToken = response.data.data.accessToken;
-        const newRefreshToken = response.data.data.refreshToken || refreshToken;
-
-        // 새 토큰들 저장
         setAccessToken(newAccessToken);
-        setRefreshToken(newRefreshToken);
-        setStoredTokens(newAccessToken, newRefreshToken);
+        setStoredTokens(newAccessToken, 'httponly-cookie');
         setAuthenticated(true);
 
-        console.log('✅ AuthProvider: Access Token 갱신 성공');
         return true;
       } else {
-        throw new Error('Invalid refresh response');
+        throw new Error(response.data?.message || 'Invalid refresh response');
       }
-    } catch (error: unknown) {
-      console.error('❌ AuthProvider: Refresh Token 갱신 실패:', error);
+    } catch (error) {
+      const axiosError = error as { response?: { status?: number }; code?: string };
+      const status = axiosError.response?.status;
 
-      const axiosError = error as {
-        response?: { status?: number };
-        code?: string;
-      };
-
-      // 세분화된 에러 처리
-      if (axiosError.response?.status === 403 || axiosError.response?.status === 401) {
-        console.log('🚪 Refresh Token 만료 - 로그아웃 처리');
+      // 리프레시 토큰 만료
+      if (status === 401 || status === 403) {
         showToast?.('세션이 만료되었습니다. 다시 로그인해주세요.');
-      } else if (axiosError.code === 'NETWORK_ERROR' || !axiosError.response) {
-        console.warn('⚠️ 네트워크 오류 - Refresh Token 갱신 실패');
-        showToast?.('네트워크 연결을 확인해주세요.');
-        return false; // 네트워크 오류는 로그아웃하지 않음
+        await logout();
+      } else if (status && status >= 500) {
+        showToast?.('서버 오류가 발생했습니다.');
+        await logout();
+      } else if (axiosError.code === 'NETWORK_ERROR') {
+        console.warn('네트워크 에러로 인한 리프레시 실패 - 로그아웃하지 않음');
+        // 네트워크 에러는 로그아웃하지 않음
       } else {
-        showToast?.('인증 오류가 발생했습니다.');
+        await logout();
       }
 
-      await logout();
       return false;
     }
   };
 
-  // 토큰 유효성 검증 및 사용자 정보 로드 함수
+  // 인증 상태 확인
   const checkAuthStatus = async (): Promise<boolean> => {
     const token = getStoredAccessToken();
 
     if (!token) {
-      // Access Token이 없으면 Refresh Token으로 시도
+      // 액세스 토큰이 없으면 리프레시 시도
       const canRefresh = await refreshAccessToken();
       if (canRefresh) {
-        // 토큰 갱신 성공 시 사용자 정보도 로드
         await loadUserInfo();
         return true;
       }
@@ -133,75 +116,63 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     try {
-      console.log('🔍 AuthProvider: 토큰 유효성 검증 및 사용자 정보 로드 중...');
-
-      // /users/me API로 토큰 검증과 사용자 정보 조회를 동시에
+      // 사용자 정보로 토큰 유효성 검증
       const userInfo = await getUserInfo();
 
       if (userInfo) {
         setAccessToken(token);
         setAuthenticated(true);
-        console.log('✅ AuthProvider: 토큰 유효성 검증 및 사용자 정보 로드 성공');
         return true;
       } else {
-        // 사용자 정보 조회 실패 시 토큰 갱신 시도
+        // getUserInfo가 실패했지만 네트워크 에러가 아닌 경우에만 리프레시 시도
         return await refreshAccessToken();
       }
-    } catch (error: unknown) {
-      const axiosError = error as {
-        response?: { status?: number };
-        code?: string;
-      };
+    } catch (error) {
+      const axiosError = error as { response?: { status?: number }; code?: string };
+      const status = axiosError.response?.status;
 
-      if (axiosError.response?.status === 401) {
-        // 401 에러면 Refresh Token으로 재시도
-        console.log('🔄 AuthProvider: 401 에러 - Refresh Token으로 재시도');
+      if (status === 401) {
+        // 401 에러면 리프레시 시도
         const refreshSuccess = await refreshAccessToken();
         if (refreshSuccess) {
-          // 토큰 갱신 성공 시 사용자 정보도 로드
           await loadUserInfo();
         }
         return refreshSuccess;
-      } else if (axiosError.code === 'NETWORK_ERROR' || !axiosError.response) {
-        console.warn('⚠️ 네트워크 오류 - 토큰 검증 실패');
-        showToast?.('네트워크 연결을 확인해주세요.');
-        return false; // 네트워크 오류는 로그아웃하지 않음
+      } else if (axiosError.code === 'NETWORK_ERROR') {
+        // 네트워크 에러인 경우 현재 토큰이 있으면 인증된 것으로 간주
+        console.warn('네트워크 에러로 인한 인증 상태 확인 실패 - 기존 토큰 유지');
+        setAccessToken(token);
+        setAuthenticated(true);
+        return true;
       }
 
-      console.error('❌ AuthProvider: 토큰 검증 실패:', error);
+      // 다른 에러의 경우에만 로그아웃
       await logout();
       return false;
     }
   };
 
-  // 사용자 정보 로드 함수
+  // 사용자 정보 로드
   const loadUserInfo = async (): Promise<void> => {
     try {
-      console.log('👤 AuthProvider: 사용자 정보 로드 시작...');
-      const userInfo = await getUserInfo();
-      if (userInfo) {
-        console.log('✅ AuthProvider: 사용자 정보 로드 완료');
-      }
+      await getUserInfo();
     } catch (error) {
-      console.error('❌ AuthProvider: 사용자 정보 로드 실패:', error);
+      console.error('사용자 정보 로드 실패:', error);
     }
   };
 
-  // 로그인 함수 (Access Token + Refresh Token + 사용자 정보 로드)
+  // 로그인
   const login = async (accessToken: string, refreshToken?: string): Promise<void> => {
-    console.log('🚪 AuthProvider: 로그인 처리 중...');
-
-    // 메모리에 토큰 저장
+    const { setRefreshToken } = useAuthStore.getState();
     setAccessToken(accessToken);
     if (refreshToken) {
       setRefreshToken(refreshToken);
     }
     setAuthenticated(true);
 
-    // 저장소에 토큰 저장
     setStoredTokens(accessToken, refreshToken || null);
 
-    // 기존 localStorage 토큰 정리 (마이그레이션)
+    // 기존 토큰 정리
     try {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('auth-storage');
@@ -209,90 +180,86 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.warn('기존 토큰 정리 실패:', error);
     }
 
-    // 사용자 정보 로드
     await loadUserInfo();
-
-    console.log('✅ AuthProvider: 로그인 완료');
   };
 
-  // 로그아웃 함수
+  // 로그아웃
   const logout = async (): Promise<void> => {
-    console.log('🚪 AuthProvider: 로그아웃 처리 중...');
-
     try {
-      // 1. 서버에 로그아웃 API 호출 (HttpOnly 쿠키 삭제)
-      console.log('🌐 서버 로그아웃 요청 중...');
-      await axiosInstance.post(
-        '/auth/logout',
-        {},
-        {
-          withCredentials: true, // HttpOnly 쿠키 포함해서 전송
-        }
-      );
-      console.log('✅ 서버 로그아웃 완료 - HttpOnly 쿠키 삭제됨');
+      // 서버에 로그아웃 요청 (HttpOnly 쿠키 삭제)
+      await axiosInstance.post('/auth/logout', {}, { withCredentials: true });
     } catch (error) {
-      console.warn('⚠️ 서버 로그아웃 실패 (클라이언트 정리는 계속 진행):', error);
-      // 서버 로그아웃 실패해도 클라이언트 정리는 계속 진행
+      const axiosError = error as { code?: string };
+      // 네트워크 에러가 아닌 경우에만 경고 출력
+      if (axiosError.code !== 'NETWORK_ERROR') {
+        console.warn('서버 로그아웃 실패:', error);
+      }
     }
 
-    // 2. 클라이언트 상태 정리 (메모리, sessionStorage, localStorage)
-    storeLogout();
-    console.log('✅ AuthProvider: 로그아웃 완료');
+    // 클라이언트 상태 정리
+    performManualLogout();
   };
 
-  // 컴포넌트 마운트 시 인증 상태 확인
+  // 초기화
   useEffect(() => {
     const initializeAuth = async (): Promise<void> => {
       setIsLoading(true);
 
-      console.log('🔄 AuthProvider: 인증 상태 초기화 중...');
+      try {
+        // 기존 토큰 마이그레이션
+        const oldToken = localStorage.getItem('accessToken');
+        const oldAuthStorage = localStorage.getItem('auth-storage');
 
-      // 기존 localStorage 토큰 마이그레이션
-      const oldToken = localStorage.getItem('accessToken');
-      const oldAuthStorage = localStorage.getItem('auth-storage');
-
-      if (oldToken && !getStoredAccessToken()) {
-        console.log('📦 기존 토큰 마이그레이션 중...');
-        setAccessToken(oldToken);
-        setStoredTokens(oldToken, null);
-        localStorage.removeItem('accessToken');
-      }
-
-      if (oldAuthStorage && !getStoredAccessToken()) {
-        try {
-          const parsed = JSON.parse(oldAuthStorage) as {
-            state?: {
-              accessToken?: string;
-              refreshToken?: string;
-            };
-          };
-          if (parsed.state?.accessToken) {
-            console.log('📦 기존 Zustand 토큰 마이그레이션 중...');
-            setAccessToken(parsed.state.accessToken);
-            setStoredTokens(parsed.state.accessToken, parsed.state.refreshToken || null);
-          }
-        } catch (e) {
-          console.warn('기존 auth storage 파싱 실패:', e);
+        if (oldToken && !getStoredAccessToken()) {
+          setAccessToken(oldToken);
+          setStoredTokens(oldToken, null);
+          localStorage.removeItem('accessToken');
         }
-        localStorage.removeItem('auth-storage');
+
+        if (oldAuthStorage && !getStoredAccessToken()) {
+          try {
+            const parsed = JSON.parse(oldAuthStorage) as {
+              state?: { accessToken?: string; refreshToken?: string };
+            };
+            if (parsed.state?.accessToken) {
+              setAccessToken(parsed.state.accessToken);
+              setStoredTokens(parsed.state.accessToken, parsed.state.refreshToken || null);
+            }
+          } catch (e) {
+            console.warn('기존 auth storage 파싱 실패:', e);
+          }
+          localStorage.removeItem('auth-storage');
+        }
+
+        // OAuth 리다이렉트 페이지인 경우 초기 인증 상태 확인을 건너뜀
+        const currentPath = window.location.pathname;
+        const isOAuthRedirect = currentPath.includes('/login/oauth2/code/');
+
+        if (isOAuthRedirect) {
+          console.log('🔄 OAuth 리다이렉트 감지 - 초기 인증 확인 건너뜀');
+          setAuthenticated(false); // 기본값으로 설정
+        } else {
+          // 일반 페이지 접근 시에만 인증 상태 확인
+          await checkAuthStatus();
+        }
+      } catch (error) {
+        console.error('AuthProvider 초기화 실패:', error);
+        setAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
-
-      // 인증 상태 확인 (사용자 정보도 함께 로드)
-      await checkAuthStatus();
-
-      setIsLoading(false);
-      console.log('✅ AuthProvider: 인증 상태 초기화 완료');
     };
 
     initializeAuth();
   }, []);
 
-  // 로딩 중일 때 로딩 스크린 표시
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <LoadingSpinner size="xl" />
-        <p className="mt-6 text-base font-regular text-gray-700">애플리케이션 초기화 중...</p>
+      <div className="w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600">U:NEAR에 연결하는 중...</p>
+        </div>
       </div>
     );
   }
