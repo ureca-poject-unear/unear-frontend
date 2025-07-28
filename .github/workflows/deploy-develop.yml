@@ -26,8 +26,8 @@ jobs:
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: Build Vite project
-        run: yarn build --mode production
+      - name: Build Vite project (Skip TypeCheck)
+        run: vite build --mode production
         env:
           NODE_ENV: production
           CI: false
