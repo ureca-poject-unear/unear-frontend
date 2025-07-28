@@ -6,7 +6,7 @@ interface HeaderProps {
   bgColor?: string;
   textColor?: string;
   iconColor?: string;
-  onBack?: () => void; // 사용자 정의 시 우선
+  onBack?: () => void;
 }
 
 const Header = ({
@@ -20,9 +20,9 @@ const Header = ({
 
   const handleBack = () => {
     if (onBack) {
-      onBack(); // 사용자 정의 우선
+      onBack();
     } else {
-      navigate(-1); // 기본 뒤로가기
+      navigate(-1); // 뒤로가기
     }
   };
 

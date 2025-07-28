@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Default from '../default';
 import MainPage from '@/pages/MainPage';
+import MembershipPage from '@/pages/MembershipPage';
+import MembershipDetailPage from '@/pages/MembershipDetailPage';
 import MapPage from '@/pages/MapPage';
 import StoryPage from '@/pages/StoryPage';
 import StoryDiagnosisPage from '@/pages/StoryDiagnosisPage';
@@ -35,6 +37,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MainPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/membership',
+        element: (
+          <ProtectedRoute>
+            <MembershipPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/membership/detail/:name',
+        element: (
+          <ProtectedRoute>
+            <MembershipDetailPage />
           </ProtectedRoute>
         ),
       },

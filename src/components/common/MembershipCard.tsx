@@ -1,11 +1,14 @@
+import { useNavigate } from 'react-router-dom';
 import GradeMini from './GradeMini';
+
 type GradeType = 'VIP' | 'VVIP' | '우수';
 
 type MembershipCardProps = {
   name: string;
   description: string;
-  grade: GradeType | GradeType[]; // ✅ 배열도 받을 수 있게 수정
+  grade: GradeType | GradeType[];
   imageUrl: string;
+  onClick?: () => void; // 클릭 이벤트 핸들러 추가
 };
 
 export default function MembershipCard({
@@ -13,11 +16,31 @@ export default function MembershipCard({
   description,
   grade,
   imageUrl,
+  onClick,
 }: MembershipCardProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      // 기본 동작: 상세페이지로 이동 (name 기준, 필요시 id로 변경)
+      navigate(`/membership/detail/${encodeURIComponent(name)}`);
+    }
+  };
+
   return (
-    <div className="relative w-[353px] h-[85px]">
+    <div
+      className="relative w-[353px] h-[85px] cursor-pointer"
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') handleClick();
+      }}
+    >
       {/* 배경 테두리 박스 */}
-      <div className="absolute left-0 top-0 w-full h-full rounded-xl border border-zinc-400 bg-white" />
+      <div className="absolute left-0 top-0 w-full h-full rounded-[12px] border-[0.5px] border-gray-400 bg-white" />
 
       {/* 콘텐츠 영역 */}
       <div className="flex justify-start items-center absolute left-2 top-2.5 gap-3">
@@ -45,12 +68,14 @@ export default function MembershipCard({
         </div>
 
         {/* 텍스트 정보 */}
-        <div className="flex flex-col gap-1 w-[249.92px]">
-          <p className="text-xs font-bold text-black">{name}</p>
-          <p className="text-s font-bold text-black">{description}</p>
+        <div className="flex flex-col w-[249.92px]">
+          <div className="flex flex-col gap-[2px]">
+            <p className="text-xs font-bold text-black">{name}</p>
+            <p className="text-s font-bold text-black truncate">{description}</p>
+          </div>
 
           {/* 등급 뱃지 */}
-          <div className="flex items-center gap-1.5">
+          <div className="mt-[6px] flex items-center gap-1.5">
             {Array.isArray(grade) ? (
               grade.map((g, index) => <GradeMini key={index} grade={g} />)
             ) : (

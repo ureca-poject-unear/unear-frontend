@@ -6,12 +6,12 @@ import MiniButton from '@/components/common/MiniButton';
 interface BottomSheetFilterProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (categoryCode: string | null, benefitCategory: string | null) => void;
-  selectedCategoryCode: string | null;
-  selectedBenefitCategory: string | null;
+  onApply: (categories: string[], benefits: string[]) => void;
+  selectedCategoryCodes: string[];
+  selectedBenefitCategories: string[];
 }
 
-const reverseCategoryCode = (code: string | null): string => {
+const reverseCategoryCode = (code: string): string => {
   const map: Record<string, string> = {
     CAFE: '카페',
     FOOD: '푸드',
@@ -23,7 +23,7 @@ const reverseCategoryCode = (code: string | null): string => {
     LIFE: '생활/편의',
     ACTIVITY: '액티비티',
   };
-  return code && map[code] ? map[code] : '전체';
+  return map[code] ?? '';
 };
 
 const mapCategoryCode = (name: string): string | null => {
@@ -38,7 +38,7 @@ const mapCategoryCode = (name: string): string | null => {
     '생활/편의': 'LIFE',
     액티비티: 'ACTIVITY',
   };
-  return name === '전체' ? null : map[name];
+  return map[name] ?? null;
 };
 const CATEGORY_LIST = [
   '전체',
@@ -58,20 +58,12 @@ export default function BottomSheetFilter({
   isOpen,
   onClose,
   onApply,
-  selectedCategoryCode,
-  selectedBenefitCategory,
+  selectedCategoryCodes,
+  selectedBenefitCategories,
 }: BottomSheetFilterProps) {
-  const initialCategory = reverseCategoryCode(selectedCategoryCode);
-  const initialBenefit = selectedBenefitCategory ?? '전체';
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([initialCategory]);
-  const [selectedBenefits, setSelectedBenefits] = useState<string[]>([initialBenefit]);
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedCategories([reverseCategoryCode(selectedCategoryCode)]);
-      setSelectedBenefits([selectedBenefitCategory ?? '전체']);
-    }
-  }, [isOpen, selectedCategoryCode, selectedBenefitCategory]);
   const toggleSelection = (
     value: string,
     list: string[],
@@ -96,11 +88,28 @@ export default function BottomSheetFilter({
   };
 
   const handleApply = () => {
-    const category = mapCategoryCode(selectedCategories[0]);
-    const benefit = selectedBenefits.includes('전체') ? null : selectedBenefits[0];
-    onApply(category, benefit);
+    const mappedCategories = selectedCategories.includes('전체')
+      ? []
+      : (selectedCategories.map(mapCategoryCode).filter(Boolean) as string[]);
+
+    const mappedBenefits = selectedBenefits.includes('전체') ? [] : [...selectedBenefits];
+
+    onApply(mappedCategories, mappedBenefits);
     onClose();
   };
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCategories(
+        selectedCategoryCodes.length === 0
+          ? ['전체']
+          : selectedCategoryCodes.map(reverseCategoryCode)
+      );
+
+      setSelectedBenefits(
+        selectedBenefitCategories.length === 0 ? ['전체'] : [...selectedBenefitCategories]
+      );
+    }
+  }, [isOpen, selectedCategoryCodes, selectedBenefitCategories]);
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose}>
@@ -137,7 +146,13 @@ export default function BottomSheetFilter({
 
         {/* 버튼 */}
         <div className="flex flex-col items-center gap-3">
-          <MiniButton text="필터 적용하기" onClick={handleApply} isActive />
+          <MiniButton
+            text="필터 적용하기"
+            onClick={handleApply}
+            isActive
+            widthClass="w-[150px]"
+            heightClass="h-[32px]"
+          />
           <button onClick={handleReset} className="text-sm font-semibold text-black underline">
             초기화
           </button>

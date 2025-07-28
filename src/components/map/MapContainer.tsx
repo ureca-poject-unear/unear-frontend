@@ -1,23 +1,28 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import type { KakaoMap, KakaoCustomOverlay } from '@/types/kakao';
+import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
-import axiosInstance from '@/apis/axiosInstance';
 import MapMarkerIcon from '../common/MapMarkerIcon';
+import { getPlaces } from '@/apis/getPlaces';
 
 export interface MapContainerRef {
   showCurrentLocation: () => void;
+  setCenter: (lat: number, lng: number) => void;
 }
 
 interface MapContainerProps {
   isBookmarkOnly: boolean;
-  categoryCode: string | null;
-  benefitCategory: string | null;
+  categoryCodes: string[];
+  benefitCategories: string[];
   shouldRestoreLocation: boolean;
+  onMarkerClick: (placeId: number, latitude: string, longitude: string) => void;
 }
 
 const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
-  ({ isBookmarkOnly, categoryCode, benefitCategory, shouldRestoreLocation }, ref) => {
+  (
+    { isBookmarkOnly, categoryCodes, benefitCategories, shouldRestoreLocation, onMarkerClick },
+    ref
+  ) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
     const mapInstanceRef = useRef<KakaoMap | null>(null);
@@ -25,34 +30,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const markersRef = useRef<KakaoCustomOverlay[]>([]);
     const currentLocationRef = useRef<{ lat: number; lng: number } | null>(null);
     const [isLocationShown, setIsLocationShown] = useState(false);
-
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
-
-    interface Place {
-      id: number;
-      latitude: number;
-      longitude: number;
-      categoryCode: CategoryType;
-      markerCode: StoreClassType;
-      eventCode: EventType;
-      benefitCategory: string;
-      favorite: boolean;
-    }
-
-    type CategoryType =
-      | 'FOOD'
-      | 'ACTIVITY'
-      | 'EDUCATION'
-      | 'CULTURE'
-      | 'BAKERY'
-      | 'LIFE'
-      | 'SHOPPING'
-      | 'CAFE'
-      | 'BEAUTY'
-      | 'POPUP';
-
-    type StoreClassType = 'LOCAL' | 'FRANCHISE' | 'BASIC';
-    type EventType = 'NONE' | 'GENERAL' | 'REQUIRE';
+    const staticCircleRef = useRef<KakaoCircle | null>(null);
 
     const renderCurrentLocation = (lat: number, lng: number) => {
       const currentLatLng = new window.kakao.maps.LatLng(lat, lng);
@@ -83,6 +62,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          console.log('현재 위치:', { latitude, longitude });
           currentLocationRef.current = { lat: latitude, lng: longitude };
           renderCurrentLocation(latitude, longitude);
           mapInstanceRef.current?.setCenter(new window.kakao.maps.LatLng(latitude, longitude));
@@ -97,6 +77,13 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     useImperativeHandle(ref, () => ({
       showCurrentLocation,
+      setCenter: (lat: number, lng: number) => {
+        const map = mapInstanceRef.current;
+        if (map) {
+          const newCenter = new window.kakao.maps.LatLng(lat, lng);
+          map.setCenter(newCenter);
+        }
+      },
     }));
 
     useEffect(() => {
@@ -109,19 +96,15 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         const ne = bounds.getNorthEast();
 
         try {
-          const res = await axiosInstance.get('/places', {
-            params: {
-              southWestLatitude: sw.getLat(),
-              southWestLongitude: sw.getLng(),
-              northEastLatitude: ne.getLat(),
-              northEastLongitude: ne.getLng(),
-              isFavorite: isBookmarkOnly ? 'true' : undefined,
-              categoryCode: categoryCode ?? undefined,
-              benefitCategory: benefitCategory ?? undefined,
-            },
+          const places = await getPlaces({
+            swLat: sw.getLat(),
+            swLng: sw.getLng(),
+            neLat: ne.getLat(),
+            neLng: ne.getLng(),
+            isFavorite: isBookmarkOnly,
+            categoryCodes,
+            benefitCategories,
           });
-
-          const places: Place[] = res.data?.data || [];
 
           markersRef.current.forEach((marker) => marker.setMap(null));
           markersRef.current = [];
@@ -129,20 +112,39 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           places.forEach((place) => {
             const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
 
-            const markerHTML = ReactDOMServer.renderToString(
-              <MapMarkerIcon
-                category={place.categoryCode}
-                storeClass={place.markerCode}
-                event={place.eventCode}
-              />
-            );
-
+            // HTML 요소 생성
             const el = document.createElement('div');
-            el.innerHTML = markerHTML;
+            el.innerHTML = ReactDOMServer.renderToString(
+              <div style={{ cursor: 'pointer' }}>
+                <MapMarkerIcon
+                  category={place.categoryCode}
+                  storeClass={place.markerCode}
+                  event={place.eventCode}
+                />
+              </div>
+            );
+            const markerElement = el.firstElementChild;
+            if (markerElement) {
+              markerElement.setAttribute('data-place-id', String(place.placeId));
+              markerElement.setAttribute('data-lat', String(place.latitude));
+              markerElement.setAttribute('data-lng', String(place.longitude));
+
+              markerElement.addEventListener('click', () => {
+                const placeId = markerElement.getAttribute('data-place-id');
+                const lat = markerElement.getAttribute('data-lat');
+                const lng = markerElement.getAttribute('data-lng');
+
+                if (placeId && lat && lng) {
+                  onMarkerClick(Number(placeId), lat, lng);
+                } else {
+                  console.error('❌ 마커 클릭: dataset 값이 올바르지 않음');
+                }
+              });
+            }
 
             const overlay = new window.kakao.maps.CustomOverlay({
               position,
-              content: el.firstElementChild as Node,
+              content: markerElement as Node,
               yAnchor: 1,
               zIndex: 1,
             });
@@ -158,7 +160,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           console.error('장소 가져오기 실패:', error);
         }
       };
-    }, [isBookmarkOnly, categoryCode, benefitCategory, isLocationShown]);
+    }, [isBookmarkOnly, categoryCodes, benefitCategories, isLocationShown, onMarkerClick]);
 
     useEffect(() => {
       if (!kakaoMapKey) {
@@ -185,6 +187,19 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             const map = new window.kakao.maps.Map(container, options);
             mapInstanceRef.current = map;
 
+            const staticCircle = new window.kakao.maps.Circle({
+              center: new window.kakao.maps.LatLng(37.544581, 127.055961),
+              radius: 300,
+              strokeWeight: 5,
+              strokeColor: '#DFA2A2',
+              strokeOpacity: 1,
+              strokeStyle: 'shortdash',
+              fillColor: '#F316B0',
+              fillOpacity: 0.08,
+            });
+            staticCircle.setMap(map);
+            staticCircleRef.current = staticCircle;
+
             showCurrentLocation();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
@@ -198,6 +213,9 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
       return () => {
         document.head.removeChild(script);
+        if (staticCircleRef.current) {
+          staticCircleRef.current.setMap(null);
+        }
       };
     }, [kakaoMapKey]);
 
@@ -205,7 +223,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       if (mapInstanceRef.current) {
         fetchPlacesInViewportRef.current();
       }
-    }, [isBookmarkOnly, categoryCode, benefitCategory]);
+    }, [isBookmarkOnly, categoryCodes, benefitCategories]);
 
     useEffect(() => {
       if (shouldRestoreLocation && mapInstanceRef.current && currentLocationRef.current) {
