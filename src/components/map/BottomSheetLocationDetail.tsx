@@ -93,7 +93,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
         </div>
 
         <div className="mt-1">
-          <h3 className="font-semibold text-lm text-black">{store.name}</h3>
+          <h3 className="font-semibold text-lg text-black">{store.name}</h3>
         </div>
 
         <div className="mt-1">
