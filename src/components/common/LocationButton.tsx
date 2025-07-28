@@ -9,7 +9,13 @@ type LocationButtonProps = {
  * 마우스 호버 시 배경색이 pink-50으로 변경되고 아이콘 및 텍스트 색상이 더 진한 핑크색으로 바뀝니다.
  */
 const LocationButton: React.FC<LocationButtonProps> = ({ onClick, width }) => {
-  const buttonWidthClass = typeof width === 'number' ? `w-[${width}px]` : (width ?? 'w-[146px]');
+  // Tailwind에서 정적으로 인식 가능한 width 클래스만 분기 처리
+  let buttonWidthClass = 'w-[146px]';
+
+  if (width === 169) buttonWidthClass = 'w-[169px]';
+  else if (width === 180) buttonWidthClass = 'w-[180px]';
+  else if (typeof width === 'string') buttonWidthClass = width;
+
   return (
     <button
       className={`group ${buttonWidthClass} h-[46px] relative flex items-center justify-center bg-white 

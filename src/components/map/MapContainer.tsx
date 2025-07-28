@@ -8,6 +8,7 @@ import { getPlaces } from '@/apis/getPlaces';
 export interface MapContainerRef {
   showCurrentLocation: () => void;
   setCenter: (lat: number, lng: number) => void;
+  fetchPlaces: () => void;
 }
 
 interface MapContainerProps {
@@ -83,6 +84,9 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           const newCenter = new window.kakao.maps.LatLng(lat, lng);
           map.setCenter(newCenter);
         }
+      },
+      fetchPlaces: () => {
+        fetchPlacesInViewportRef.current();
       },
     }));
 
