@@ -22,26 +22,32 @@ interface LoginError {
   message?: string;
 }
 
+// 사용자 정보 타입 정의
+interface UserInfo {
+  isProfileComplete?: boolean;
+}
+
 const KakaoRedirectHandler: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login } = useAuth();
-  const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { login, checkAuthStatus } = useAuth();
+  const [loadingMessage, setLoadingMessage] = useState('카카오 로그인 처리 중...');
+  const [hasError, setHasError] = useState(false);
   const hasProcessed = useRef(false); // 중복 실행 방지
 
   useEffect(() => {
-    // 이미 처리했거나 처리 중이면 무시
-    if (hasProcessed.current || isProcessing) {
+    // 이미 처리했으면 무시
+    if (hasProcessed.current) {
       return;
     }
 
     const handleKakaoLogin = async (): Promise<void> => {
       // 처리 시작 플래그 설정
       hasProcessed.current = true;
-      setIsProcessing(true);
 
       try {
+        setLoadingMessage('카카오 인가 코드 확인 중...');
+        
         // URL에서 'code' 파라미터(인가 코드)를 추출합니다.
         const code = searchParams.get('code');
 
@@ -51,6 +57,8 @@ const KakaoRedirectHandler: React.FC = () => {
 
         console.log('카카오 인가 코드:', code);
 
+        setLoadingMessage('카카오 서버와 연동 중...');
+        
         // 환경변수를 사용한 API URL
         const apiUrl = `${API_DOMAIN}/login/oauth2/code/kakao`;
 
@@ -68,13 +76,40 @@ const KakaoRedirectHandler: React.FC = () => {
           console.log('백엔드 응답 데이터:', data);
 
           if (data.data?.accessToken) {
+            setLoadingMessage('사용자 정보를 불러오는 중...');
+            
             // AuthProvider의 login 함수 사용
             await login(data.data.accessToken, data.data.refreshToken);
-            alert('카카오 로그인 성공!');
+            console.log('✅ 카카오 로그인 및 사용자 정보 로드 완료');
 
-            // 메인 페이지로 리다이렉트
-            navigate('/', { replace: true });
-            console.log('✅ 메인페이지로 이동합니다.');
+            // 인증 상태 확인 (네트워크 에러 시 간단한 대기 후 진행)
+            setLoadingMessage('인증 상태 확인 중...');
+            
+            // 짧은 대기 시간으로 AuthProvider 상태 업데이트 보장
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            
+            // 사용자 정보 확인 후 적절한 페이지로 이동
+            setLoadingMessage('페이지 이동 준비 중...');
+            const { useAuthStore } = await import('@/store/auth');
+            const userInfo = useAuthStore.getState().userInfo as UserInfo | null;
+            
+            if (userInfo?.isProfileComplete) {
+              console.log('✅ 프로필 완성됨 - 메인페이지로 이동');
+              setLoadingMessage('메인 페이지로 이동 중...');
+              
+              // OAuth 리다이렉트 진행 중 플래그 설정
+              sessionStorage.setItem('oauth_redirect_in_progress', 'true');
+              
+              navigate('/', { replace: true });
+            } else {
+              console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
+              setLoadingMessage('프로필 설정 페이지로 이동 중...');
+              
+              // OAuth 리다이렉트 진행 중 플래그 설정
+              sessionStorage.setItem('oauth_redirect_in_progress', 'true');
+              
+              navigate('/complete-profile', { replace: true });
+            }
           } else {
             throw new Error('백엔드에서 accessToken을 받지 못했습니다.');
           }
@@ -83,51 +118,36 @@ const KakaoRedirectHandler: React.FC = () => {
           throw new Error(data.message || '카카오 로그인에 실패했습니다.');
         }
       } catch (error: unknown) {
-        console.error('카카오 로그인 처리 중 오류 발생:', error);
-
+        console.error('❌ 카카오 로그인 처리 중 오류:', error);
+        setHasError(true);
+        
         const loginError = error as LoginError;
-        setError(loginError.message || '로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-
+        const errorMessage = loginError.message || '카카오 로그인 처리 중 오류가 발생했습니다.';
+        
+        setLoadingMessage(errorMessage);
+        
         // 에러 발생 시 3초 후 로그인 페이지로 이동
-        setTimeout(() => navigate('/login', { replace: true }), 3000);
-      } finally {
-        setIsProcessing(false);
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 3000);
       }
     };
 
     handleKakaoLogin();
   }, []); // 의존성 배열 비움 - 한 번만 실행
 
-  // 에러 발생 시 화면
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-6">
-        <div className="text-center max-w-md w-full">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">카카오 로그인 오류</h1>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-              <p className="text-red-700 text-sm leading-relaxed">{error}</p>
-            </div>
-            <p className="text-gray-600 text-sm">3초 후 로그인 페이지로 자동 이동됩니다...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 로딩 화면
+  // 카카오 로그인 처리 중 로딩 화면 표시
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="flex justify-center mb-8">
-          <LoadingSpinner size="xl" />
+    <>
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600" style={{ color: hasError ? '#6B7280' : '#6B7280' }}>
+            {loadingMessage}
+          </p>
         </div>
-        <h1 className="text-xl font-semibold text-gray-800 mb-3">카카오 로그인 처리 중</h1>
-        <p className="text-gray-600">사용자 정보를 불러오고 있습니다...</p>
-
-        <div className="mt-8 text-xs text-gray-400">U:NEAR에 로그인하고 있습니다</div>
       </div>
-    </div>
+    </>
   );
 };
 
