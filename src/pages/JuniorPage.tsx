@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'; // [추가] useState, useEffect 임포트
 import Header from '@/components/common/Header';
-import EventBanner from '@/components/JuniorPage/EventBanner';
-import StampRouletteCard from '@/components/JuniorPage/StampRouletteCard';
-import JuniorMap from '@/components/JuniorPage/JuniorMap';
-import TodayCouponSection from '@/components/JuniorPage/TodayCouponSection';
-import JuniorMarket from '@/components/JuniorPage/JuniorMarket';
+import EventBanner from '@/components/junior/EventBanner';
+import StampRouletteCard from '@/components/junior/StampRouletteCard';
+import JuniorMap from '@/components/junior/JuniorMap';
+import TodayCouponSection from '@/components/junior/TodayCouponSection';
+import JuniorMarket from '@/components/junior/JuniorMarket';
 
 // --- 실제로는 별도의 api 파일에 있을 함수들의 예시입니다 ---
 // [추가] 사용자의 룰렛 참여 여부를 서버에서 가져오는 API 함수 (가상)
