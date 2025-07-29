@@ -1,39 +1,144 @@
 // src/components/JuniorPage/JuniorMarket.tsx
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import BookmarkCard from '@/components/common/BookmarkCard';
-import type { StoreType, EventType } from '@/types/Junior'; // [수정] 임포트 경로 변경
+import type { StoreInfo } from '@/components/common/BookmarkCard';
+import type { Place } from '@/apis/getPlaces';
+import { getPlaces } from '@/apis/getPlaces';
+import { getPlaceDetail } from '@/apis/getPlaceDetail';
+import type {
+  CategoryType,
+  EventType,
+  StoreClassType,
+  StoreStatusType,
+} from '@/components/common/StoreTypeIcon';
 
-// 부모로부터 받을 props 타입 정의
-interface JuniorMarketProps {
-  stores: StoreType[];
-  onBookmarkToggle: (storeId: string) => void;
-}
-
-const getStoreColorClass = (event: EventType): string => {
-  if (event === 'REQUIRE') return 'text-pink-400';
-  if (event === 'GENERAL') return 'text-primary';
-  return 'text-black';
+const getStoreNameColorClass = (eventTypeCode: EventType): string => {
+  switch (eventTypeCode) {
+    case 'GENERAL':
+      return 'text-blue-600';
+    case 'REQUIRE':
+      return 'text-red-600';
+    default:
+      return 'text-gray-900';
+  }
 };
 
-const JuniorMarket = ({ stores, onBookmarkToggle }: JuniorMarketProps) => {
+const JuniorMarket = () => {
+  const [stores, setStores] = useState<StoreInfo[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSeoulEventStores = async () => {
+      try {
+        setIsLoading(true);
+        const seoulBounds = {
+          swLat: 37.42,
+          swLng: 126.73,
+          neLat: 37.7,
+          neLng: 127.2,
+        };
+        const allPlacesInSeoul = await getPlaces(seoulBounds);
+        const eventPlaces = allPlacesInSeoul.filter((p) => p.eventCode !== 'NONE');
+
+        if (eventPlaces.length === 0) {
+          setStores([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // --- 여기가 핵심 수정 지점입니다 ---
+        // MapContainer의 초기 중심 좌표와 동일한 값을 사용하여 API를 호출합니다.
+        const centerLat = '37.544581';
+        const centerLng = '127.055961';
+
+        const detailResults = await Promise.allSettled(
+          eventPlaces.map((place) =>
+            // 각 장소의 위경도가 아닌, 고정된 중심 좌표를 전달합니다.
+            getPlaceDetail(place.placeId, centerLat, centerLng)
+          )
+        );
+        // ---------------------------------
+
+        const successfulDetails = detailResults
+          .filter((result) => result.status === 'fulfilled' && result.value)
+          .map((result) => (result as PromiseFulfilledResult<any>).value);
+
+        detailResults.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            console.error(
+              `상세 정보를 가져오는 데 실패했습니다 (placeId: ${eventPlaces[index].placeId}):`,
+              result.reason
+            );
+          }
+        });
+
+        const finalStoreInfo = successfulDetails.map((detail) => {
+          const originalPlace = eventPlaces.find((p) => p.placeId === detail.placeId)!;
+          return {
+            id: String(detail.placeId),
+            name: detail.name,
+            address: detail.address,
+            hours: detail.hours,
+            isBookmarked: detail.isBookmarked,
+            status: detail.status as StoreStatusType,
+            category: detail.category as CategoryType,
+            event: detail.eventTypeCode as EventType,
+            storeClass: originalPlace.markerCode as StoreClassType,
+          };
+        });
+
+        setStores(finalStoreInfo);
+      } catch (err) {
+        setError('매장 정보를 불러오는 데 실패했습니다.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSeoulEventStores();
+  }, []);
+
+  const handleBookmarkToggle = (storeId: string) => {
+    setStores((prevStores) =>
+      prevStores.map((store) =>
+        store.id === storeId ? { ...store, isBookmarked: !store.isBookmarked } : store
+      )
+    );
+  };
+
+  if (isLoading) {
+    return <div className="p-5 text-center text-gray-500">매장 목록을 불러오는 중...</div>;
+  }
+
+  if (error) {
+    return <div className="p-5 text-center text-red-500">{error}</div>;
+  }
+
   return (
-    <div className="relative bg-white pl-5 pr-5">
+    <div className="relative bg-white px-5">
       <div className="m-2 mb-4">
         <p className="text-lm font-bold text-black">이번주니어 매장</p>
       </div>
       <div className="flex flex-col items-start gap-4 mb-2">
-        {stores.map((store) => {
-          const colorClass = getStoreColorClass(store.event);
-          return (
-            <BookmarkCard
-              key={store.id}
-              store={store}
-              storeNameClass={colorClass}
-              onBookmarkToggle={() => onBookmarkToggle(store.id)}
-            />
-          );
-        })}
+        {stores.length > 0 ? (
+          stores.map((store) => {
+            const colorClass = getStoreNameColorClass(store.event);
+            return (
+              <BookmarkCard
+                key={store.id}
+                store={store}
+                variant="full"
+                nameColorClass={colorClass}
+                onBookmarkToggle={() => handleBookmarkToggle(store.id)}
+              />
+            );
+          })
+        ) : (
+          <div className="p-5 text-center text-gray-500">표시할 이벤트 매장이 없습니다.</div>
+        )}
       </div>
     </div>
   );

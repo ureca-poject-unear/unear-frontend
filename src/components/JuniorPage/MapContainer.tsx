@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom/client';
 import type { KakaoMap, KakaoCustomOverlay } from '@/types/kakao';
 import type { Place } from '@/apis/getPlaces';
 import { getPlaces } from '@/apis/getPlaces';
-import { getPlaceDetail } from '@/apis/getPlaceDetail'; // 상세 정보 API 호출 함수
-import type { StoreData } from '@/types/storeDetail'; // 상세 정보 타입
+import { getPlaceDetail } from '@/apis/getPlaceDetail';
+import type { StoreData } from '@/types/storeDetail';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
-import BookmarkCard from '@/components/JuniorPage/BookmarkCard'; // 정보창에 사용할 카드 컴포넌트
-import type { StoreInfo } from '@/components/JuniorPage/BookmarkCard'; // BookmarkCard가 사용하는 타입
+import BookmarkCard from '@/components/JuniorPage/BookmarkCard';
+import type { StoreInfo } from '@/components/JuniorPage/BookmarkCard';
 import type {
   CategoryType,
   EventType,
@@ -15,7 +15,6 @@ import type {
   StoreStatusType,
 } from '@/components/common/StoreTypeIcon';
 
-// 컴포넌트 Props 정의
 interface MapContainerProps {
   onMarkerSelect?: (place: Place) => void;
   onBookmarkToggle?: (placeId: number) => void;
@@ -25,30 +24,23 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
   const mapRef = useRef<HTMLDivElement>(null);
   const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-  // --- 상태(State) 및 참조(Ref) 관리 ---
   const [map, setMap] = useState<KakaoMap | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
   const [infoOverlay, setInfoOverlay] = useState<KakaoCustomOverlay | null>(null);
-
-  // [추가] API로 받아온 상세 정보 및 로딩 상태 관리
   const [detailedStore, setDetailedStore] = useState<StoreData | null>(null);
   const [isInfoLoading, setIsInfoLoading] = useState(false);
 
   const markerOverlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const markerRootsRef = useRef<any[]>([]);
 
-  // --- 함수 정의 (useCallback으로 최적화) ---
-
-  // 정보창 닫기 함수
   const closeInfoWindow = useCallback(() => {
     infoOverlay?.setMap(null);
     setInfoOverlay(null);
     setSelectedPlaceId(null);
-    setDetailedStore(null); // [추가] 상세 정보 상태 초기화
+    setDetailedStore(null);
   }, [infoOverlay]);
 
-  // 마커 클릭 핸들러 (수정됨: API 호출 로직 추가)
   const handleMarkerClick = useCallback(
     async (place: Place) => {
       if (selectedPlaceId === place.placeId) {
@@ -56,7 +48,6 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
         return;
       }
 
-      // 기존 정보창을 즉시 닫고 로딩 상태 시작
       closeInfoWindow();
       setSelectedPlaceId(place.placeId);
       setIsInfoLoading(true);
@@ -64,7 +55,6 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
       if (!map) return;
 
       try {
-        // 사용자의 현재 위치 대신 지도의 중심 좌표를 사용
         const center = map.getCenter();
         const fetchedDetails = await getPlaceDetail(
           place.placeId,
@@ -74,7 +64,7 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
         setDetailedStore(fetchedDetails);
       } catch (error) {
         console.error('장소 상세 정보 조회 실패:', error);
-        closeInfoWindow(); // 에러 발생 시 정보창 닫기
+        closeInfoWindow();
       } finally {
         setIsInfoLoading(false);
       }
@@ -84,7 +74,6 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
     [map, selectedPlaceId, closeInfoWindow, onMarkerSelect]
   );
 
-  // 지도 영역 내 장소 데이터 불러오기 함수
   const fetchPlacesInViewport = useCallback(async () => {
     if (!map) return;
     const bounds = map.getBounds();
@@ -104,11 +93,7 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
     }
   }, [map]);
 
-  // --- useEffect 훅 ---
-
-  // 1. 지도 초기화 (기존과 동일)
   useEffect(() => {
-    // ... (이 부분은 기존 코드와 동일합니다)
     if (!kakaoMapKey) {
       console.error('Kakao Map API Key is missing');
       return;
@@ -152,13 +137,12 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
     }
   }, [kakaoMapKey]);
 
-  // 2. 지도 이벤트 리스너 설정 (기존과 동일)
   useEffect(() => {
     if (!map) return;
     const idleListener = window.kakao.maps.event.addListener(map, 'idle', fetchPlacesInViewport);
     const clickListener = window.kakao.maps.event.addListener(map, 'click', closeInfoWindow);
 
-    fetchPlacesInViewport(); // 최초 데이터 로딩
+    fetchPlacesInViewport();
 
     return () => {
       window.kakao.maps.event.removeListener(map, 'idle', idleListener);
@@ -166,34 +150,26 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
     };
   }, [map, fetchPlacesInViewport, closeInfoWindow]);
 
-  // 3. [수정됨] 상세 정보 로드 완료 시 정보창(CustomOverlay) 렌더링
   useEffect(() => {
     if (!map || !selectedPlaceId) return;
-
-    // 로딩 중이거나 데이터가 아직 없는 경우, 혹은 이미 정보창이 있는 경우는 무시
     if (isInfoLoading || !detailedStore || infoOverlay) return;
 
-    // API 응답(StoreData)을 BookmarkCard의 props(StoreInfo) 타입으로 변환
-    const convertToCardData = (data: StoreData): StoreInfo => {
-      const originalPlace = places.find((p) => p.placeId === data.placeId);
-      return {
-        id: String(data.placeId),
-        name: data.name,
-        address: data.address,
-        hours: data.hours,
-        category: data.category as CategoryType,
-        // markerCode는 초기 places 데이터에서 가져옴 (getPlaceDetail 응답에 없으므로)
-        storeClass: (originalPlace?.markerCode as StoreClassType) || 'LOCAL',
-        event: data.eventTypeCode as EventType,
-        status: data.status as StoreStatusType,
-        isBookmarked: data.isBookmarked,
-      };
+    const originalPlace = places.find((p) => p.placeId === detailedStore.placeId);
+    const cardData: StoreInfo = {
+      id: String(detailedStore.placeId),
+      name: detailedStore.name,
+      address: detailedStore.address,
+      hours: detailedStore.hours,
+      category: detailedStore.category as CategoryType,
+      storeClass: (originalPlace?.markerCode as StoreClassType) || 'LOCAL',
+      event: detailedStore.eventTypeCode as EventType,
+      status: detailedStore.status as StoreStatusType,
+      isBookmarked: detailedStore.isBookmarked,
     };
-
-    const cardData = convertToCardData(detailedStore);
 
     const contentNode = document.createElement('div');
     const root = ReactDOM.createRoot(contentNode);
+
     root.render(
       <BookmarkCard
         store={cardData}
@@ -223,12 +199,15 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
     map.panTo(new window.kakao.maps.LatLng(detailedStore.latitude, newCenterLng));
   }, [detailedStore, isInfoLoading, map, selectedPlaceId, onBookmarkToggle, places, infoOverlay]);
 
-  // 4. 마커 렌더링 (기존과 동일)
   useEffect(() => {
     if (!map) return;
 
     markerOverlaysRef.current.forEach((overlay) => overlay.setMap(null));
-    markerRootsRef.current.forEach((root) => root.unmount());
+    markerRootsRef.current.forEach((root) => {
+      // React 18 대응: unmount는 렌더링 이후 비동기 처리
+      setTimeout(() => root.unmount(), 0);
+    });
+
     markerOverlaysRef.current = [];
     markerRootsRef.current = [];
 
@@ -236,8 +215,8 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
       const isSelected = place.placeId === selectedPlaceId;
       const contentNode = document.createElement('div');
       contentNode.style.cursor = 'pointer';
-      const root = ReactDOM.createRoot(contentNode);
 
+      const root = ReactDOM.createRoot(contentNode);
       root.render(
         <MapMarkerIcon
           category={place.categoryCode}

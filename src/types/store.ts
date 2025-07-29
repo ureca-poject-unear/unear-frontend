@@ -15,7 +15,7 @@ export interface NearbyStore {
   name: string;
   address: string;
   categoryCode: string;
-  distanceKm: number;
+  distanceKm: number | null;
   latitude: number;
   longitude: number;
   startTime: number;

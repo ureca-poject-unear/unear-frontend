@@ -6,7 +6,7 @@ export interface PlaceDetailResponse {
   name: string;
   address: string;
   categoryCode: string;
-  distanceKm: number;
+  distanceKm: number | null;
   latitude: number;
   longitude: number;
   startTime: number;
@@ -37,7 +37,7 @@ const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
     name: data.name,
     address: data.address,
     category: data.categoryCode,
-    distance: `${data.distanceKm.toFixed(1)}km`,
+    distance: data.distanceKm !== null ? `${data.distanceKm.toFixed(1)}km` : '거리 정보 없음',
     latitude: data.latitude,
     longitude: data.longitude,
     hours: `${data.startTime}:00 ~ ${data.endTime}:00`,

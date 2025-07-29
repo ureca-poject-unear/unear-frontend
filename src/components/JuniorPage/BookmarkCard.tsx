@@ -9,12 +9,12 @@ import StoreStatus, { type StoreStatusType } from '@/components/common/StoreStat
 import MiniLocationButton from '@/components/common/MiniLocationButton';
 import PhoneButton from '@/components/common/PhoneButton';
 import PhoneButtonDark from '@/components/common/PhoneButtonDark';
-import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
-import LocationWhiteIcon from '@/assets/common/locationWhiteIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
 
-// export하여 MapContainer 등 다른 파일에서 이 타입을 재사용할 수 있게 합니다.
+// --- 1. StoreInfo 인터페이스 수정 ---
+// API 응답에 맞춰 쿠폰(coupons) 배열을 추가합니다.
+// optional chaining(?.)을 사용하여 쿠폰이 없는 경우에도 오류가 발생하지 않도록 합니다.
 export interface StoreInfo {
   id: string;
   name: string;
@@ -25,11 +25,17 @@ export interface StoreInfo {
   event: EventType;
   status: StoreStatusType;
   isBookmarked: boolean;
+  coupons?: {
+    couponTemplateId: number;
+    couponName: string;
+    discountInfo: string | null;
+    couponEnd: string;
+  }[];
 }
 
 interface BookmarkCardProps {
   store: StoreInfo;
-  onBookmarkToggle?: (storeId: string) => void; // storeId만 받도록 수정
+  onBookmarkToggle?: (storeId: string) => void;
   className?: string;
   isDarkMode?: boolean;
   variant?: 'full' | 'compact';
@@ -42,8 +48,6 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   isDarkMode = false,
   variant = 'full',
 }) => {
-  // BookmarkStar의 onToggle은 isBookmarked 값을 넘겨주지만,
-  // 상위 컴포넌트에서는 storeId만 필요하므로 래핑 함수를 만듭니다.
   const handleBookmarkClick = () => {
     onBookmarkToggle?.(store.id);
   };
@@ -56,18 +60,30 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     console.log('전화버튼클릭됨');
   };
 
-  // --- 인포윈도우를 위한 compact 모드 ---
+  // 'compact' 모드는 기존과 동일하게 유지합니다.
   if (variant === 'compact') {
     return (
       <div className="bg-white rounded-md shadow-lg p-3 w-56">
         <div className="flex flex-col gap-1">
-          <div className="flex justify-between items-start">
-            <h3 className="font-bold text-base text-black pr-2 flex-grow">{store.name}</h3>
+          <div className="flex justify-between items-start gap-2">
+            <h3 className="font-bold text-base text-black flex-grow min-w-0 break-words">
+              {store.name}
+            </h3>
             <div className="flex-shrink-0 cursor-pointer">
               <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
             </div>
           </div>
-          <p className="text-xs text-gray-600 mt-1">{store.address}</p>
+          <div className="mt-1">
+            <p
+              className="text-xs text-gray-600"
+              style={{
+                wordBreak: 'break-all',
+                whiteSpace: 'normal',
+              }}
+            >
+              {store.address}
+            </p>
+          </div>
           <div className="flex items-center gap-1 text-xs text-gray-500">
             <TimeIcon className="w-3 h-3" />
             <span>{store.hours}</span>
@@ -77,44 +93,77 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     );
   }
 
-  // --- 기존 'full' 모드 렌더링 ---
+  // --- 2. 'full' 모드 레이아웃 리팩터링 및 쿠폰 기능 추가 ---
   const bgColor = isDarkMode ? 'bg-[#251A49]' : 'bg-white';
   const textColor = isDarkMode ? 'text-white' : 'text-black';
   const subTextColor = isDarkMode ? 'text-gray-300' : 'text-gray-400';
-  const IconLocation = isDarkMode ? LocationWhiteIcon : LocationIcon;
+  const borderColor = isDarkMode ? 'border-gray-600' : 'border-gray-200';
   const IconTime = isDarkMode ? TimeWhiteIcon : TimeIcon;
 
   return (
     <div
-      className={`relative w-[353px] h-[159px] rounded-[8px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] transition-all duration-300 pl-[19px] pr-[15px] pt-[19px] ${bgColor} ${className}`}
+      // 고정 높이(h-[159px])를 제거하여 컨텐츠 길이에 따라 유연하게 높이가 조절되도록 합니다.
+      className={`relative w-[353px] rounded-[8px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] transition-all duration-300 p-4 flex flex-col gap-2 ${bgColor} ${className}`}
     >
-      <div className="absolute left-[19px] top-[19px]">
-        <StoreTypeIcon
-          category={store.category}
-          storeClass={store.storeClass}
-          event={store.event}
-          size={50}
-        />
+      {/* --- 상단 정보 (아이콘, 이름, 주소, 북마크) --- */}
+      <div className="flex gap-4">
+        <div className="flex-shrink-0">
+          <StoreTypeIcon
+            category={store.category}
+            storeClass={store.storeClass}
+            event={store.event}
+            size={50}
+          />
+        </div>
+        <div className="flex-1 overflow-hidden pr-8">
+          <h3 className={`font-semibold text-lm ${textColor} break-words`}>{store.name}</h3>
+          <p
+            className={`font-regular text-sm ${subTextColor} leading-[19px] mt-1`}
+            style={{ wordBreak: 'break-all', whiteSpace: 'normal' }}
+          >
+            {store.address}
+          </p>
+        </div>
+        <div className="absolute right-[15px] top-[14px]">
+          <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
+        </div>
       </div>
-      <div className="absolute right-[15px] top-[14px]">
-        <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
-      </div>
-      <div className="absolute left-[85px] top-[19px]">
-        <h3 className={`font-semibold text-lm ${textColor}`}>{store.name}</h3>
-      </div>
-      <div className="absolute left-[85px] top-[46px]">
-        <p className={`font-regular text-sm ${subTextColor} leading-[19px]`}>{store.address}</p>
-      </div>
-      <div className="absolute left-[19px] right-[15px] top-[80px] mb-[10px] flex items-center justify-between">
+
+      {/* --- 중간 정보 (시간, 영업상태) --- */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
           <IconTime />
-          <span className={`font-regular text-sm ${subTextColor} relative top-[2px]`}>
+          <span className={`font-regular text-sm ${subTextColor} relative top-px`}>
             {store.hours}
           </span>
         </div>
-        <StoreStatus status={store.status} className="relative top-[1px]" />
+        <StoreStatus status={store.status} />
       </div>
-      <div className="absolute left-[19px] right-[15px] bottom-[15px] flex gap-2">
+
+      {/* --- 3. 쿠폰 목록 렌더링 섹션 (새로 추가된 부분) --- */}
+      {store.coupons && store.coupons.length > 0 && (
+        <div className={`mt-2 pt-3 border-t ${borderColor}`}>
+          <div className="flex flex-col gap-2">
+            {store.coupons.map((coupon) => (
+              <div
+                key={coupon.couponTemplateId}
+                className="p-2 rounded-md bg-green-500/10 flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-bold text-sm text-green-600">{coupon.couponName}</p>
+                  <p className="text-xs text-gray-500">
+                    {coupon.discountInfo || `~ ${coupon.couponEnd}`}
+                  </p>
+                </div>
+                {/* 필요 시 여기에 다운로드 버튼 등을 추가할 수 있습니다. */}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* --- 하단 버튼 --- */}
+      <div className="mt-2 flex gap-2">
         <MiniLocationButton onClick={handleLocationClick} />
         {isDarkMode ? (
           <PhoneButtonDark onClick={handlePhoneClick} />
