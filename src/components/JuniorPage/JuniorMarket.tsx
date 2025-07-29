@@ -33,13 +33,18 @@ const JuniorMarket = () => {
     const fetchSeoulEventStores = async () => {
       try {
         setIsLoading(true);
+
+        // 서울시 전체 영역으로 매장 검색
         const seoulBounds = {
           swLat: 37.42,
           swLng: 126.73,
           neLat: 37.7,
           neLng: 127.2,
         };
+
         const allPlacesInSeoul = await getPlaces(seoulBounds);
+        console.log('Places API Response:', allPlacesInSeoul);
+        // 이벤트가 있는 매장만 필터링 (MapContainer와 동일)
         const eventPlaces = allPlacesInSeoul.filter((p) => p.eventCode !== 'NONE');
 
         if (eventPlaces.length === 0) {
@@ -48,18 +53,13 @@ const JuniorMarket = () => {
           return;
         }
 
-        // --- 여기가 핵심 수정 지점입니다 ---
-        // MapContainer의 초기 중심 좌표와 동일한 값을 사용하여 API를 호출합니다.
-        const centerLat = '37.544581';
-        const centerLng = '127.055961';
+        // MapContainer와 동일한 방식으로 중심 좌표 사용
+        const centerLatStr = '37.544581';
+        const centerLngStr = '127.055961';
 
         const detailResults = await Promise.allSettled(
-          eventPlaces.map((place) =>
-            // 각 장소의 위경도가 아닌, 고정된 중심 좌표를 전달합니다.
-            getPlaceDetail(place.placeId, centerLat, centerLng)
-          )
+          eventPlaces.map((place) => getPlaceDetail(place.placeId, centerLatStr, centerLngStr))
         );
-        // ---------------------------------
 
         const successfulDetails = detailResults
           .filter((result) => result.status === 'fulfilled' && result.value)
@@ -89,7 +89,18 @@ const JuniorMarket = () => {
           };
         });
 
-        setStores(finalStoreInfo);
+        // REQUIRE 이벤트 타입 매장을 제일 위로 정렬
+        const sortedStores = finalStoreInfo.sort((a, b) => {
+          if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') {
+            return -1; // a를 b보다 앞에 배치
+          }
+          if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') {
+            return 1; // b를 a보다 앞에 배치
+          }
+          return 0; // 순서 유지
+        });
+
+        setStores(sortedStores);
       } catch (err) {
         setError('매장 정보를 불러오는 데 실패했습니다.');
         console.error(err);

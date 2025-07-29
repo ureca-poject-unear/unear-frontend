@@ -19,25 +19,87 @@ type CouponDownloadData = {
   createdAt: string;
 };
 
+// 쿠폰 상태 확인 API 응답 타입
+type CouponStatusResponse = {
+  message: string;
+  data: {
+    isDownloaded: boolean;
+    isSoldOut: boolean;
+  };
+};
+
 const TodayCouponSection: React.FC = () => {
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string>('');
   const navigate = useNavigate();
 
+  // 사용자의 쿠폰 다운로드 상태를 서버에서 확인하는 함수
+  const checkCouponStatus = async (couponTemplateId: number) => {
+    try {
+      const token = sessionStorage.getItem('temp_access_token');
+
+      if (!token) {
+        // 토큰이 없으면 다운로드되지 않은 상태로 설정
+        setCoupon({
+          id: couponTemplateId,
+          title: '(필수 매장) 20% 할인 쿠폰 (10명 한정)',
+          isDownloaded: false,
+          isSoldOut: false,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(
+        `https://dev.unear.site/api/app/coupons/${couponTemplateId}/status`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseText = await response.text();
+      const result = responseText ? JSON.parse(responseText) : {};
+
+      if (response.ok) {
+        setCoupon({
+          id: couponTemplateId,
+          title: '(필수 매장) 20% 할인 쿠폰 (10명 한정)',
+          isDownloaded: result.data?.isDownloaded || false,
+          isSoldOut: result.data?.isSoldOut || false,
+        });
+      } else {
+        // API 에러 시 기본값으로 설정
+        setCoupon({
+          id: couponTemplateId,
+          title: '(필수 매장) 20% 할인 쿠폰 (10명 한정)',
+          isDownloaded: false,
+          isSoldOut: false,
+        });
+        console.error('쿠폰 상태 확인 실패:', result.message);
+      }
+    } catch (error) {
+      console.error('쿠폰 상태 확인 중 오류 발생:', error);
+      // 네트워크 오류 시 기본값으로 설정
+      setCoupon({
+        id: couponTemplateId,
+        title: '(필수 매장) 20% 할인 쿠폰 (10명 한정)',
+        isDownloaded: false,
+        isSoldOut: false,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // 초기 쿠폰 상태 설정 (실제로는 API로 데이터를 받아오는 것이 좋습니다)
     const couponId = 45; // 백엔드와 약속된 실제 쿠폰 템플릿 ID
-
-    // [수정] 로컬 스토리지에서 해당 쿠폰의 다운로드 상태를 확인
-    const isAlreadyDownloaded = localStorage.getItem(`coupon-${couponId}-downloaded`) === 'true';
-
-    setCoupon({
-      id: couponId,
-      title: '(필수 매장) 20% 할인 쿠폰 (10명 한정)',
-      isDownloaded: isAlreadyDownloaded, // 로컬 스토리지 상태를 반영
-      isSoldOut: false,
-    });
+    checkCouponStatus(couponId);
   }, []);
 
   // 쿠폰 다운로드 처리 함수
@@ -73,9 +135,6 @@ const TodayCouponSection: React.FC = () => {
         setCoupon((prevCoupon) => (prevCoupon ? { ...prevCoupon, isDownloaded: true } : null));
         setMessage(result.message || '쿠폰이 성공적으로 다운로드되었습니다.');
         console.log('다운로드 성공:', result.data);
-
-        // [추가] 다운로드 성공 시 로컬 스토리지에 상태 저장
-        localStorage.setItem(`coupon-${couponTemplateId}-downloaded`, 'true');
       } else {
         setMessage(result.message || `에러가 발생했습니다: ${response.statusText}`);
 
@@ -95,7 +154,7 @@ const TodayCouponSection: React.FC = () => {
     }
   };
 
-  if (!coupon) {
+  if (isLoading || !coupon) {
     return (
       <div className="w-[393px] h-[153px] flex justify-center items-center">
         <Loader2 className="w-8 h-8 animate-spin" />
