@@ -186,7 +186,7 @@ const CompleteProfilePage: React.FC = () => {
             // 4. 추가 대기 시간 (AuthProvider 상태 업데이트 대기)
             await new Promise((resolve) => setTimeout(resolve, 500));
 
-            showSuccessToast('추가 정보 입력이 완료되었습니다! 서비스를 시작합니다.');
+            showSuccessToast('추가 정보 입력이 완료되었습니다!');
 
             // 프로필 완료 후 메인으로 이동
             navigate('/', { replace: true });
