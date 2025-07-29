@@ -245,14 +245,18 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
           discountRate={
             selectedCoupon.discountCode === 'COUPON_PERCENT'
               ? `${selectedCoupon.discountPercent}%`
-              : `${(selectedCoupon.fixedDiscount ?? 0).toLocaleString()}원`
+              : selectedCoupon.discountCode === 'COUPON_FIXED'
+                ? `${selectedCoupon.fixedDiscount?.toLocaleString() ?? 0}원`
+                : '팝업매장쿠폰'
           }
           expireDate={selectedCoupon.couponEnd}
           barcodeValue={selectedCoupon.barcodeNumber}
           usageCondition={
-            selectedCoupon.discountCode === 'COUPON_PERCENT'
-              ? `최대 ${(selectedCoupon.maxDiscountAmount ?? 0).toLocaleString()}원 할인`
-              : `최소 ${(selectedCoupon.minPurchaseAmount ?? 0).toLocaleString()}원 이상 구매 시`
+            selectedCoupon.discountCode === 'COUPON_FIXED'
+              ? `최소 ${selectedCoupon.minPurchaseAmount?.toLocaleString() ?? 0}원 이상 구매 시`
+              : selectedCoupon.discountCode === 'COUPON_PERCENT'
+                ? `최대 ${selectedCoupon.maxDiscountAmount?.toLocaleString() ?? 0}원 할인`
+                : '팝업매장에서만 사용가능'
           }
           usageGuide={[
             '매장에서 결제 전 바코드 제시',
