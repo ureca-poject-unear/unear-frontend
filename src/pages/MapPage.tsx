@@ -57,7 +57,7 @@ const MapPage = () => {
   const displayName = getUserDisplayName();
   const userGrade = getUserGrade();
   const barcodeValue = getBarcodeNumber();
-  const gradeForComponent = userGrade === 'BASIC' ? 'VIP' : userGrade;
+  const gradeForComponent = userGrade === 'BASIC' ? '우수' : userGrade;
 
   useEffect(() => {
     localStorage.setItem('isBookmarkOnly', JSON.stringify(isBookmarkOnly));
