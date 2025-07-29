@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 import { useAuthStore } from '@/store/auth';
 
 export interface ChangePasswordRequest {
@@ -8,19 +8,13 @@ export interface ChangePasswordRequest {
 
 export const changePassword = async (data: ChangePasswordRequest): Promise<void> => {
   const token = useAuthStore.getState().getStoredAccessToken();
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  if (!token) {
+    throw new Error('인증 토큰이 없습니다. 다시 로그인해주세요.');
+  }
 
   try {
-    const response = await axios.put(`${API_BASE_URL}/auth/password`, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      withCredentials: true,
-      validateStatus: function (status) {
-        return status >= 200 && status < 300;
-      },
-    });
+    const response = await axiosInstance.put('/auth/password', data);
 
     // 추가 검증: 응답 데이터에서 resultCode 확인
     if (response.data && response.data.resultCode && response.data.resultCode !== 200) {

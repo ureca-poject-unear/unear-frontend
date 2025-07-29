@@ -5,6 +5,17 @@ import ClosedEyeIcon from '@/assets/common/closedeye.svg?react';
 import OpenEyeIcon from '@/assets/common/openeye.svg?react';
 import { changePassword } from '@/apis/changePassword';
 import { AxiosError } from 'axios';
+import { showErrorToast, showSuccessToast } from '@/utils/toast';
+
+// API 에러 응답 타입 정의
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      codeName?: string;
+      message?: string;
+    };
+  };
+}
 
 const ChangePasswordPage = () => {
   const navigate = useNavigate();
@@ -129,7 +140,7 @@ const ChangePasswordPage = () => {
         newPassword: form.newPassword,
       });
 
-      alert('비밀번호가 성공적으로 변경되었습니다.');
+      showSuccessToast('비밀번호가 성공적으로 변경되었습니다.');
       navigate('/my');
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -140,18 +151,18 @@ const ChangePasswordPage = () => {
         if (codeName === 'INVALID_PASSWORD') {
           setCurrentPasswordError(true);
         } else {
-          alert(message || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+          showErrorToast(message || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
         }
       } else {
-        const errorResponse = (error as any).response;
-        if (errorResponse && errorResponse.data) {
-          if (errorResponse.data.codeName === 'INVALID_PASSWORD') {
+        const errorResponse = error as ApiErrorResponse;
+        if (errorResponse.response?.data) {
+          if (errorResponse.response.data.codeName === 'INVALID_PASSWORD') {
             setCurrentPasswordError(true);
           } else {
-            alert(errorResponse.data.message || '비밀번호 변경에 실패했습니다.');
+            showErrorToast(errorResponse.response.data.message || '비밀번호 변경에 실패했습니다.');
           }
         } else {
-          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+          showErrorToast('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
         }
       }
     } finally {
