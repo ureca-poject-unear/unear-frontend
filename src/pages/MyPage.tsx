@@ -21,7 +21,6 @@ const MyPage = () => {
     onStatisticsDetail,
     onUsageHistoryDetail,
     onChangePassword,
-    onDeleteAccount,
   } = useMyPageHandlers();
 
   return (
@@ -65,10 +64,7 @@ const MyPage = () => {
           />
 
           {/* 계정 관리 영역 */}
-          <AccountManagementSection
-            onChangePassword={onChangePassword}
-            onDeleteAccount={onDeleteAccount}
-          />
+          <AccountManagementSection onChangePassword={onChangePassword} />
         </>
       )}
     </>
