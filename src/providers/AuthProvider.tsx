@@ -27,6 +27,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   checkAuthStatus: () => Promise<boolean>;
   refreshAccessToken: () => Promise<boolean>;
+  refreshUserInfo: () => Promise<void>;
   userInfo: UserInfo | null;
 }
 
@@ -161,6 +162,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // 사용자 정보 강제 새로고침 (외부에서 호출 가능)
+  const refreshUserInfo = async (): Promise<void> => {
+    try {
+      console.log('🔄 사용자 정보 강제 새로고침 시작');
+      await getUserInfo();
+      console.log('✅ 사용자 정보 강제 새로고침 완료');
+    } catch (error) {
+      console.error('❌ 사용자 정보 강제 새로고침 실패:', error);
+      throw error;
+    }
+  };
+
   // 로그인
   const login = async (accessToken: string, refreshToken?: string): Promise<void> => {
     const { setRefreshToken } = useAuthStore.getState();
@@ -271,6 +284,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     checkAuthStatus,
     refreshAccessToken,
+    refreshUserInfo,
     userInfo,
   };
 

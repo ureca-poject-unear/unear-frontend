@@ -18,6 +18,7 @@ import ChangePasswordPage from '@/pages/ChangePasswordPage';
 import KakaoRedirectHandler from '@/pages/auth/KakaoRedirectHandler';
 import CompleteProfilePage from '@/pages/CompleteProfilePage';
 import GoogleRedirectHandler from '@/pages/auth/GoogleRedirectHandler';
+import NaverAuthHandler from '@/pages/auth/NaverAuthHandler';
 
 import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
 import UsageHistoryPage from '@/pages/UsageHistoryPage';
@@ -175,6 +176,7 @@ const router = createBrowserRouter([
       { path: '/signup', element: <SignUpPage /> },
       { path: '/login/oauth2/code/kakao', element: <KakaoRedirectHandler /> },
       { path: '/login/oauth2/code/google', element: <GoogleRedirectHandler /> },
+      { path: '/login/oauth2/code/naver', element: <NaverAuthHandler /> },
     ],
   },
 ]);
