@@ -16,7 +16,8 @@ export interface CouponCardProps {
     | 'BEAUTY'
     | 'LIFE'
     | 'ACTIVITY'
-    | 'POPUP';
+    | 'POPUP'
+    | null;
   storeClass: 'FRANCHISE' | 'LOCAL' | 'BASIC';
   onClick?: () => void;
 }
@@ -29,6 +30,7 @@ const CouponCard = ({
   storeClass,
   onClick,
 }: CouponCardProps) => {
+  const fallbackCategory = category ?? 'POPUP';
   return (
     <div
       className="relative w-full h-[107px] max-w-[393px] drop-shadow-[0_0px_10px_rgba(0,0,0,0.15)] cursor-pointer"
@@ -38,7 +40,12 @@ const CouponCard = ({
       <div className="absolute inset-0 flex items-center px-2 py-3 gap-x-8">
         {/* 아이콘 */}
         <div className="pl-8">
-          <StoreTypeIcon category={category} storeClass={storeClass} size={48} shape="square" />
+          <StoreTypeIcon
+            category={fallbackCategory}
+            storeClass={storeClass}
+            size={48}
+            shape="square"
+          />
         </div>
 
         {/* 세로 점선 */}
