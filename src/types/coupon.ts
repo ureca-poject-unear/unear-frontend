@@ -56,6 +56,7 @@ export interface UserCouponDetail {
   couponName: string;
   couponEnd: string;
   barcodeNumber: string;
+  brandName: string;
   discountCode: 'COUPON_PERCENT' | 'COUPON_FIXED';
   discountPercent?: number;
   fixedDiscount?: number;

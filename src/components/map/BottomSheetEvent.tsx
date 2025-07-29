@@ -1,7 +1,7 @@
 import BottomSheet from '@/components/common/BottomSheet';
 import CoffeeIcon from '@/assets/map/IconExampleCoffee.svg?react';
-import BigCloud from '@/assets/map/BigCloud.svg?react';
-import SmallCloud from '@/assets/map/SmallCloud.svg?react';
+import BigCloud from '@/assets/map/bigCloud.svg?react';
+import SmallCloud from '@/assets/map/smallCloud.svg?react';
 import { Link } from 'react-router-dom';
 
 interface BottomSheetEventProps {

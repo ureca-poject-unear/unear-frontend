@@ -36,6 +36,9 @@ const MapPage = () => {
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState<StoreData | null>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: string; longitude: string } | null>(
+    null
+  );
 
   const ALL_CATEGORY_CODES = [
     'FOOD',
@@ -76,15 +79,41 @@ const MapPage = () => {
     }
   }, [benefitCategories]);
 
+  useEffect(() => {
+    const handleRefreshStores = () => {
+      console.log('🔄 [refreshMapStores] 이벤트 수신됨 - 지도 재요청');
+      mapRef.current?.fetchPlaces();
+    };
+
+    window.addEventListener('refreshMapStores', handleRefreshStores);
+    return () => {
+      window.removeEventListener('refreshMapStores', handleRefreshStores);
+    };
+  }, []);
+
   const handleCurrentLocation = () => {
     mapRef.current?.showCurrentLocation();
   };
 
-  const handleMarkerClick = async (placeId: number, latitude: string, longitude: string) => {
+  const handleMarkerClick = async (placeId: number, storeLat: string, storeLng: string) => {
     try {
-      const storeDetail = await getPlaceDetail(placeId, latitude, longitude);
-      setSelectedStore(storeDetail);
-      setIsBottomSheetOpen(true);
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const userLat = pos.coords.latitude.toString();
+          const userLng = pos.coords.longitude.toString();
+
+          console.log('🧍 사용자 위치:', userLat, userLng);
+          console.log('📍 마커 위치:', storeLat, storeLng);
+
+          const storeDetail = await getPlaceDetail(placeId, userLat, userLng);
+          setUserLocation({ latitude: userLat, longitude: userLng });
+          setSelectedStore(storeDetail);
+          setIsBottomSheetOpen(true);
+        },
+        (err) => {
+          console.error('❌ 사용자 위치 가져오기 실패:', err);
+        }
+      );
     } catch (error) {
       console.error('상세 정보 불러오기 실패:', error);
     }
@@ -150,13 +179,13 @@ const MapPage = () => {
       />
 
       {/* 바텀시트 - store가 있을 때만 렌더 */}
-      {selectedStore && (
+      {selectedStore && userLocation && (
         <BottomSheetLocationDetail
           store={selectedStore}
           isOpen={isBottomSheetOpen}
           onClose={() => setIsBottomSheetOpen(false)}
-          isExpanded={false}
-          onToggleExpand={() => {}}
+          mapRef={mapRef}
+          userLocation={userLocation}
         />
       )}
     </div>

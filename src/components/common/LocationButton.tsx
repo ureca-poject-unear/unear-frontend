@@ -1,5 +1,6 @@
 type LocationButtonProps = {
   onClick?: () => void; // 버튼 클릭 시 실행할 함수
+  width?: number | string;
 };
 
 /**
@@ -7,11 +8,18 @@ type LocationButtonProps = {
  * 버튼을 클릭하면 위치를 보여주는 동작을 수행할 수 있도록 설정됩니다.
  * 마우스 호버 시 배경색이 pink-50으로 변경되고 아이콘 및 텍스트 색상이 더 진한 핑크색으로 바뀝니다.
  */
-const LocationButton: React.FC<LocationButtonProps> = ({ onClick }) => {
+const LocationButton: React.FC<LocationButtonProps> = ({ onClick, width }) => {
+  // Tailwind에서 정적으로 인식 가능한 width 클래스만 분기 처리
+  let buttonWidthClass = 'w-[146px]';
+
+  if (width === 169) buttonWidthClass = 'w-[169px]';
+  else if (width === 180) buttonWidthClass = 'w-[180px]';
+  else if (typeof width === 'string') buttonWidthClass = width;
+
   return (
     <button
-      className="group w-full max-w-[146px] h-[46px] relative flex items-center justify-center bg-white 
-                 hover:bg-pink-50 transition-colors duration-200 rounded-lg"
+      className={`group ${buttonWidthClass} h-[46px] relative flex items-center justify-center bg-white 
+                  hover:bg-pink-50 transition-colors duration-200 rounded-lg flex-shrink-0`}
       onClick={onClick}
     >
       {/* 버튼 외곽 박스 */}
