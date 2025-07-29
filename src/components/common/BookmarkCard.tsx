@@ -16,7 +16,7 @@ import { getOperatingStatus } from '@/utils/operatingHours';
 
 interface BookmarkCardProps {
   store: BookmarkStore;
-  onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
+  onBookmarkToggle?: (storeId: string) => void;
   className?: string;
   isDarkMode?: boolean;
 }
@@ -28,8 +28,8 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   isDarkMode = false,
 }) => {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const handleBookmarkToggle = (isBookmarked: boolean) => {
-    onBookmarkToggle?.(store.id, isBookmarked);
+  const handleBookmarkToggle = () => {
+    onBookmarkToggle?.(store.id);
   };
 
   const handleLocationClick = () => {
@@ -74,9 +74,11 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
         <h3 className={`font-semibold text-lm ${textColor}`}>{store.name}</h3>
       </div>
 
-      {/* 주소 */}
+      {/* 주소 - 주소가 길 경우 180px 이후는 ...으로 표시 */}
       <div className="absolute left-[85px] top-[46px]">
-        <p className={`font-regular text-sm ${subTextColor} leading-[19px]`}>{store.address}</p>
+        <p className={`font-regular text-sm ${subTextColor} truncate max-w-[220px]`}>
+          {store.address}
+        </p>
       </div>
 
       {/* 거리 & 시간 & 상태 */}

@@ -13,6 +13,7 @@ import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
+import ChangePasswordPage from '@/pages/ChangePasswordPage';
 
 import KakaoRedirectHandler from '@/pages/auth/KakaoRedirectHandler';
 import CompleteProfilePage from '@/pages/CompleteProfilePage';
@@ -149,6 +150,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <CouponPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/change-password',
+        element: (
+          <ProtectedRoute>
+            <ChangePasswordPage />
           </ProtectedRoute>
         ),
       },

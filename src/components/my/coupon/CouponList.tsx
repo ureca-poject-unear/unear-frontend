@@ -1,12 +1,12 @@
 import CouponCard from '@/components/common/CouponCard';
 import CouponHeader from './CouponHeader';
-import type { CouponItem } from '@/types/coupon';
+import type { UserCoupon } from '@/types/coupon';
 
 interface CouponListProps {
-  coupons: CouponItem[];
+  coupons: UserCoupon[];
   title: string;
   icon?: 'clock' | 'coupon';
-  onCouponClick: (coupon: CouponItem) => void;
+  onCouponClick: (coupon: UserCoupon) => void;
 }
 
 const CouponList = ({ coupons, title, icon = 'coupon', onCouponClick }: CouponListProps) => {
@@ -21,12 +21,12 @@ const CouponList = ({ coupons, title, icon = 'coupon', onCouponClick }: CouponLi
       <div className="space-y-3">
         {coupons.map((coupon) => (
           <CouponCard
-            key={coupon.id}
-            brand={coupon.brand}
-            title={coupon.title}
-            validUntil={coupon.validUntil}
-            category={coupon.category}
-            storeClass={coupon.storeClass}
+            key={coupon.userCouponId}
+            brand={coupon.name}
+            title={coupon.couponName}
+            validUntil={coupon.couponEnd}
+            category={coupon.categoryCode}
+            storeClass={coupon.markerCode}
             onClick={() => onCouponClick(coupon)}
           />
         ))}
