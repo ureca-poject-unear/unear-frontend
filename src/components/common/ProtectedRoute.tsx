@@ -10,8 +10,11 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// 프로필 완성이 필요하지 않은 경로들
+const PROFILE_EXEMPT_ROUTES = ['/complete-profile', '/login', '/signup'];
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading, refreshAccessToken } = useAuth();
+  const { isAuthenticated, isLoading, refreshAccessToken, userInfo } = useAuth();
   const { getStoredAccessToken } = useAuthStore();
   const location = useLocation();
   const [isCheckingToken, setIsCheckingToken] = useState(false);
@@ -123,6 +126,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (!isAuthenticated && !isOAuthTransition) {
     console.log('🚪 ProtectedRoute: 인증되지 않음 - 로그인 페이지로 이동');
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // 프로필 완성 여부 체크 (인증된 사용자에 대해서만)
+  if (isAuthenticated && userInfo && !isOAuthTransition) {
+    const isProfileExempt = PROFILE_EXEMPT_ROUTES.includes(location.pathname);
+    const isProfileIncomplete = userInfo.isProfileComplete === false;
+
+    // 디버깅을 위한 로그는 줄이고, 중요한 상황에서만 출력
+    if (isProfileIncomplete && !isProfileExempt) {
+      console.log('⚠️ ProtectedRoute: 프로필 미완성 - 프로필 완성 페이지로 이동', {
+        pathname: location.pathname,
+        isProfileComplete: userInfo.isProfileComplete,
+      });
+      return <Navigate to="/complete-profile" state={{ from: location }} replace />;
+    }
   }
 
   // 인증된 경우 자식 컴포넌트 렌더링

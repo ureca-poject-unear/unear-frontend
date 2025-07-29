@@ -67,14 +67,20 @@ const CouponPage = () => {
           discountRate={
             selectedCoupon.discountCode === 'COUPON_PERCENT'
               ? `${selectedCoupon.discountPercent}%`
-              : `${selectedCoupon.fixedDiscount?.toLocaleString() ?? 0}원`
+              : selectedCoupon.fixedDiscount
+                ? `${selectedCoupon.fixedDiscount.toLocaleString()}원`
+                : '할인 정보 없음'
           }
           expireDate={selectedCoupon.couponEnd}
           barcodeValue={selectedCoupon.barcodeNumber}
           usageCondition={
             selectedCoupon.discountCode === 'COUPON_FIXED'
-              ? `최소 ${selectedCoupon.minPurchaseAmount?.toLocaleString() ?? 0}원 이상 구매 시`
-              : `최대 ${selectedCoupon.maxDiscountAmount?.toLocaleString() ?? 0}원 할인`
+              ? selectedCoupon.minPurchaseAmount
+                ? `최소 ${selectedCoupon.minPurchaseAmount.toLocaleString()}원 이상 구매 시`
+                : '최소 구매 금액 제한 없음'
+              : selectedCoupon.maxDiscountAmount
+                ? `최대 ${selectedCoupon.maxDiscountAmount.toLocaleString()}원 할인`
+                : '최대 할인 금액 제한 없음'
           }
           usageGuide={[
             '매장에서 결제 전 바코드 제시',
