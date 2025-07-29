@@ -36,6 +36,9 @@ const MapPage = () => {
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState<StoreData | null>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: string; longitude: string } | null>(
+    null
+  );
 
   const ALL_CATEGORY_CODES = [
     'FOOD',
@@ -103,6 +106,7 @@ const MapPage = () => {
           console.log('📍 마커 위치:', storeLat, storeLng);
 
           const storeDetail = await getPlaceDetail(placeId, userLat, userLng);
+          setUserLocation({ latitude: userLat, longitude: userLng });
           setSelectedStore(storeDetail);
           setIsBottomSheetOpen(true);
         },
@@ -175,12 +179,13 @@ const MapPage = () => {
       />
 
       {/* 바텀시트 - store가 있을 때만 렌더 */}
-      {selectedStore && (
+      {selectedStore && userLocation && (
         <BottomSheetLocationDetail
           store={selectedStore}
           isOpen={isBottomSheetOpen}
           onClose={() => setIsBottomSheetOpen(false)}
           mapRef={mapRef}
+          userLocation={userLocation}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import BookmarkStar from '@/components/common/BookmarkStar';
 import StoreStatus from '@/components/common/StoreStatus';
@@ -16,12 +16,17 @@ import { postDownloadCoupon } from '@/apis/postDownloadCoupon';
 import type { StoreData } from '@/types/storeDetail';
 import type { MapContainerRef } from '@/components/map/MapContainer';
 import { toggleFavorite } from '@/apis/postFavorite';
+import { getUserCouponDetail } from '@/apis/getUserCouponDetail';
+import CouponModal from '../common/CouponModal';
+import type { UserCouponDetail } from '@/types/coupon';
+import { getPlaceDetail } from '@/apis/getPlaceDetail';
 
 interface BottomSheetLocationDetailProps {
   isOpen: boolean;
   onClose: () => void;
   store: StoreData;
   mapRef: React.RefObject<MapContainerRef | null>;
+  userLocation: { latitude: string; longitude: string };
 }
 
 const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
@@ -29,12 +34,15 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
   onClose,
   store,
   mapRef,
+  userLocation,
 }) => {
   console.log('store 데이터 확인:', store);
   const [downloadedCoupons, setDownloadedCoupons] = useState<Set<string>>(new Set());
   const [downloadingCoupons, setDownloadingCoupons] = useState<Set<string>>(new Set());
   const [isExpanded, setIsExpanded] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(store.isBookmarked);
+  const [selectedCoupon, setSelectedCoupon] = useState<UserCouponDetail | null>(null);
+  const [localStore, setLocalStore] = useState(store);
 
   const handleCouponDownload = async (couponId: string) => {
     setDownloadingCoupons((prev) => new Set(prev).add(couponId));
@@ -42,6 +50,16 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
     try {
       await postDownloadCoupon(Number(couponId));
       setDownloadedCoupons((prev) => new Set(prev).add(couponId));
+
+      // 쿠폰 다운로드 후 store 최신화
+      const updated = await getPlaceDetail(
+        store.placeId,
+        String(userLocation.latitude),
+        String(userLocation.longitude)
+      );
+      if (updated) {
+        setLocalStore(updated);
+      }
     } catch (err) {
       console.error('쿠폰 다운로드 실패:', err);
       alert('쿠폰 다운로드에 실패했습니다.');
@@ -54,10 +72,29 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
     }
   };
 
+  const handleCloseModal = () => {
+    setSelectedCoupon(null);
+  };
+
+  // 쿠폰 클릭 시 상세 정보 불러오기
+  const handleCouponClick = async (userCouponId: number | null) => {
+    if (userCouponId == null) return;
+
+    try {
+      const detail = await getUserCouponDetail(userCouponId);
+      if (detail) {
+        console.log('📦 쿠폰 상세 정보:', detail);
+        setSelectedCoupon(detail);
+      }
+    } catch (error) {
+      console.error('❌ 쿠폰 상세 정보 요청 중 오류 발생:', error);
+    }
+  };
+
   const handleBookmarkToggle = async () => {
     const prev = isBookmarked;
     const next = !prev;
-    setIsBookmarked(next); // 낙관적 UI
+    setIsBookmarked(next);
 
     try {
       await toggleFavorite(store.placeId);
@@ -72,6 +109,9 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
       setIsBookmarked(prev);
     }
   };
+  useEffect(() => {
+    setLocalStore(store);
+  }, [store]);
 
   const handleLocationClick = () => {
     mapRef.current?.setCenter(store.latitude, store.longitude);
@@ -142,37 +182,54 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
 
         {isExpanded && (
           <div className="mt-4 space-y-3">
-            {store.coupons.map((coupon) => (
-              <div
-                key={coupon.couponTemplateId}
-                className="relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-full h-[46px]"
-              >
-                <div className="absolute left-3 top-3">
-                  <CouponIcon />
-                </div>
-                <div className="ml-8">
-                  <h4 className="font-bold text-s text-black leading-[12px]">
-                    {coupon.couponName}
-                  </h4>
-                  <p className="text-xs text-gray-400 mt-[2px]">
-                    {coupon.couponEnd?.split('T')[0]} 까지
-                  </p>
-                </div>
-                {!coupon.downloaded && !downloadedCoupons.has(String(coupon.couponTemplateId)) && (
-                  <button
-                    onClick={() => handleCouponDownload(String(coupon.couponTemplateId))}
-                    className="absolute right-3 top-[13px] w-5 h-5 flex items-center justify-center"
-                    disabled={downloadingCoupons.has(String(coupon.couponTemplateId))}
-                  >
-                    {downloadingCoupons.has(String(coupon.couponTemplateId)) ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-black" />
-                    ) : (
-                      <DownloadIcon className="w-5 h-5 text-black" />
+            {localStore.coupons.map((coupon, index) => {
+              const userCouponId = coupon.userCouponId ?? null;
+              const isClickable = userCouponId !== null;
+
+              return (
+                <div
+                  key={userCouponId ?? `coupon-${index}`}
+                  onClick={() => {
+                    if (isClickable) handleCouponClick(userCouponId);
+                  }}
+                  className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-[355px] h-[46px] ${
+                    coupon.userCouponId
+                      ? 'cursor-pointer hover:bg-gray-50 transition-colors'
+                      : 'cursor-default'
+                  }`}
+                >
+                  <div className="absolute left-3 top-3">
+                    <CouponIcon />
+                  </div>
+                  <div className="ml-8">
+                    <h4 className="font-bold text-s text-black leading-[12px]">
+                      {coupon.couponName}
+                    </h4>
+                    <p className="text-xs text-gray-400 mt-[2px]">
+                      {coupon.couponEnd?.split('T')[0]} 까지
+                    </p>
+                  </div>
+
+                  {!coupon.downloaded &&
+                    !downloadedCoupons.has(String(coupon.couponTemplateId)) && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCouponDownload(String(coupon.couponTemplateId));
+                        }}
+                        className="absolute right-3 top-[13px] w-5 h-5 flex items-center justify-center"
+                        disabled={downloadingCoupons.has(String(coupon.couponTemplateId))}
+                      >
+                        {downloadingCoupons.has(String(coupon.couponTemplateId)) ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-black" />
+                        ) : (
+                          <DownloadIcon className="w-5 h-5 text-black" />
+                        )}
+                      </button>
                     )}
-                  </button>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -181,6 +238,36 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
           <CallButton onClick={handlePhoneClick} width={169} />
         </div>
       </div>
+      {selectedCoupon && (
+        <CouponModal
+          brand={selectedCoupon.brandName}
+          title={selectedCoupon.couponName}
+          discountRate={
+            selectedCoupon.discountCode === 'COUPON_PERCENT'
+              ? `${selectedCoupon.discountPercent}%`
+              : `${(selectedCoupon.fixedDiscount ?? 0).toLocaleString()}원`
+          }
+          expireDate={selectedCoupon.couponEnd}
+          barcodeValue={selectedCoupon.barcodeNumber}
+          usageCondition={
+            selectedCoupon.discountCode === 'COUPON_PERCENT'
+              ? `최대 ${(selectedCoupon.maxDiscountAmount ?? 0).toLocaleString()}원 할인`
+              : `최소 ${(selectedCoupon.minPurchaseAmount ?? 0).toLocaleString()}원 이상 구매 시`
+          }
+          usageGuide={[
+            '매장에서 결제 전 바코드 제시',
+            '직원에게 쿠폰 사용 의사 전달',
+            '할인 적용 후 결제',
+          ]}
+          caution={[
+            '다른 할인 쿠폰과 중복 사용 불가',
+            '사용 후 환불 불가',
+            '타인 양도 및 교환 불가',
+            '유효기간 경과 시 자동 소멸',
+          ]}
+          onClose={handleCloseModal}
+        />
+      )}
     </BottomSheet>
   );
 };
