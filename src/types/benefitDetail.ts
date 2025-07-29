@@ -1,5 +1,3 @@
-export type GradeType = 'VIP' | 'VVIP' | '우수';
-
 export interface MembershipPolicy {
   membershipCode: 'BASIC' | 'VIP' | 'VVIP';
   discountCode: string;
@@ -10,10 +8,10 @@ export interface MembershipPolicy {
   maxDiscountAmount: number | null;
 }
 
-export interface BenefitDetail {
+export interface BenefitDetailResponse {
   franchiseId: number;
   franchiseName: string;
   imageUrl: string;
   categoryCode: string;
-  membershipPolicies?: MembershipPolicy[];
+  membershipPolicies: MembershipPolicy[];
 }
