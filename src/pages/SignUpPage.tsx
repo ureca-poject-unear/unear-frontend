@@ -1,11 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
-import ToggleButton from '../components/common/ToggleButton'; // 경로에 맞게 조정
+import ToggleButton from '../components/common/ToggleButton';
 import ConfirmButton from '../components/common/ConfirmButton';
+import { authApi } from '../apis/auth';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
+
+interface FormData {
+  name: string;
+  gender: string;
+  birth: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+// API 에러 응답 타입
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      codeName?: string;
+      message?: string;
+      data?: {
+        fieldErrors?: Record<string, string>;
+      };
+    };
+  };
+}
 
 const SignUpPage = () => {
-  // --- 기존 상태(State) 및 변수 선언 (변경 없음) ---
-  const [form, setForm] = useState({
+  const navigate = useNavigate();
+
+  // 폼 데이터 상태
+  const [form, setForm] = useState<FormData>({
     name: '',
     gender: '남자',
     birth: '',
@@ -15,22 +43,24 @@ const SignUpPage = () => {
     confirmPassword: '',
   });
 
+  // UI 상태
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // 이메일 인증 관련 상태
   const [emailVerificationTimer, setEmailVerificationTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const timerIntervalRef = useRef<number | null>(null);
-
-  const [emailExistsError, setEmailExistsError] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationCodeError, setVerificationCodeError] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [emailExistsError, setEmailExistsError] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const timerIntervalRef = useRef<number | null>(null);
 
+  // 회원가입 버튼 활성화 조건
   const isSignUpActive =
     form.name.trim() !== '' &&
     form.gender.trim() !== '' &&
@@ -42,7 +72,7 @@ const SignUpPage = () => {
     !passwordMismatch &&
     isEmailVerified;
 
-  // --- 기존 핸들러 및 헬퍼 함수 (변경 없음) ---
+  // 비밀번호 토글 함수들
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
@@ -50,21 +80,14 @@ const SignUpPage = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
   };
-  //  전화번호 자동 하이픈 추가 핸들러
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    const formattedValue = value
-      .replace(/[^0-9]/g, '')
-      .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
-    setForm((prevForm) => ({
-      ...prevForm,
-      phone: formattedValue,
-    }));
-  };
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  // 폼 입력 핸들러
+  const handleChange = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setForm((prevForm) => {
       const newForm = { ...prevForm, [field]: value };
+
+      // 비밀번호 일치 확인
       if (field === 'password' || field === 'confirmPassword') {
         if (newForm.password && newForm.confirmPassword) {
           setPasswordMismatch(newForm.password !== newForm.confirmPassword);
@@ -72,103 +95,101 @@ const SignUpPage = () => {
           setPasswordMismatch(false);
         }
       }
+
+      // 이메일 변경 시 인증 상태 초기화
       if (field === 'email') {
         setEmailExistsError(false);
         setIsEmailVerified(false);
+        setShowEmailVerification(false);
+        setVerificationCode('');
+        setVerificationCodeError(false);
+        // 타이머 정리
+        if (timerIntervalRef.current) {
+          clearInterval(timerIntervalRef.current);
+          timerIntervalRef.current = null;
+        }
+        setIsTimerRunning(false);
+        setEmailVerificationTimer(0);
       }
+
       return newForm;
     });
   };
 
+  // 인증번호 입력 핸들러
   const handleVerificationCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVerificationCode(e.target.value);
     setVerificationCodeError(false);
   };
 
-  // --- API 연동 부분 수정 ---
-
-  // 이메일 인증 요청 및 타이머 시작 함수 (이전과 동일)
+  // 이메일 인증번호 요청
   const handleEmailVerificationRequest = async () => {
     if (!form.email.trim()) {
-      alert('이메일을 입력해주세요.');
+      showErrorToast('이메일을 입력해주세요.');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://dev.unear.site/api/app/auth/send-code?email=${encodeURIComponent(form.email)}`,
-        {
-          method: 'POST',
-        }
-      );
+      await authApi.sendVerificationCode(form.email);
 
-      if (response.ok) {
-        setEmailExistsError(false);
-        setShowEmailVerification(true);
-        setEmailVerificationTimer(240);
-        setIsTimerRunning(true);
-        setIsEmailVerified(false);
-        alert('인증번호가 전송되었습니다.');
-      } else {
-        const result = await response.json();
-        if (result.codeName === 'DUPLICATED_EMAIL') {
-          setEmailExistsError(true);
-        } else {
-          alert(result.message || '인증번호 전송에 실패했습니다.');
-        }
-      }
-    } catch (error) {
+      setEmailExistsError(false);
+      setShowEmailVerification(true);
+      setEmailVerificationTimer(240); // 4분
+      setIsTimerRunning(true);
+      setIsEmailVerified(false);
+      setVerificationCode('');
+      setVerificationCodeError(false);
+
+      showSuccessToast('인증번호가 전송되었습니다.');
+    } catch (error: unknown) {
       console.error('이메일 인증번호 전송 실패:', error);
-      alert('네트워크 오류가 발생했습니다.');
+      const apiError = error as ApiErrorResponse;
+
+      if (apiError.response?.data?.codeName === 'DUPLICATED_EMAIL') {
+        setEmailExistsError(true);
+        showErrorToast('이미 가입된 이메일입니다.');
+      } else {
+        showErrorToast(apiError.response?.data?.message || '인증번호 전송에 실패했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // [수정된 부분] 이메일 인증번호 확인 함수
+  // 이메일 인증번호 확인
   const handleVerifyCode = async () => {
     if (!verificationCode.trim()) {
-      alert('인증번호를 입력해주세요.');
+      showErrorToast('인증번호를 입력해주세요.');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://dev.unear.site/api/app/auth/verify-code?email=${encodeURIComponent(
-          form.email
-        )}&code=${encodeURIComponent(verificationCode)}`,
-        {
-          method: 'POST',
-        }
-      );
+      await authApi.verifyCode(form.email, verificationCode);
 
-      // response.ok가 true이면 성공으로 간주하고, JSON 파싱을 시도하지 않습니다.
-      if (response.ok) {
-        setVerificationCodeError(false);
-        setIsTimerRunning(false);
-        setIsEmailVerified(true);
-        if (timerIntervalRef.current) {
-          clearInterval(timerIntervalRef.current);
-          timerIntervalRef.current = null;
-        }
-        alert('이메일 인증이 완료되었습니다!');
-      } else {
-        // response.ok가 false인 경우에만 JSON 파싱을 시도합니다. (에러 메시지 처리)
-        const result = await response.json();
-        setVerificationCodeError(true);
-        alert(result.message || '인증번호가 올바르지 않습니다.');
+      setVerificationCodeError(false);
+      setIsTimerRunning(false);
+      setIsEmailVerified(true);
+
+      // 타이머 정리
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
       }
-    } catch (error) {
+
+      showSuccessToast('이메일 인증이 완료되었습니다!');
+    } catch (error: unknown) {
       console.error('이메일 인증 실패:', error);
-      alert('네트워크 오류가 발생했습니다.');
+      const apiError = error as ApiErrorResponse;
+      setVerificationCodeError(true);
+      showErrorToast(apiError.response?.data?.message || '인증번호가 올바르지 않습니다.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 타이머 로직 (변경 없음)
+  // 타이머 관리
   useEffect(() => {
     if (isTimerRunning && emailVerificationTimer > 0) {
       timerIntervalRef.current = window.setInterval(() => {
@@ -181,6 +202,7 @@ const SignUpPage = () => {
       }
       setIsTimerRunning(false);
     }
+
     return () => {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
@@ -188,12 +210,14 @@ const SignUpPage = () => {
     };
   }, [isTimerRunning, emailVerificationTimer]);
 
+  // 타이머 포맷팅
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}분 ${remainingSeconds.toString().padStart(2, '0')}초`;
   };
 
+  // 생년월일 포맷팅
   const formatBirthdate = (birthString: string) => {
     if (birthString.length === 8) {
       const year = birthString.substring(0, 4);
@@ -204,15 +228,22 @@ const SignUpPage = () => {
     return birthString;
   };
 
-  // 회원가입 제출 함수 (변경 없음)
+  // 회원가입 제출
   const handleSubmit = async () => {
     if (form.password !== form.confirmPassword) {
       setPasswordMismatch(true);
+      showErrorToast('비밀번호가 일치하지 않습니다.');
       return;
     }
-    setPasswordMismatch(false);
 
+    if (!isEmailVerified) {
+      showErrorToast('이메일 인증을 완료해주세요.');
+      return;
+    }
+
+    setPasswordMismatch(false);
     setIsLoading(true);
+
     try {
       const signupData = {
         email: form.email,
@@ -220,51 +251,52 @@ const SignUpPage = () => {
         username: form.name,
         tel: form.phone,
         birthdate: formatBirthdate(form.birth),
-        gender: form.gender === '남자' ? 'M' : 'F',
+        gender: form.gender === '남자' ? ('M' as const) : ('F' as const),
       };
 
-      const response = await fetch('https://dev.unear.site/api/app/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(signupData),
-      });
+      const result = await authApi.signup(signupData);
 
-      const result = await response.json();
-
-      if (response.ok && result.resultCode === 200) {
-        alert(`회원가입이 완료되었습니다! 환영합니다, ${result.data.username}님!`);
-        window.location.href = '/login';
+      if (result.resultCode === 200) {
+        showSuccessToast(`회원가입이 완료되었습니다! 환영합니다, ${result.data.username}님!`);
+        navigate('/login');
       } else {
-        if (result.codeName === 'INVALID_INPUT_VALUE' && result.data?.fieldErrors) {
-          const fieldErrors = result.data.fieldErrors;
-          let errorMessage = '입력값을 확인해주세요:\n';
-          Object.entries(fieldErrors).forEach(([, message]) => {
-            errorMessage += `- ${message}\n`;
-          });
-          alert(errorMessage);
-        } else if (result.codeName === 'DUPLICATED_EMAIL') {
-          setEmailExistsError(true);
-          alert(result.message);
-        } else {
-          alert(result.message || '회원가입에 실패했습니다.');
-        }
+        showErrorToast(result.message || '회원가입에 실패했습니다.');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('회원가입 실패:', error);
-      alert('네트워크 오류가 발생했습니다.');
+      const apiError = error as ApiErrorResponse;
+
+      if (
+        apiError.response?.data?.codeName === 'INVALID_INPUT_VALUE' &&
+        apiError.response.data?.data?.fieldErrors
+      ) {
+        const fieldErrors = apiError.response.data.data.fieldErrors;
+        let errorMessage = '입력값을 확인해주세요:\n';
+        Object.entries(fieldErrors).forEach(([, message]) => {
+          errorMessage += `- ${message}\n`;
+        });
+        showErrorToast(errorMessage);
+      } else if (apiError.response?.data?.codeName === 'DUPLICATED_EMAIL') {
+        setEmailExistsError(true);
+        showErrorToast('이미 가입된 이메일입니다.');
+      } else {
+        showErrorToast(apiError.response?.data?.message || '회원가입에 실패했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- JSX 렌더링 부분 (변경 없음) ---
+  // 로그인 페이지로 이동
+  const handleNavigateToLogin = () => {
+    navigate('/login');
+  };
+
   return (
     <>
       <Header title="회원가입" />
       <div className="mt-[25px]">
-        <div className="px-5 flex flex-col gap-6 ">
+        <div className="px-5 flex flex-col gap-6">
           {/* 이름 */}
           <div>
             <label className="text-lm font-bold text-black">이름</label>
@@ -287,11 +319,7 @@ const SignUpPage = () => {
                   text={g}
                   isActive={form.gender === g}
                   onClick={() => {
-                    if (form.gender === g) {
-                      setForm({ ...form, gender: '' }); // 해제
-                    } else {
-                      setForm({ ...form, gender: g }); // 선택
-                    }
+                    setForm({ ...form, gender: form.gender === g ? '' : g });
                   }}
                 />
               ))}
@@ -315,14 +343,14 @@ const SignUpPage = () => {
             <label className="text-lm font-bold text-black">전화번호</label>
             <input
               type="text"
-              placeholder="예: 010-1234-5678"
+              placeholder="'-' 포함 입력 (예: 010-1234-5678)"
               value={form.phone}
-              onChange={handlePhoneChange}
+              onChange={handleChange('phone')}
               className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent"
             />
           </div>
 
-          {/* 이메일 섹션 시작 */}
+          {/* 이메일 */}
           <div>
             <label className="text-lm font-bold text-black">이메일</label>
             <div className="flex justify-between items-center border-b border-zinc-300">
@@ -346,9 +374,8 @@ const SignUpPage = () => {
               <p className="text-xs text-green-500 mt-1">이메일 인증이 완료되었습니다.</p>
             )}
           </div>
-          {/* 이메일 섹션 끝 */}
 
-          {/* 이메일 인증번호 입력 UI */}
+          {/* 이메일 인증번호 입력 */}
           {showEmailVerification && !isEmailVerified && (
             <div>
               <p className="text-lm font-bold text-black">이메일 인증번호</p>
@@ -365,7 +392,11 @@ const SignUpPage = () => {
                     {formatTime(emailVerificationTimer)}
                   </p>
                 )}
-                <ConfirmButton text="인증확인" onClick={handleVerifyCode} disabled={isLoading} />
+                <ConfirmButton
+                  text="인증확인"
+                  onClick={handleVerifyCode}
+                  disabled={isLoading || !verificationCode.trim()}
+                />
               </div>
               {verificationCodeError && (
                 <p className="text-xs text-red-500 mt-1">인증번호가 틀렸습니다.</p>
@@ -498,7 +529,7 @@ const SignUpPage = () => {
             disabled={!isSignUpActive || isLoading}
             className={`w-[353px] h-[50px] rounded-xl font-semibold text-white transition-colors ${
               isSignUpActive && !isLoading
-                ? 'bg-[#e6007e] hover:bg-[#d1006b]'
+                ? 'bg-primary hover:bg-[#d1006b]'
                 : 'bg-zinc-300 cursor-not-allowed'
             }`}
           >
@@ -511,7 +542,7 @@ const SignUpPage = () => {
           <p className="text-sm text-[#666]">이미 계정이 있으신가요?</p>
           <p
             className="text-sm font-semibold text-primary cursor-pointer"
-            onClick={() => (window.location.href = '/login')}
+            onClick={handleNavigateToLogin}
           >
             로그인
           </p>

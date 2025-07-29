@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import type { MyPageHandlers } from '@/types/myPage';
 
-const useMyPageHandlers = (): Omit<MyPageHandlers, 'onLogout'> & { handleBack: () => void } => {
+const useMyPageHandlers = (): Omit<MyPageHandlers, 'onLogout'> & {
+  handleBack: () => void;
+  onChangePassword: () => void;
+} => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -26,12 +29,18 @@ const useMyPageHandlers = (): Omit<MyPageHandlers, 'onLogout'> & { handleBack: (
     navigate('/my/usage-history');
   };
 
+  const onChangePassword = () => {
+    // 비밀번호 변경 페이지로 이동
+    navigate('/my/change-password');
+  };
+
   return {
     handleBack,
     onCouponClick,
     onBookmarkClick,
     onStatisticsDetail,
     onUsageHistoryDetail,
+    onChangePassword,
   };
 };
 

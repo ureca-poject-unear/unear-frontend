@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
+import React, { Component } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -55,9 +56,7 @@ class ErrorBoundary extends Component<Props, State> {
                   />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-black mb-2">
-                앱에서 오류가 발생했습니다
-              </h1>
+              <h1 className="text-xl font-semibold text-black mb-2">앱에서 오류가 발생했습니다</h1>
               <p className="text-sm text-gray-600 mb-6">
                 예상치 못한 오류가 발생했습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해주세요.
               </p>
@@ -70,7 +69,7 @@ class ErrorBoundary extends Component<Props, State> {
               >
                 페이지 새로고침
               </button>
-              
+
               <button
                 onClick={() => {
                   // 로컬 스토리지 정리 후 홈으로 이동
@@ -97,9 +96,7 @@ class ErrorBoundary extends Component<Props, State> {
                   {this.state.error.stack && (
                     <div className="mt-2 font-mono text-gray-600">
                       <strong>Stack:</strong>
-                      <pre className="whitespace-pre-wrap">
-                        {this.state.error.stack}
-                      </pre>
+                      <pre className="whitespace-pre-wrap">{this.state.error.stack}</pre>
                     </div>
                   )}
                 </div>

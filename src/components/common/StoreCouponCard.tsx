@@ -45,6 +45,7 @@ interface StoreCouponCardProps {
   onBookmarkToggle?: (storeId: string, isBookmarked: boolean) => void;
   onLocationClick?: (lat: number, lng: number) => void;
   onCouponDownloaded?: () => void;
+  onCouponClick?: (couponId: number) => void;
   className?: string;
 }
 
@@ -53,6 +54,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
   onBookmarkToggle,
   onLocationClick,
   onCouponDownloaded,
+  onCouponClick,
   className = '',
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -186,7 +188,12 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
           {store.coupons.map((coupon) => (
             <div
               key={coupon.id}
-              className="relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-[318px] h-[46px]"
+              className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-[318px] h-[46px] ${
+                coupon.userCouponId
+                  ? 'cursor-pointer hover:bg-gray-50 transition-colors'
+                  : 'cursor-default'
+              }`}
+              onClick={() => coupon.userCouponId && onCouponClick?.(coupon.userCouponId)}
             >
               <div className="absolute left-3 top-3">
                 <CouponIcon />

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/common/Header'; // 실제 경로에 맞게 수정해주세요.
-import ToggleButton from '../components/common/ToggleButton'; // 실제 경로에 맞게 수정해주세요.
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/common/Header';
+import ToggleButton from '../components/common/ToggleButton';
+import { authApi } from '../apis/auth';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
+import axiosInstance from '../apis/axiosInstance';
+import { useAuthStore } from '../store/auth';
+import { useAuth } from '../providers/AuthProvider';
 
 // --- 1. 타입 정의 (변경 없음) ---
 interface UserInfo {
@@ -9,8 +15,6 @@ interface UserInfo {
 
 interface ProfileForm {
   name: string;
-  password: string;
-  confirmPassword: string;
   gender: '남자' | '여자';
   birth: string;
   phone: string;
@@ -27,65 +31,99 @@ interface MeApiResponse {
 }
 
 const CompleteProfilePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { getStoredAccessToken } = useAuthStore();
+  const { refreshUserInfo } = useAuth();
   // --- 2. 상태(State) 정의 (변경 없음) ---
   const [user, setUser] = useState<UserInfo>({ email: '' });
   const [form, setForm] = useState<ProfileForm>({
     name: '',
-    password: '',
-    confirmPassword: '',
     gender: '남자',
     birth: '',
     phone: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true); // 초기 로딩 상태
 
-  // --- 3. 데이터 로딩 및 검증 (변경 없음) ---
+  // 데이터 로딩 및 검증 (OAuth 리다이렉트 시 중복 확인 방지)
   useEffect(() => {
     const fetchAndVerifyUser = async () => {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = getStoredAccessToken();
       if (!accessToken) {
-        alert('잘못된 접근입니다. 다시 로그인해주세요.');
-        window.location.href = '/login';
+        showErrorToast('잘못된 접근입니다. 다시 로그인해주세요.');
+        navigate('/login', { replace: true });
         return;
       }
-      try {
-        const response = await fetch('https://dev.unear.site/api/app/users/me', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        if (!response.ok) throw new Error('사용자 정보 조회 실패');
-        const result = (await response.json()) as MeApiResponse;
-        if (result.data.isProfileComplete) {
-          alert('이미 모든 정보를 입력하셨습니다. 홈으로 이동합니다.');
-          window.location.href = '/';
+
+      // OAuth 리다이렉트에서 이미 프로필 확인을 완료했는지 체크
+      const profileCheckCompleted = sessionStorage.getItem('profile_check_completed');
+      const oauthInProgress = sessionStorage.getItem('oauth_redirect_in_progress');
+
+      if (profileCheckCompleted && oauthInProgress) {
+        console.log('🔄 OAuth 리다이렉트에서 이미 프로필 확인 완료 - 중복 확인 건너뜀');
+        // 플래그 제거
+        sessionStorage.removeItem('profile_check_completed');
+        sessionStorage.removeItem('oauth_redirect_in_progress');
+
+        try {
+          // 기본 사용자 정보만 로드 (프로필 완료 상태 재확인 안 함)
+          const response = await axiosInstance.get('/users/me');
+          const result = response.data as MeApiResponse;
+          setUser({ email: result.data.email });
+          setForm((prev) => ({ ...prev, name: result.data.username }));
+          setIsInitializing(false); // 초기화 완료
+          return;
+        } catch (error) {
+          console.error('API Error:', error);
+          showErrorToast('오류가 발생했습니다. 다시 로그인해주세요.');
+          navigate('/login', { replace: true });
           return;
         }
+      }
+
+      // 일반적인 접근 시에만 프로필 완료 상태 확인
+      try {
+        const response = await axiosInstance.get('/users/me');
+        const result = response.data as MeApiResponse;
+
+        if (result.data.isProfileComplete) {
+          console.log('✅ 이미 프로필 완성됨 - 메인으로 리다이렉트');
+          navigate('/', { replace: true });
+          return;
+        }
+
         setUser({ email: result.data.email });
         setForm((prev) => ({ ...prev, name: result.data.username }));
+        setIsInitializing(false); // 초기화 완료
       } catch (error) {
         console.error('API Error:', error);
-        alert('오류가 발생했습니다. 다시 로그인해주세요.');
-        window.location.href = '/login';
+        showErrorToast('오류가 발생했습니다. 다시 로그인해주세요.');
+        navigate('/login', { replace: true });
       }
     };
+
     fetchAndVerifyUser();
-  }, []);
+  }, [navigate, getStoredAccessToken]);
+
+  // 초기 로딩 중이면 로딩 화면 표시
+  if (isInitializing) {
+    return (
+      <div className="bg-white min-h-screen">
+        <Header title="추가 정보 입력" />
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="mt-4 text-sm font-regular text-gray-600">사용자 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   // --- 4. 핸들러 함수 (변경 없음) ---
   const handleChange = (field: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setForm((prev) => {
       const newForm = { ...prev, [field]: value };
-      if (newForm.password && newForm.confirmPassword) {
-        setPasswordMismatch(newForm.password !== newForm.confirmPassword);
-      } else {
-        setPasswordMismatch(false);
-      }
       return newForm;
     });
   };
@@ -101,58 +139,95 @@ const CompleteProfilePage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (passwordMismatch) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
     if (form.birth.length !== 8) {
-      alert('생년월일을 8자리로 입력해주세요.');
+      showErrorToast('생년월일을 8자리로 입력해주세요.');
       return;
     }
     if (form.name.trim() === '') {
-      alert('이름을 입력해주세요.');
+      showErrorToast('이름을 입력해주세요.');
       return;
     }
 
     setIsLoading(true);
-    const accessToken = localStorage.getItem('accessToken');
+
     try {
-      const response = await fetch('https://dev.unear.site/api/app/auth/oauth/complete-profile', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          username: form.name,
-          tel: form.phone,
-          birthdate: formatBirthdate(form.birth),
-          gender: form.gender === '남자' ? 'M' : 'F',
-        }),
+      // 1. 프로필 업데이트
+      await authApi.completeOAuthProfile({
+        username: form.name,
+        tel: form.phone,
+        birthdate: formatBirthdate(form.birth),
+        gender: form.gender === '남자' ? 'M' : 'F',
       });
-      if (response.ok) {
-        alert('추가 정보 입력이 완료되었습니다! 서비스를 시작합니다.');
-        window.location.href = '/';
-      } else {
-        const errorResult = await response.json();
-        alert(errorResult.message || '정보 업데이트에 실패했습니다. 다시 시도해주세요.');
+
+      console.log('✅ 프로필 업데이트 API 성공');
+
+      // 2. DB 업데이트 시간 확보 및 재시도 로직
+      let retryCount = 0;
+      const maxRetries = 5;
+      let isUpdated = false;
+
+      while (retryCount < maxRetries && !isUpdated) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 + retryCount * 500));
+
+        try {
+          const verifyResponse = await axiosInstance.get('/users/me');
+          const userData = verifyResponse.data.data;
+
+          console.log(`🔍 업데이트 확인 시도 ${retryCount + 1}/${maxRetries}:`, {
+            isProfileComplete: userData.isProfileComplete,
+            username: userData.username,
+          });
+
+          if (userData.isProfileComplete) {
+            isUpdated = true;
+            console.log('✅ 프로필 완성 상태 확인됨');
+
+            // 3. AuthProvider의 사용자 정보 강제 새로고침
+            await refreshUserInfo();
+
+            // 4. 추가 대기 시간 (AuthProvider 상태 업데이트 대기)
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            showSuccessToast('추가 정보 입력이 완료되었습니다! 서비스를 시작합니다.');
+
+            // 프로필 완료 후 메인으로 이동
+            navigate('/', { replace: true });
+            return;
+          }
+        } catch (verifyError) {
+          console.warn(`⚠️ 업데이트 확인 중 오류 (시도 ${retryCount + 1}):`, verifyError);
+        }
+
+        retryCount++;
       }
-    } catch (error) {
+
+      // 모든 재시도가 실패한 경우
+      if (!isUpdated) {
+        console.error('❌ 프로필 업데이트 확인 실패 - 모든 재시도 완료');
+        showErrorToast(
+          '프로필 업데이트는 완료되었지만 확인에 시간이 걸리고 있습니다. 잠시 후 다시 시도해주세요.'
+        );
+      }
+    } catch (error: unknown) {
       console.error('Submit Error:', error);
-      alert('네트워크 오류가 발생했습니다.');
+      const apiError = error as {
+        response?: {
+          data?: {
+            message?: string;
+          };
+        };
+      };
+
+      const errorMessage =
+        apiError.response?.data?.message || '정보 업데이트에 실패했습니다. 다시 시도해주세요.';
+      showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const isFormValid =
-    form.name.trim() !== '' &&
-    form.birth.trim() !== '' &&
-    form.phone.trim() !== '' &&
-    form.password.trim() !== '' &&
-    form.confirmPassword.trim() !== '' &&
-    !passwordMismatch;
+    form.name.trim() !== '' && form.birth.trim() !== '' && form.phone.trim() !== '';
 
   // --- 5. JSX 렌더링 (수정된 부분) ---
   return (
@@ -179,123 +254,6 @@ const CompleteProfilePage: React.FC = () => {
             <div className="w-full h-10 pt-2 border-b border-zinc-300 text-zinc-500 bg-zinc-100 rounded px-2">
               {user.email}
             </div>
-          </div>
-
-          {/* 비밀번호 */}
-          <div>
-            <label className="text-lm font-bold text-black">비밀번호 설정</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="8자리 이상, 영문/숫자/특수문자 조합"
-                value={form.password}
-                onChange={handleChange('password')}
-                className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-0 top-2"
-                aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
-              >
-                {showPassword ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="#A1A1AA"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25s8.268 2.693 9.542 6.75c-1.274 4.057-5.065 6.75-9.542 6.75S3.732 16.057 2.458 12z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="#A1A1AA"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.98 8.223A10.477 10.477 0 001.458 12c1.274 4.057 5.065 6.75 9.542 6.75 1.493 0 2.91-.348 4.208-.97M8.25 15a3.75 3.75 0 005.25-5.25M12 5.25c1.493 0 2.91.348 4.208-.97A10.477 10.477 0 0122.542 12a10.45 10.45 0 01-1.852 3.045M3 3l18 18"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* 비밀번호 확인 */}
-          <div>
-            <label className="text-lm font-bold text-black">비밀번호 확인</label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="비밀번호를 다시 입력해주세요"
-                value={form.confirmPassword}
-                onChange={handleChange('confirmPassword')}
-                className="w-full border-b border-zinc-300 text-zinc-700 mt-1 placeholder-zinc-400 focus:outline-none bg-transparent pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="absolute right-0 top-2"
-                aria-label={showConfirmPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
-              >
-                {showConfirmPassword ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="#A1A1AA"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.458 12C3.732 7.943 7.523 5.25 12 5.25s8.268 2.693 9.542 6.75c-1.274 4.057-5.065 6.75-9.542 6.75S3.732 16.057 2.458 12z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="#A1A1AA"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.98 8.223A10.477 10.477 0 001.458 12c1.274 4.057 5.065 6.75 9.542 6.75 1.493 0 2.91-.348 4.208-.97M8.25 15a3.75 3.75 0 005.25-5.25M12 5.25c1.493 0 2.91.348 4.208.97A10.477 10.477 0 0122.542 12a10.45 10.45 0 01-1.852 3.045M3 3l18 18"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
-            {passwordMismatch && (
-              <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
-            )}
           </div>
 
           {/* 성별 */}

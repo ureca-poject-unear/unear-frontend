@@ -13,10 +13,12 @@ import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
+import ChangePasswordPage from '@/pages/ChangePasswordPage';
 
 import KakaoCallback from '@/pages/auth/KakaoCallback';
 import CompleteProfilePage from '@/pages/CompleteProfilePage';
 import GoogleRedirectHandler from '@/pages/auth/GoogleRedirectHandler';
+import NaverAuthHandler from '@/pages/auth/NaverAuthHandler';
 
 import StatisticsDetailPage from '@/pages/StatisticsDetailPage';
 import UsageHistoryPage from '@/pages/UsageHistoryPage';
@@ -153,6 +155,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: '/my/change-password',
+        element: (
+          <ProtectedRoute>
+            <ChangePasswordPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/complete-profile',
         element: (
           <ProtectedRoute>
@@ -168,7 +178,10 @@ const router = createBrowserRouter([
       { path: '/complete-profile', element: <CompleteProfilePage /> },
 
       { path: '/login/oauth2/code/google', element: <GoogleRedirectHandler /> },
+
       { path: '/login/oauth2/code/kakao', element: <KakaoCallback /> },
+
+      { path: '/login/oauth2/code/naver', element: <NaverAuthHandler /> },
     ],
   },
 ]);
