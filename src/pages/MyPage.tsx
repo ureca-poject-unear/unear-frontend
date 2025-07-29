@@ -10,8 +10,14 @@ import useMyPageHandlers from '@/hooks/my/useMyPageHandlers';
 
 const MyPage = () => {
   // 데이터 관리
-  const { userProfile, membershipBenefit, statisticsData, recentUsageHistory, isLoading } =
-    useMyPageData();
+  const {
+    userProfile,
+    membershipBenefit,
+    statisticsData,
+    recentUsageHistory,
+    isLoading,
+    userProvider,
+  } = useMyPageData();
 
   // 액션 핸들러 (로그아웃 제외)
   const {
@@ -64,7 +70,7 @@ const MyPage = () => {
           />
 
           {/* 계정 관리 영역 */}
-          <AccountManagementSection onChangePassword={onChangePassword} />
+          <AccountManagementSection onChangePassword={onChangePassword} provider={userProvider} />
         </>
       )}
     </>

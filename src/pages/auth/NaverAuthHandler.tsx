@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import axiosInstance from '@/apis/axiosInstance';
 
 // API 응답 타입 정의
 interface NaverLoginResponse {
@@ -80,28 +81,38 @@ const NaverAuthHandler = () => {
           setLoadingMessage('인증 상태 확인 중...');
 
           // 짧은 대기 시간으로 AuthProvider 상태 업데이트 보장
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          // 사용자 정보 확인 후 적절한 페이지로 이동
-          setLoadingMessage('페이지 이동 준비 중...');
-          const { useAuthStore } = await import('@/store/auth');
-          const userInfo = useAuthStore.getState().userInfo as UserInfo | null;
+          // 프로필 완료 상태를 직접 API로 확인 (AuthProvider 상태 대신)
+          setLoadingMessage('프로필 상태 확인 중...');
 
-          if (userInfo?.isProfileComplete) {
-            console.log('✅ 프로필 완성됨 - 메인페이지로 이동');
-            setLoadingMessage('메인 페이지로 이동 중...');
+          try {
+            const userResponse = await axiosInstance.get('/users/me');
+            const userData = userResponse.data.data;
 
-            // OAuth 리다이렉트 진행 중 플래그 설정
-            sessionStorage.setItem('oauth_redirect_in_progress', 'true');
-
-            navigate('/', { replace: true });
-          } else {
-            console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
-            setLoadingMessage('프로필 설정 페이지로 이동 중...');
+            console.log('🔍 직접 API로 사용자 정보 확인:', {
+              isProfileComplete: userData.isProfileComplete,
+              username: userData.username,
+            });
 
             // OAuth 리다이렉트 진행 중 플래그 설정
             sessionStorage.setItem('oauth_redirect_in_progress', 'true');
+            sessionStorage.setItem('profile_check_completed', 'true'); // 프로필 확인 완료 플래그
 
+            // 프로필 완성 여부에 따라 즉시 분기
+            if (userData.isProfileComplete === true) {
+              console.log('✅ 프로필 완성됨 - 메인페이지로 즉시 이동');
+              setLoadingMessage('메인 페이지로 이동 중...');
+              navigate('/', { replace: true });
+            } else {
+              console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
+              setLoadingMessage('추가 정보 입력 페이지로 이동 중...');
+              navigate('/complete-profile', { replace: true });
+            }
+          } catch (apiError) {
+            console.error('❌ 프로필 상태 확인 실패:', apiError);
+            // API 실패 시 기본적으로 완성 페이지로 이동
+            sessionStorage.setItem('oauth_redirect_in_progress', 'true');
             navigate('/complete-profile', { replace: true });
           }
         } else {

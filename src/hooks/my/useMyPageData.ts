@@ -11,6 +11,7 @@ interface UseMyPageDataReturn {
   recentUsageHistory: UsageHistoryItem[];
   isLoading: boolean;
   refreshData: () => Promise<void>;
+  userProvider: string | null; // provider 정보 추가
 }
 
 const useMyPageData = (): UseMyPageDataReturn => {
@@ -18,7 +19,7 @@ const useMyPageData = (): UseMyPageDataReturn => {
   const couponCount = useCouponCount();
 
   // Zustand store에서 사용자 정보 가져오기
-  const { getUserDisplayName, getUserGrade } = useAuthStore();
+  const { getUserDisplayName, getUserGrade, getUserProvider } = useAuthStore();
 
   // 사용자 프로필 데이터 - Zustand store 사용
   const userProfile: UserProfile = useMemo(() => {
@@ -117,6 +118,7 @@ const useMyPageData = (): UseMyPageDataReturn => {
     recentUsageHistory,
     isLoading,
     refreshData,
+    userProvider: getUserProvider(), // provider 정보 추가
   };
 };
 

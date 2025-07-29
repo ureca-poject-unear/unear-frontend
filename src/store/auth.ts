@@ -42,6 +42,7 @@ interface AuthState {
   getUserDisplayName: () => string;
   getUserGrade: () => 'BASIC' | 'VIP' | 'VVIP';
   getBarcodeNumber: () => string;
+  getUserProvider: () => 'EMAIL' | 'GOOGLE' | 'KAKAO' | 'NAVER' | null; // provider 반환 메서드 추가
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -148,5 +149,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   getBarcodeNumber: () => {
     const userInfo = get().userInfo;
     return userInfo?.barcodeNumber || '123456789';
+  },
+
+  getUserProvider: () => {
+    const userInfo = get().userInfo;
+    return userInfo?.provider || null;
   },
 }));
