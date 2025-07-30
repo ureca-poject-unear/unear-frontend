@@ -1,5 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Header from '@/components/common/Header';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import {
   StatisticsHeader,
   CategoryDiscountList,
@@ -7,35 +8,47 @@ import {
   MonthlyDiscountChart,
 } from '@/components/my/statistics';
 import type { StatisticsHeaderRef } from '@/components/my/statistics/StatisticsHeader';
+import useStatisticsDetail from '@/hooks/my/statistics/useStatisticsDetail';
+import useMonthlyChartData from '@/hooks/my/statistics/useMonthlyChartData';
+import { useNavigate } from 'react-router-dom';
 import {
-  useStatisticsData,
   useStatisticsCalculations,
-  useStatisticsHandlers,
   useProgressBars,
   useCategoryHighlight,
 } from '@/hooks/my/statistics';
+import type { CategoryData } from '@/hooks/my/statistics/types';
 
 const StatisticsDetailPage = () => {
   const statisticsHeaderRef = useRef<StatisticsHeaderRef>(null);
+  const navigate = useNavigate();
 
-  // 데이터 관리
+  // API 데이터 관리
   const {
+    statisticsDetail,
+    isLoading,
+    error,
+    currentYear,
     currentMonth,
-    setCurrentMonth,
-    showAllCategories,
-    setShowAllCategories,
-    currentApiData,
-    previousMonthData,
-    currentUsageAmount,
-    previousUsageAmount,
-  } = useStatisticsData();
+    moveToPrevMonth,
+    moveToNextMonth,
+    canMoveToPrev,
+    canMoveToNext,
+  } = useStatisticsDetail();
+
+  // 월별 차트 데이터 관리
+  const {
+    chartData,
+    averageAmount,
+    currentMonthAmount,
+    isLoading: chartLoading,
+    error: chartError,
+  } = useMonthlyChartData(currentYear, currentMonth);
+
+  // 더보기 상태 관리
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   // 계산 로직
-  const { calculateMonthSummary, calculateCategoryPercentages } = useStatisticsCalculations();
-
-  // 이벤트 핸들러
-  const { handlePrevMonth, handleNextMonth, handleBack, handleToggleCategories } =
-    useStatisticsHandlers(currentMonth, setCurrentMonth, setShowAllCategories);
+  const { calculateCategoryPercentages } = useStatisticsCalculations();
 
   // 진행률 바 관련
   const { generateProgressBars } = useProgressBars();
@@ -44,25 +57,92 @@ const StatisticsDetailPage = () => {
   const { highlightedCategory, highlightCategory, clearHighlight, shouldBeTransparent } =
     useCategoryHighlight();
 
+  // 카테고리 이름 매핑 함수
+  const getCategoryName = (category: string): string => {
+    const categoryNames: Record<string, string> = {
+      SHOPPING: '쇼핑',
+      ACTIVITY: '액티비티',
+      LIFE: '라이프',
+      FOOD: '외식',
+      CULTURE: '문화',
+      BEAUTY: '뷰티',
+      CAFE: '카페',
+      EDUCATION: '교육',
+      BAKERY: '베이커리',
+      POPUP: '팝업',
+    };
+    return categoryNames[category] || category;
+  };
+
+  // API 데이터에서 카테고리 데이터 변환
+  const categoryApiData = statisticsDetail
+    ? {
+        categoryData: Object.entries(statisticsDetail.discountByCategory).map(
+          ([category, amount]) => ({
+            category: category as CategoryData['category'],
+            categoryName: getCategoryName(category),
+            discountAmount: amount,
+          })
+        ),
+      }
+    : { categoryData: [] };
+
   // 계산된 데이터들
-  const calculatedSummary = calculateMonthSummary(
-    currentApiData,
-    previousMonthData,
-    currentUsageAmount,
-    previousUsageAmount
-  );
-  const totalDiscountAmount = calculatedSummary.discountAmount;
-  const calculatedCategoryData = calculateCategoryPercentages(currentApiData.categoryData);
+  const totalDiscountAmount = statisticsDetail?.totalDiscount || 0;
+  const calculatedCategoryData = calculateCategoryPercentages(categoryApiData.categoryData);
   const progressBars = generateProgressBars(calculatedCategoryData, totalDiscountAmount);
 
-  // 차트 데이터
-  const chartData = [
-    { month: '3월', value: 0 },
-    { month: '4월', value: 6 },
-    { month: '5월', value: 5 },
-    { month: '6월', value: 1 },
-    { month: '7월', value: 2, highlight: true },
-  ];
+  // 이벤트 핸들러
+  const handlePrevMonth = async () => {
+    await moveToPrevMonth();
+    clearHighlight();
+  };
+
+  const handleNextMonth = async () => {
+    await moveToNextMonth();
+    clearHighlight();
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleToggleCategories = () => {
+    setShowAllCategories(!showAllCategories);
+  };
+
+  // 로딩 상태 처리
+  if (isLoading) {
+    return (
+      <>
+        <Header title="개인별 통계" onBack={handleBack} />
+        <div className="bg-background min-h-screen">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <LoadingSpinner size="lg" />
+            <p className="mt-4 text-sm font-regular text-gray-600">통계 데이터를 불러오는 중...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // 에러 상태 처리
+  if (error) {
+    return (
+      <>
+        <Header title="개인별 통계" onBack={handleBack} />
+        <div className="bg-background min-h-screen">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <p className="text-sm font-regular text-gray-600 text-center px-5">
+              통계 데이터를 불러오는 중 오류가 발생했습니다.
+              <br />
+              잠시 후 다시 시도해주세요.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   // 포맷팅 함수
   const formatCurrency = (amount: number): string => {
@@ -108,20 +188,31 @@ const StatisticsDetailPage = () => {
     }
   };
 
+  // 계산된 요약 데이터 (UsageDiscountSummary용) - API 데이터 사용
+  const calculatedSummary = {
+    usageAmount: statisticsDetail?.totalSpent || 0,
+    discountAmount: totalDiscountAmount,
+    usageGrowth: statisticsDetail?.spentChangeRatio || 0,
+    discountGrowth: statisticsDetail?.discountChangeRatio || 0,
+  };
+
   return (
     <>
       <Header title="개인별 통계" onBack={handleBack} />
 
-      <div className="bg-background min-h-screen relative" onClick={handleBackgroundClick}>
+      <div className="bg-background mb-3 relative" onClick={handleBackgroundClick}>
         {/* 헤더 및 진행률 바 섹션 */}
         <StatisticsHeader
           ref={statisticsHeaderRef}
+          currentYear={currentYear}
           currentMonth={currentMonth}
           totalDiscountAmount={totalDiscountAmount}
           progressBars={progressBars}
           highlightedCategory={highlightedCategory}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
+          canMoveToPrev={canMoveToPrev()}
+          canMoveToNext={canMoveToNext()}
           onBarClick={handleBarClick}
           onTooltipClose={clearHighlight}
           formatCurrency={formatCurrency}
@@ -132,7 +223,7 @@ const StatisticsDetailPage = () => {
           calculatedCategoryData={calculatedCategoryData}
           currentMonth={currentMonth}
           showAllCategories={showAllCategories}
-          onToggleCategories={() => handleToggleCategories(showAllCategories)}
+          onToggleCategories={handleToggleCategories}
           onCardClick={handleCardClick}
           shouldBeTransparent={shouldBeTransparent}
         />
@@ -146,7 +237,13 @@ const StatisticsDetailPage = () => {
         />
 
         {/* 월별 누적 할인액 차트 */}
-        <MonthlyDiscountChart chartData={chartData} />
+        <MonthlyDiscountChart
+          chartData={chartData}
+          averageAmount={averageAmount}
+          currentMonthAmount={currentMonthAmount}
+          isLoading={chartLoading}
+          error={chartError}
+        />
       </div>
     </>
   );
