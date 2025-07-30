@@ -19,6 +19,8 @@ const MyPage = () => {
     userProvider,
     statisticsLoading,
     statisticsError,
+    usageHistoryLoading,
+    usageHistoryError,
   } = useMyPageData();
 
   // 액션 핸들러 (로그아웃 제외)
@@ -70,6 +72,8 @@ const MyPage = () => {
           <RecentUsageSection
             usageHistory={recentUsageHistory}
             onDetailClick={onUsageHistoryDetail}
+            isLoading={usageHistoryLoading}
+            error={usageHistoryError}
           />
 
           {/* 계정 관리 영역 */}

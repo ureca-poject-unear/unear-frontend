@@ -5,6 +5,7 @@ export { default as useStatisticsChart } from './useStatisticsChart';
 export { default as useCouponCount } from './useCouponCount';
 export { default as useBookmarkCount } from './useBookmarkCount';
 export { default as useStatisticsSummary } from './useStatisticsSummary';
+export { default as useRecentUsageHistory } from './useRecentUsageHistory';
 
 // 통계 페이지 관련 훅들
 export * from './statistics';

@@ -4,6 +4,7 @@ import type { UserProfile, MembershipBenefit, StatisticsData } from '@/types/myP
 import type { UsageHistoryItem } from '@/types/usageHistory';
 import useCouponCount from './useCouponCount';
 import useStatisticsSummary from './useStatisticsSummary';
+import useRecentUsageHistory from './useRecentUsageHistory';
 
 interface UseMyPageDataReturn {
   userProfile: UserProfile;
@@ -15,6 +16,8 @@ interface UseMyPageDataReturn {
   userProvider: string | null; // provider 정보 추가
   statisticsLoading: boolean; // 통계 로딩 상태 추가
   statisticsError: string | null; // 통계 에러 상태 추가
+  usageHistoryLoading: boolean; // 이용내역 로딩 상태 추가
+  usageHistoryError: string | null; // 이용내역 에러 상태 추가
 }
 
 const useMyPageData = (): UseMyPageDataReturn => {
@@ -28,6 +31,14 @@ const useMyPageData = (): UseMyPageDataReturn => {
     error: statisticsError,
     refreshData: refreshStatistics,
   } = useStatisticsSummary();
+
+  // 이용 내역 데이터 훅 사용
+  const {
+    recentUsageHistory,
+    isLoading: usageHistoryLoading,
+    error: usageHistoryError,
+    refreshData: refreshUsageHistory,
+  } = useRecentUsageHistory();
 
   // Zustand store에서 사용자 정보 가져오기
   const { getUserDisplayName, getUserGrade, getUserProvider } = useAuthStore();
@@ -53,39 +64,14 @@ const useMyPageData = (): UseMyPageDataReturn => {
     [statisticsData.accumulatedSavings, couponCount]
   );
 
-  // 최근 이용 내역 데이터
-  const recentUsageHistory: UsageHistoryItem[] = useMemo(
-    () => [
-      {
-        id: '1',
-        storeName: '스타벅스 강남점',
-        usedDate: '7월 3일 17:29',
-        originalPrice: 16000,
-        discountPrice: 2400,
-        category: 'CAFE',
-        storeClass: 'FRANCHISE',
-      },
-      {
-        id: '2',
-        storeName: '스타벅스 강남점',
-        usedDate: '7월 3일 17:29',
-        originalPrice: 16000,
-        discountPrice: 2400,
-        category: 'CAFE',
-        storeClass: 'FRANCHISE',
-      },
-      {
-        id: '3',
-        storeName: '스타벅스 강남점',
-        usedDate: '7월 3일 17:29',
-        originalPrice: 16000,
-        discountPrice: 2400,
-        category: 'CAFE',
-        storeClass: 'FRANCHISE',
-      },
-    ],
-    []
-  );
+  // 통계 차트 데이터 - API에서 가져온 데이터 사용
+  // (useStatisticsSummary 훅에서 이미 처리됨)
+
+  // 통계 데이터 - API에서 가져온 실제 데이터 사용
+  // (useStatisticsSummary 훅에서 이미 처리됨)
+
+  // 최근 이용 내역 데이터 - API에서 가져온 실제 데이터 사용
+  // (useRecentUsageHistory 훅에서 이미 처리됨)
 
   // 데이터 새로고침 함수
   const refreshData = async (): Promise<void> => {
@@ -93,8 +79,9 @@ const useMyPageData = (): UseMyPageDataReturn => {
     try {
       // 통계 데이터 새로고침
       await refreshStatistics();
-      // TODO: 다른 API 호출로 데이터 새로고침
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 로딩
+      // 이용 내역 데이터 새로고침
+      await refreshUsageHistory();
+      // TODO: 다른 API 호출로 데이터 새로고침 (쿠폰 카운트 등)
     } catch (error) {
       console.error('데이터 새로고침 실패:', error);
     } finally {
@@ -112,6 +99,8 @@ const useMyPageData = (): UseMyPageDataReturn => {
     userProvider: getUserProvider(), // provider 정보 추가
     statisticsLoading,
     statisticsError,
+    usageHistoryLoading,
+    usageHistoryError,
   };
 };
 
