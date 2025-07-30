@@ -1,18 +1,13 @@
-// src/components/junior/JuniorMarket.tsx (수정된 최종 코드)
+// src/app/(main)/junior-market/page.tsx
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import BookmarkCard from '@/components/common/BookmarkCard';
 import type { BookmarkStore } from '@/types/bookmark';
-
 import type { Place } from '@/types/map';
 import { getPlaces } from '@/apis/getPlaces';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
-
 import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
-
-// [제거] 더 이상 사용되지 않으므로 함수를 삭제합니다.
-// const getStoreNameColorClass = ...
 
 const JuniorMarket = () => {
   const [stores, setStores] = useState<BookmarkStore[]>([]);
@@ -29,7 +24,7 @@ const JuniorMarket = () => {
           neLat: 37.7,
           neLng: 127.2,
         };
-        const allPlacesInSeoul = await getPlaces(seoulBounds);
+        const allPlacesInSeoul: Place[] = await getPlaces(seoulBounds);
         const eventPlaces = allPlacesInSeoul.filter((p) => p.eventCode !== 'NONE');
 
         if (eventPlaces.length === 0) {
@@ -51,7 +46,8 @@ const JuniorMarket = () => {
           .map((result) => (result as PromiseFulfilledResult<any>).value);
 
         const finalStoreInfo: BookmarkStore[] = successfulDetails.map((detail) => {
-          const originalPlace = eventPlaces.find((p) => p.placeId === detail.placeId)!;
+          const originalPlace = eventPlaces.find((p: Place) => p.placeId === detail.placeId)!;
+
           return {
             id: String(detail.placeId),
             name: detail.name,
@@ -62,6 +58,11 @@ const JuniorMarket = () => {
             category: detail.category as CategoryType,
             event: detail.eventTypeCode as EventType,
             storeClass: originalPlace.markerCode as StoreClassType,
+            phoneNumber: detail.tel,
+            // Add benefit and coupon information
+            benefitDesc: detail.benefitDesc,
+            coupons: detail.coupons,
+            status: detail.status, // Add store status
           };
         });
 
@@ -111,6 +112,7 @@ const JuniorMarket = () => {
               key={store.id}
               store={store}
               onBookmarkToggle={() => handleBookmarkToggle(store.id)}
+              // Ensure the full variant is used to display all info
             />
           ))
         ) : (

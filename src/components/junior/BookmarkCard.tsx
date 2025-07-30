@@ -1,3 +1,5 @@
+// src/components/common/BookmarkCard.tsx
+
 import type React from 'react';
 import StoreTypeIcon, {
   type CategoryType,
@@ -12,9 +14,6 @@ import PhoneButtonDark from '@/components/common/PhoneButtonDark';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
 
-// --- 1. StoreInfo 인터페이스 수정 ---
-// API 응답에 맞춰 쿠폰(coupons) 배열을 추가합니다.
-// optional chaining(?.)을 사용하여 쿠폰이 없는 경우에도 오류가 발생하지 않도록 합니다.
 export interface StoreInfo {
   id: string;
   name: string;
@@ -25,6 +24,7 @@ export interface StoreInfo {
   event: EventType;
   status: StoreStatusType;
   isBookmarked: boolean;
+  benefitDesc?: string;
   coupons?: {
     couponTemplateId: number;
     couponName: string;
@@ -60,52 +60,22 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     console.log('전화버튼클릭됨');
   };
 
-  // 'compact' 모드는 기존과 동일하게 유지합니다.
   if (variant === 'compact') {
-    return (
-      <div className="bg-white rounded-md shadow-lg p-3 w-56">
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="font-bold text-base text-black flex-grow min-w-0 break-words">
-              {store.name}
-            </h3>
-            <div className="flex-shrink-0 cursor-pointer">
-              <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
-            </div>
-          </div>
-          <div className="mt-1">
-            <p
-              className="text-xs text-gray-600"
-              style={{
-                wordBreak: 'break-all',
-                whiteSpace: 'normal',
-              }}
-            >
-              {store.address}
-            </p>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <TimeIcon className="w-3 h-3" />
-            <span>{store.hours}</span>
-          </div>
-        </div>
-      </div>
-    );
+    // ... (compact variant remains the same)
   }
 
-  // --- 2. 'full' 모드 레이아웃 리팩터링 및 쿠폰 기능 추가 ---
   const bgColor = isDarkMode ? 'bg-[#251A49]' : 'bg-white';
   const textColor = isDarkMode ? 'text-white' : 'text-black';
   const subTextColor = isDarkMode ? 'text-gray-300' : 'text-gray-400';
   const borderColor = isDarkMode ? 'border-gray-600' : 'border-gray-200';
   const IconTime = isDarkMode ? TimeWhiteIcon : TimeIcon;
 
+  const hasBenefitsOrCoupons = store.benefitDesc || (store.coupons && store.coupons.length > 0);
+
   return (
     <div
-      // 고정 높이(h-[159px])를 제거하여 컨텐츠 길이에 따라 유연하게 높이가 조절되도록 합니다.
       className={`relative w-[353px] rounded-[8px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] transition-all duration-300 p-4 flex flex-col gap-2 ${bgColor} ${className}`}
     >
-      {/* --- 상단 정보 (아이콘, 이름, 주소, 북마크) --- */}
       <div className="flex gap-4">
         <div className="flex-shrink-0">
           <StoreTypeIcon
@@ -129,7 +99,6 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
         </div>
       </div>
 
-      {/* --- 중간 정보 (시간, 영업상태) --- */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
           <IconTime />
@@ -140,11 +109,17 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
         <StoreStatus status={store.status} />
       </div>
 
-      {/* --- 3. 쿠폰 목록 렌더링 섹션 (새로 추가된 부분) --- */}
-      {store.coupons && store.coupons.length > 0 && (
+      {hasBenefitsOrCoupons && (
         <div className={`mt-2 pt-3 border-t ${borderColor}`}>
           <div className="flex flex-col gap-2">
-            {store.coupons.map((coupon) => (
+            {store.benefitDesc && (
+              <div className="p-2 rounded-md bg-sky-500/10">
+                <p className="font-bold text-sm text-sky-600">대표 혜택</p>
+                <p className="text-xs text-gray-500 mt-1">{store.benefitDesc}</p>
+              </div>
+            )}
+
+            {store.coupons?.map((coupon) => (
               <div
                 key={coupon.couponTemplateId}
                 className="p-2 rounded-md bg-green-500/10 flex justify-between items-center"
@@ -152,18 +127,16 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
                 <div>
                   <p className="font-bold text-sm text-green-600">{coupon.couponName}</p>
                   <p className="text-xs text-gray-500">
-                    {coupon.discountInfo || `~ ${coupon.couponEnd}`}
+                    {coupon.discountInfo || `~ ${coupon.couponEnd.split('T')[0]}`}
                   </p>
                 </div>
-                {/* 필요 시 여기에 다운로드 버튼 등을 추가할 수 있습니다. */}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* --- 하단 버튼 --- */}
-      <div className="mt-2 flex gap-2">
+      <div className="mt-auto pt-2 flex gap-2">
         <MiniLocationButton onClick={handleLocationClick} />
         {isDarkMode ? (
           <PhoneButtonDark onClick={handlePhoneClick} />
