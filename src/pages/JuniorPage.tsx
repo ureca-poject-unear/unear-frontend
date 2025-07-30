@@ -3,11 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/common/Header';
 
-import EventBanner from '@/components/JuniorPage/EventBanner';
-import StampRouletteCard from '@/components/JuniorPage/StampRouletteCard';
-import JuniorMap from '@/components/JuniorPage/JuniorMap';
-import TodayCouponSection from '@/components/JuniorPage/TodayCouponSection';
-import JuniorMarket from '@/components/JuniorPage/JuniorMarket';
+import EventBanner from '@/components/junior/EventBanner';
+import StampRouletteCard from '@/components/junior/StampRouletteCard';
+import JuniorMap from '@/components/junior/JuniorMap';
+import TodayCouponSection from '@/components/junior/TodayCouponSection';
+import JuniorMarket from '@/components/junior/JuniorMarket';
 import type { Place } from '@/apis/getPlaces';
 import { getPlaces } from '@/apis/getPlaces'; // API 호출 함수
 
