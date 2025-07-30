@@ -40,7 +40,7 @@ const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
     distance: `${data.distanceKm.toFixed(1)}km`,
     latitude: data.latitude,
     longitude: data.longitude,
-    hours: `${data.startTime}:00 ~ ${data.endTime}:00`,
+    hours: `${data.startTime}:00 - ${data.endTime}:00`,
     tel: data.tel,
     isBookmarked: data.favorite,
     status: data.endTime < new Date().getHours() ? '영업종료' : '영업중',
@@ -75,6 +75,7 @@ export const getPlaceDetail = async (
   if (!data) {
     throw new Error('❌ 상세 정보 데이터가 없습니다 (data is null)');
   }
+  console.log('[getPlaceDetail] PlaceDetailResponse:', data);
 
   return convertToStoreData(data);
 };

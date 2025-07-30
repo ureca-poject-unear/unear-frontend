@@ -9,6 +9,7 @@ export interface MapContainerRef {
   showCurrentLocation: () => void;
   setCenter: (lat: number, lng: number) => void;
   fetchPlaces: () => void;
+  getBounds: () => ReturnType<typeof window.kakao.maps.Map.prototype.getBounds> | null;
 }
 
 interface MapContainerProps {
@@ -82,15 +83,17 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     useImperativeHandle(ref, () => ({
       showCurrentLocation,
-      setCenter: (lat: number, lng: number) => {
+      setCenter: (lat, lng) => {
         const map = mapInstanceRef.current;
         if (map) {
-          const newCenter = new window.kakao.maps.LatLng(lat, lng);
-          map.setCenter(newCenter);
+          map.setCenter(new window.kakao.maps.LatLng(lat, lng));
         }
       },
       fetchPlaces: () => {
         fetchPlacesInViewportRef.current();
+      },
+      getBounds: () => {
+        return mapInstanceRef.current?.getBounds() || null;
       },
     }));
 
@@ -197,7 +200,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             const staticCircle = new window.kakao.maps.Circle({
               center: new window.kakao.maps.LatLng(37.544581, 127.055961),
-              radius: 300,
+              radius: 800,
               strokeWeight: 5,
               strokeColor: '#DFA2A2',
               strokeOpacity: 1,
