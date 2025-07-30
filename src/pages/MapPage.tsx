@@ -186,6 +186,7 @@ const MapPage = () => {
         benefitCategories={benefitCategories}
         shouldRestoreLocation={false}
         onMarkerClick={handleMarkerClick}
+        onMarkerDeselect={() => {}}
       />
 
       {/* 상단 검색바 */}
@@ -240,7 +241,10 @@ const MapPage = () => {
         <BottomSheetLocationDetail
           store={selectedStore}
           isOpen={isBottomSheetOpen}
-          onClose={() => setIsBottomSheetOpen(false)}
+          onClose={() => {
+            setIsBottomSheetOpen(false);
+            mapRef.current?.deselectMarker?.();
+          }}
           mapRef={mapRef}
           userLocation={userLocation}
         />

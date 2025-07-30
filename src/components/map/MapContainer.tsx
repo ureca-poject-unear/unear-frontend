@@ -10,6 +10,7 @@ export interface MapContainerRef {
   setCenter: (lat: number, lng: number) => void;
   fetchPlaces: () => void;
   getBounds: () => ReturnType<typeof window.kakao.maps.Map.prototype.getBounds> | null;
+  deselectMarker?: () => void;
 }
 
 interface MapContainerProps {
@@ -18,11 +19,19 @@ interface MapContainerProps {
   benefitCategories: string[];
   shouldRestoreLocation: boolean;
   onMarkerClick: (placeId: number, latitude: string, longitude: string) => void;
+  onMarkerDeselect?: () => void;
 }
 
 const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
   (
-    { isBookmarkOnly, categoryCodes, benefitCategories, shouldRestoreLocation, onMarkerClick },
+    {
+      isBookmarkOnly,
+      categoryCodes,
+      benefitCategories,
+      shouldRestoreLocation,
+      onMarkerClick,
+      onMarkerDeselect,
+    },
     ref
   ) => {
     const mapRef = useRef<HTMLDivElement>(null);
@@ -34,6 +43,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const [isLocationShown, setIsLocationShown] = useState(false);
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
     const staticCircleRef = useRef<KakaoCircle | null>(null);
+    const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
+
+    const clearSelectedMarker = () => {
+      setSelectedPlaceId(null);
+      onMarkerDeselect?.();
+    };
 
     const renderCurrentLocation = (lat: number, lng: number) => {
       const currentLatLng = new window.kakao.maps.LatLng(lat, lng);
@@ -68,7 +83,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('현재 위치:', { latitude, longitude });
           currentLocationRef.current = { lat: latitude, lng: longitude };
           renderCurrentLocation(latitude, longitude);
           mapInstanceRef.current?.setCenter(new window.kakao.maps.LatLng(latitude, longitude));
@@ -83,6 +97,9 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     useImperativeHandle(ref, () => ({
       showCurrentLocation,
+      deselectMarker: () => {
+        clearSelectedMarker();
+      },
       setCenter: (lat, lng) => {
         const map = mapInstanceRef.current;
         if (map) {
@@ -97,81 +114,96 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       },
     }));
 
-    useEffect(() => {
-      fetchPlacesInViewportRef.current = async () => {
-        const map = mapInstanceRef.current;
-        if (!map) return;
+    const renderMarkers = async () => {
+      const map = mapInstanceRef.current;
+      if (!map) return;
 
-        const bounds = map.getBounds();
-        const sw = bounds.getSouthWest();
-        const ne = bounds.getNorthEast();
+      const bounds = map.getBounds();
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
 
-        try {
-          const places = await getPlaces({
-            swLat: sw.getLat(),
-            swLng: sw.getLng(),
-            neLat: ne.getLat(),
-            neLng: ne.getLng(),
-            isFavorite: isBookmarkOnly,
-            categoryCodes,
-            benefitCategories,
-          });
+      try {
+        const places = await getPlaces({
+          swLat: sw.getLat(),
+          swLng: sw.getLng(),
+          neLat: ne.getLat(),
+          neLng: ne.getLng(),
+          isFavorite: isBookmarkOnly,
+          categoryCodes,
+          benefitCategories,
+        });
 
-          markersRef.current.forEach((marker) => marker.setMap(null));
-          markersRef.current = [];
+        markersRef.current.forEach((marker) => marker.setMap(null));
+        markersRef.current = [];
 
-          places.forEach((place) => {
-            const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
+        places.forEach((place) => {
+          const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
 
-            // HTML 요소 생성
-            const el = document.createElement('div');
-            el.innerHTML = ReactDOMServer.renderToString(
-              <div style={{ cursor: 'pointer' }}>
-                <MapMarkerIcon
-                  category={place.categoryCode}
-                  storeClass={place.markerCode}
-                  event={place.eventCode}
-                />
-              </div>
-            );
-            const markerElement = el.firstElementChild;
-            if (markerElement) {
-              markerElement.setAttribute('data-place-id', String(place.placeId));
-              markerElement.setAttribute('data-lat', String(place.latitude));
-              markerElement.setAttribute('data-lng', String(place.longitude));
+          const el = document.createElement('div');
+          el.innerHTML = ReactDOMServer.renderToString(
+            <div style={{ cursor: 'pointer' }}>
+              <MapMarkerIcon
+                category={place.categoryCode}
+                storeClass={place.markerCode}
+                event={place.eventCode}
+                isSelected={selectedPlaceId === place.placeId}
+              />
+            </div>
+          );
 
-              markerElement.addEventListener('click', () => {
-                const placeId = markerElement.getAttribute('data-place-id');
-                const lat = markerElement.getAttribute('data-lat');
-                const lng = markerElement.getAttribute('data-lng');
+          const markerElement = el.firstElementChild;
+          if (markerElement) {
+            markerElement.setAttribute('data-place-id', String(place.placeId));
+            markerElement.setAttribute('data-lat', String(place.latitude));
+            markerElement.setAttribute('data-lng', String(place.longitude));
 
-                if (placeId && lat && lng) {
-                  onMarkerClick(Number(placeId), lat, lng);
-                } else {
-                  console.error('❌ 마커 클릭: dataset 값이 올바르지 않음');
-                }
-              });
-            }
+            markerElement.addEventListener('click', () => {
+              const placeId = Number(markerElement.getAttribute('data-place-id'));
+              const lat = markerElement.getAttribute('data-lat');
+              const lng = markerElement.getAttribute('data-lng');
 
-            const overlay = new window.kakao.maps.CustomOverlay({
-              position,
-              content: markerElement as Node,
-              yAnchor: 1,
-              zIndex: 1,
+              if (placeId && lat && lng) {
+                setSelectedPlaceId(placeId);
+                onMarkerClick(placeId, lat, lng);
+              }
             });
+          }
 
-            overlay.setMap(map);
-            markersRef.current.push(overlay);
+          const overlay = new window.kakao.maps.CustomOverlay({
+            position,
+            content: markerElement as Node,
+            yAnchor: 1,
+            zIndex: 1,
           });
 
-          if (!isLocationShown && currentLocationRef.current) {
-            renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
-          }
-        } catch (error) {
-          console.error('장소 가져오기 실패:', error);
+          overlay.setMap(map);
+          markersRef.current.push(overlay);
+        });
+
+        if (!isLocationShown && currentLocationRef.current) {
+          renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
         }
-      };
-    }, [isBookmarkOnly, categoryCodes, benefitCategories, isLocationShown, onMarkerClick]);
+      } catch (error) {
+        console.error('장소 가져오기 실패:', error);
+      }
+    };
+
+    useEffect(() => {
+      fetchPlacesInViewportRef.current = renderMarkers;
+    }, [
+      isBookmarkOnly,
+      categoryCodes,
+      benefitCategories,
+      isLocationShown,
+      onMarkerClick,
+      selectedPlaceId,
+    ]);
+
+    useEffect(() => {
+      if (mapInstanceRef.current) {
+        renderMarkers();
+      }
+    }, [selectedPlaceId]);
 
     useEffect(() => {
       if (!kakaoMapKey) {
@@ -190,12 +222,11 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             const container = mapRef.current;
             if (!container) return;
 
-            const options = {
+            const map = new window.kakao.maps.Map(container, {
               center: new window.kakao.maps.LatLng(37.555, 126.822),
               level: 4,
-            };
+            });
 
-            const map = new window.kakao.maps.Map(container, options);
             mapInstanceRef.current = map;
 
             const staticCircle = new window.kakao.maps.Circle({
@@ -214,10 +245,10 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             showCurrentLocation();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
-              fetchPlacesInViewportRef.current();
+              renderMarkers();
             });
 
-            fetchPlacesInViewportRef.current();
+            renderMarkers();
           });
         }
       };
@@ -232,7 +263,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     useEffect(() => {
       if (mapInstanceRef.current) {
-        fetchPlacesInViewportRef.current();
+        renderMarkers();
       }
     }, [isBookmarkOnly, categoryCodes, benefitCategories]);
 
