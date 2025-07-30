@@ -17,10 +17,7 @@ const MyPage = () => {
     recentUsageHistory,
     isLoading,
     userProvider,
-    statisticsLoading,
-    statisticsError,
-    usageHistoryLoading,
-    usageHistoryError,
+    error,
   } = useMyPageData();
 
   // 액션 핸들러 (로그아웃 제외)
@@ -46,6 +43,16 @@ const MyPage = () => {
             </p>
           </div>
         </div>
+      ) : error ? (
+        <div className="bg-background">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <p className="text-sm font-regular text-gray-600 text-center px-5">
+              데이터를 불러오는 중 오류가 발생했습니다.
+              <br />
+              잠시 후 다시 시도해주세요.
+            </p>
+          </div>
+        </div>
       ) : (
         <>
           {/* 사용자 정보 영역 - 로그아웃은 컴포넌트 내부에서 처리 */}
@@ -64,16 +71,12 @@ const MyPage = () => {
             accumulatedSavings={statisticsData.accumulatedSavings}
             chartData={statisticsData.chartData}
             onDetailClick={onStatisticsDetail}
-            isLoading={statisticsLoading}
-            error={statisticsError}
           />
 
           {/* 최근 이용 내역 영역 */}
           <RecentUsageSection
             usageHistory={recentUsageHistory}
             onDetailClick={onUsageHistoryDetail}
-            isLoading={usageHistoryLoading}
-            error={usageHistoryError}
           />
 
           {/* 계정 관리 영역 */}

@@ -11,17 +11,14 @@ interface UseMyPageDataReturn {
   membershipBenefit: MembershipBenefit;
   statisticsData: StatisticsData;
   recentUsageHistory: UsageHistoryItem[];
-  isLoading: boolean;
+  isLoading: boolean; // 전체 로딩 상태 (모든 API 로딩을 통합한 상태)
   refreshData: () => Promise<void>;
-  userProvider: string | null; // provider 정보 추가
-  statisticsLoading: boolean; // 통계 로딩 상태 추가
-  statisticsError: string | null; // 통계 에러 상태 추가
-  usageHistoryLoading: boolean; // 이용내역 로딩 상태 추가
-  usageHistoryError: string | null; // 이용내역 에러 상태 추가
+  userProvider: string | null;
+  error: string | null; // 통합 에러 상태
 }
 
 const useMyPageData = (): UseMyPageDataReturn => {
-  const [isLoading, setIsLoading] = useState(false); // true로 변경하면 로딩 테스트 가능
+  const [manualRefreshLoading, setManualRefreshLoading] = useState(false); // 수동 새로고침 로딩
   const couponCount = useCouponCount();
 
   // 통계 데이터 훅 사용
@@ -39,6 +36,12 @@ const useMyPageData = (): UseMyPageDataReturn => {
     error: usageHistoryError,
     refreshData: refreshUsageHistory,
   } = useRecentUsageHistory();
+
+  // 전체 로딩 상태: 모든 API가 로딩 중이면 true
+  const isLoading = statisticsLoading || usageHistoryLoading || manualRefreshLoading;
+
+  // 통합 에러 상태: 어떤 API라도 에러가 있으면 에러 메시지 표시
+  const error = statisticsError || usageHistoryError;
 
   // Zustand store에서 사용자 정보 가져오기
   const { getUserDisplayName, getUserGrade, getUserProvider } = useAuthStore();
@@ -73,19 +76,20 @@ const useMyPageData = (): UseMyPageDataReturn => {
   // 최근 이용 내역 데이터 - API에서 가져온 실제 데이터 사용
   // (useRecentUsageHistory 훅에서 이미 처리됨)
 
-  // 데이터 새로고침 함수
+  // 데이터 수동 새로고침 함수
   const refreshData = async (): Promise<void> => {
-    setIsLoading(true);
+    setManualRefreshLoading(true);
     try {
-      // 통계 데이터 새로고침
-      await refreshStatistics();
-      // 이용 내역 데이터 새로고침
-      await refreshUsageHistory();
-      // TODO: 다른 API 호출로 데이터 새로고침 (쿠폰 카운트 등)
+      // 모든 데이터를 동시에 새로고침
+      await Promise.all([
+        refreshStatistics(),
+        refreshUsageHistory(),
+        // TODO: 다른 API 호출 (쿠폰 카운트 등)
+      ]);
     } catch (error) {
       console.error('데이터 새로고침 실패:', error);
     } finally {
-      setIsLoading(false);
+      setManualRefreshLoading(false);
     }
   };
 
@@ -96,11 +100,8 @@ const useMyPageData = (): UseMyPageDataReturn => {
     recentUsageHistory,
     isLoading,
     refreshData,
-    userProvider: getUserProvider(), // provider 정보 추가
-    statisticsLoading,
-    statisticsError,
-    usageHistoryLoading,
-    usageHistoryError,
+    userProvider: getUserProvider(),
+    error,
   };
 };
 

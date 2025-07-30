@@ -1,20 +1,15 @@
 import BackIcon from '@/assets/common/backIcon.svg?react';
 import StatisticsChart from './StatisticsChart';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { StatisticsData } from '@/types/myPage';
 
 interface StatisticsSectionProps extends StatisticsData {
   onDetailClick?: () => void;
-  isLoading?: boolean;
-  error?: string | null;
 }
 
 const StatisticsSection = ({
   accumulatedSavings,
   chartData,
   onDetailClick,
-  isLoading = false,
-  error = null,
 }: StatisticsSectionProps) => {
   const handleDetailClick = () => {
     if (onDetailClick) {
@@ -41,22 +36,8 @@ const StatisticsSection = ({
           </p>
         </div>
 
-        {/* 로딩 상태 */}
-        {isLoading && (
-          <div className="flex justify-center items-center mt-7 h-[160px]">
-            <LoadingSpinner size="md" />
-          </div>
-        )}
-
-        {/* 에러 상태 */}
-        {error && !isLoading && (
-          <div className="flex justify-center items-center mt-7 h-[160px]">
-            <p className="text-sm text-gray-500">통계 데이터를 불러올 수 없습니다.</p>
-          </div>
-        )}
-
         {/* 바 차트 */}
-        {!isLoading && !error && <StatisticsChart chartData={chartData} className="mt-7" />}
+        <StatisticsChart chartData={chartData} className="mt-7" />
       </div>
     </div>
   );
