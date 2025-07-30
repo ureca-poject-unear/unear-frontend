@@ -36,17 +36,25 @@ const RecentUsageSection = ({
         </div>
 
         <div className="-mx-5 px-5 space-y-1">
-          {displayedItems.map((item) => (
-            <UsageHistoryItemComponent
-              key={item.id}
-              storeName={item.storeName}
-              usedDate={item.usedDate}
-              originalPrice={item.originalPrice}
-              discountPrice={item.discountPrice}
-              category={item.category}
-              storeClass={item.storeClass}
-            />
-          ))}
+          {/* 데이터 없음 상태 */}
+          {displayedItems.length === 0 ? (
+            <div className="flex justify-center items-center py-8">
+              <p className="text-sm text-gray-500">최근 이용 내역이 없습니다.</p>
+            </div>
+          ) : (
+            /* 이용 내역 리스트 */
+            displayedItems.map((item) => (
+              <UsageHistoryItemComponent
+                key={item.id}
+                storeName={item.storeName}
+                usedDate={item.usedDate}
+                originalPrice={item.originalPrice}
+                discountPrice={item.discountPrice}
+                category={item.category}
+                storeClass={item.storeClass}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

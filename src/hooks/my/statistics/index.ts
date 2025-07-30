@@ -8,3 +8,5 @@ export * from './useStatisticsCalculations';
 export * from './useStatisticsHandlers';
 export * from './useProgressBars';
 export * from './useCategoryHighlight';
+export { default as useStatisticsDetail } from './useStatisticsDetail';
+export { default as useMonthlyChartData } from './useMonthlyChartData';

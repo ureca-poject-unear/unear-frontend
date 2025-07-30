@@ -1,78 +1,145 @@
-import React, { useState, useEffect } from 'react'; // [추가] useState, useEffect 임포트
+// src/pages/JuniorPage.tsx (수정된 최종 코드)
+
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/common/Header';
+
 import EventBanner from '@/components/junior/EventBanner';
 import StampRouletteCard from '@/components/junior/StampRouletteCard';
 import JuniorMap from '@/components/junior/JuniorMap';
 import TodayCouponSection from '@/components/junior/TodayCouponSection';
 import JuniorMarket from '@/components/junior/JuniorMarket';
 
-// --- 실제로는 별도의 api 파일에 있을 함수들의 예시입니다 ---
-// [추가] 사용자의 룰렛 참여 여부를 서버에서 가져오는 API 함수 (가상)
-const fetchUserSpunStatus = async (): Promise<boolean> => {
-  console.log('서버에서 사용자의 룰렛 참여 여부를 확인합니다...');
-  // 실제로는 여기서 fetch나 axios를 사용해 API를 호출합니다.
-  // 이 예시에서는 1초 후에 '아직 참여 안 함(false)'을 반환하도록 시뮬레이션합니다.
-  return new Promise((resolve) => setTimeout(() => resolve(false), 1000));
+import type { Place } from '@/types/map';
+import { getPlaces } from '@/apis/getPlaces';
+
+import type {
+  StoreType,
+  EventType,
+  CategoryType,
+  StoreClassType,
+  StoreStatusType,
+} from '@/types/Junior';
+
+type ExtendedStoreType = StoreType & {
+  isStamped: boolean;
+  date?: string;
 };
 
-// [추가] 사용자의 룰렛 참여 상태를 서버에 업데이트하는 API 함수 (가상)
-const updateUserSpunStatus = async (hasSpun: boolean): Promise<void> => {
-  console.log(`서버에 룰렛 참여 상태를 '${hasSpun}'으로 업데이트 요청합니다.`);
-  // 실제로는 여기서 fetch나 axios를 사용해 API를 호출합니다.
-  return new Promise((resolve) => setTimeout(resolve, 500));
+const convertPlaceToStore = (place: Place): ExtendedStoreType => {
+  return {
+    id: String(place.placeId),
+    lat: place.latitude,
+    lng: place.longitude,
+    name: place.placeName,
+    address: '주소 정보 없음', // Place 타입에 주소가 없으므로 임시 처리
+    hours: '09:00 ~ 21:00',
+    status: '영업중' as StoreStatusType,
+    category: place.categoryCode as CategoryType,
+    storeClass: place.markerCode as StoreClassType,
+    event: place.eventCode as EventType,
+    isBookmarked: place.favorite,
+    coupons: [],
+    isStamped: false,
+    date: undefined,
+  };
 };
-// --- 여기까지 API 함수 예시입니다 ---
 
-const sampleStamps = [
-  { name: 'GS25', isStamped: true, date: '07.21' },
-  { name: 'CU', isStamped: true, date: '07.22' },
-  { name: '이마트24', isStamped: true, date: '07.23' },
-  { name: '세븐일레븐', isStamped: true, date: '07.24' },
-];
+type Stamp = {
+  name: string;
+  isStamped: boolean;
+  date?: string;
+};
 
 const JuniorPage = () => {
-  // [추가] 룰렛 참여 여부를 관리하는 state
-  const [hasSpun, setHasSpun] = useState(false);
-  // [추가] 초기 데이터 로딩 상태를 관리하는 state
+  const [stores, setStores] = useState<ExtendedStoreType[]>([]);
+  const [stamps, setStamps] = useState<Stamp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // [추가] 컴포넌트가 처음 마운트될 때, 사용자의 룰렛 참여 상태를 가져옴
   useEffect(() => {
-    const checkUserStatus = async () => {
+    const fetchAllEventStores = async () => {
       try {
-        const userHasSpun = await fetchUserSpunStatus();
-        setHasSpun(userHasSpun);
-      } catch (error) {
-        console.error('룰렛 참여 상태 조회 중 오류 발생:', error);
-        // 에러가 발생해도 로딩은 끝나야 하므로 finally 블록 사용
+        setIsLoading(true);
+        const allPlaces = await getPlaces({
+          swLat: 33.0,
+          swLng: 124.0,
+          neLat: 39.0,
+          neLng: 132.0,
+        });
+
+        const eventPlaces = allPlaces.filter((place) => place.eventCode !== 'NONE');
+        const storeData = eventPlaces.map(convertPlaceToStore);
+        setStores(storeData);
+      } catch (err) {
+        setError('데이터를 불러오는 데 실패했습니다.');
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkUserStatus();
-  }, []); // 빈 배열을 전달하여 최초 1회만 실행
+    fetchAllEventStores();
+  }, []);
 
-  // [추가] 룰렛 돌리기 버튼 클릭 시 실행될 함수
-  const handleRouletteSpin = async () => {
-    try {
-      // 서버에 참여 상태 업데이트 요청
-      await updateUserSpunStatus(true);
-      // 요청 성공 시, 화면의 상태도 즉시 변경하여 UI 갱신
-      setHasSpun(true);
-      console.log('룰렛 참여가 완료되어 상태가 업데이트되었습니다.');
-    } catch (error) {
-      console.error('룰렛 상태 업데이트 실패:', error);
-      // 여기에 실패 시 사용자에게 보여줄 알림 로직을 추가할 수 있습니다.
+  useEffect(() => {
+    if (stores.length === 0) return;
+
+    const requiredStore = stores.find((store) => store.event === 'REQUIRE');
+    const generalStores = stores.filter((store) => store.event === 'GENERAL');
+    const newStamps: Stamp[] = [];
+
+    if (requiredStore) {
+      newStamps.push({
+        name: requiredStore.isStamped ? requiredStore.name : '-',
+        isStamped: requiredStore.isStamped,
+        date: requiredStore.isStamped ? requiredStore.date : undefined,
+      });
+    } else {
+      newStamps.push({ name: '-', isStamped: false });
     }
-  };
 
-  // [추가] 로딩 중일 때 보여줄 UI
+    const stampedGeneral = generalStores.filter((store) => store.isStamped);
+    const unstampedGeneral = generalStores.filter((store) => !store.isStamped);
+    stampedGeneral.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    const prioritizedGeneral = [...stampedGeneral, ...unstampedGeneral];
+
+    for (let i = 0; i < 3; i++) {
+      const storeForSlot = prioritizedGeneral[i];
+      if (storeForSlot) {
+        newStamps.push({
+          name: storeForSlot.isStamped ? storeForSlot.name : '-',
+          isStamped: storeForSlot.isStamped,
+          date: storeForSlot.isStamped ? storeForSlot.date : undefined,
+        });
+      } else {
+        newStamps.push({ name: '-', isStamped: false });
+      }
+    }
+    setStamps(newStamps);
+  }, [stores]);
+
+  const handleBookmarkToggle = useCallback((storeId: string) => {
+    setStores((prevStores) =>
+      prevStores.map((store) =>
+        store.id === storeId ? { ...store, isBookmarked: !store.isBookmarked } : store
+      )
+    );
+  }, []);
+
   if (isLoading) {
     return (
       <>
         <Header title="이번주니어" />
-        <div>데이터를 불러오는 중입니다...</div>
+        <div className="p-10 text-center">매장 정보를 불러오는 중입니다...</div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header title="이번주니어" />
+        <div className="p-10 text-center text-red-500">{error}</div>
       </>
     );
   }
@@ -80,16 +147,18 @@ const JuniorPage = () => {
   return (
     <>
       <Header title="이번주니어" />
-      <EventBanner />
-      <div className="flex flex-col gap-3">
-        <StampRouletteCard
-          stamps={sampleStamps}
-          onRouletteClick={handleRouletteSpin} // [수정] 직접 만든 핸들러 함수를 전달
-          hasAlreadySpun={hasSpun} // [추가] 참여 여부 상태를 prop으로 전달
-        />
-        <JuniorMap />
-        <TodayCouponSection />
-        <JuniorMarket />
+      <div className="flex flex-col items-center">
+        <EventBanner />
+        <div className="flex flex-col gap-3 items-center w-full">
+          <StampRouletteCard stamps={stamps} />
+          <JuniorMap stores={stores} onBookmarkToggle={handleBookmarkToggle} />
+          <TodayCouponSection />
+          {/*
+            [수정] JuniorMarket은 자체적으로 데이터를 로드하고 상태를 관리하므로
+            아무런 props도 전달하지 않습니다.
+          */}
+          <JuniorMarket />
+        </div>
       </div>
     </>
   );
