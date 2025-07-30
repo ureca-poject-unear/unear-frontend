@@ -13,6 +13,10 @@ import { useAuthStore } from '@/store/auth';
 import BottomSheetLocationDetail from '@/components/map/BottomSheetLocationDetail';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
 import type { StoreData } from '@/types/storeDetail';
+import { getPlacesForSearch } from '@/apis/getPlaces';
+import BottomSheetSearchList from '@/components/map/BottomSheetSearchList';
+import type { Place } from '@/types/map';
+import { showInfoToast } from '@/utils/toast';
 
 const MapPage = () => {
   const [isBookmarkOnly, setIsBookmarkOnly] = useState<boolean>(() => {
@@ -39,6 +43,11 @@ const MapPage = () => {
   const [userLocation, setUserLocation] = useState<{ latitude: string; longitude: string } | null>(
     null
   );
+  const [searchResults, setSearchResults] = useState<Place[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [isSearchOpen, setSearchOpen] = useState(false);
+  const [currentLat, setCurrentLat] = useState<number | null>(null);
+  const [currentLng, setCurrentLng] = useState<number | null>(null);
 
   const ALL_CATEGORY_CODES = [
     'FOOD',
@@ -95,6 +104,54 @@ const MapPage = () => {
     mapRef.current?.showCurrentLocation();
   };
 
+  const handleSearch = async (keyword: string) => {
+    if (!keyword.trim()) return;
+    setSearchKeyword(keyword);
+    setSearchOpen(true);
+
+    const map = mapRef.current;
+    if (!map || !map.getBounds) return;
+
+    const bounds = map.getBounds?.();
+    if (!bounds) return;
+
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+
+    const centerLat = (sw.getLat() + ne.getLat()) / 2;
+    const centerLng = (sw.getLng() + ne.getLng()) / 2;
+
+    setCurrentLat(centerLat);
+    setCurrentLng(centerLng);
+
+    const delta = 0.09;
+
+    const swLat = centerLat - delta;
+    const swLng = centerLng - delta;
+    const neLat = centerLat + delta;
+    const neLng = centerLng + delta;
+
+    try {
+      const results = await getPlacesForSearch({
+        keyword,
+        southWestLatitude: swLat,
+        southWestLongitude: swLng,
+        northEastLatitude: neLat,
+        northEastLongitude: neLng,
+      });
+
+      console.log('🔍 검색 결과:', results);
+      if (results.length === 0) {
+        showInfoToast('검색 결과가 없습니다.');
+        return;
+      }
+
+      setSearchResults(results);
+    } catch (e) {
+      console.error('검색 중 오류:', e);
+    }
+  };
+
   const handleMarkerClick = async (placeId: number, storeLat: string, storeLng: string) => {
     try {
       navigator.geolocation.getCurrentPosition(
@@ -129,11 +186,12 @@ const MapPage = () => {
         benefitCategories={benefitCategories}
         shouldRestoreLocation={false}
         onMarkerClick={handleMarkerClick}
+        onMarkerDeselect={() => {}}
       />
 
       {/* 상단 검색바 */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
       </div>
 
       {/* 좌측 하단 버튼 그룹 */}
@@ -183,9 +241,36 @@ const MapPage = () => {
         <BottomSheetLocationDetail
           store={selectedStore}
           isOpen={isBottomSheetOpen}
-          onClose={() => setIsBottomSheetOpen(false)}
+          onClose={() => {
+            setIsBottomSheetOpen(false);
+            mapRef.current?.deselectMarker?.();
+          }}
           mapRef={mapRef}
           userLocation={userLocation}
+        />
+      )}
+
+      {/* 검색 결과 바텀시트 */}
+      {searchResults.length > 0 && currentLat !== null && currentLng !== null && (
+        <BottomSheetSearchList
+          results={searchResults}
+          keyword={searchKeyword}
+          isOpen={isSearchOpen}
+          onClose={() => {
+            setSearchOpen(false);
+            setSearchResults([]);
+          }}
+          currentLat={String(currentLat)}
+          currentLng={String(currentLng)}
+          onBookmarkToggle={(placeId) => {
+            console.log('Bookmark toggled:', placeId);
+          }}
+          onCouponDownloaded={() => {
+            console.log('Coupon downloaded');
+          }}
+          onCouponClick={(userCouponId, brand) => {
+            console.log('Coupon clicked:', userCouponId, brand);
+          }}
         />
       )}
     </div>
