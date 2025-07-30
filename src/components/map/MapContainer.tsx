@@ -39,6 +39,10 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       const map = mapInstanceRef.current;
       if (!map) return;
 
+      if (overlayRef.current) {
+        overlayRef.current.setMap(null);
+      }
+
       const markerHTML = ReactDOMServer.renderToString(<CurrentLocationMarker />);
       const el = document.createElement('div');
       el.innerHTML = markerHTML;
