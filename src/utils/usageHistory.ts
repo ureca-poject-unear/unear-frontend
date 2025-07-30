@@ -24,6 +24,9 @@ export const getCategoryDisplayName = (category: CategoryType): string => {
 export const calculateStats = (items: UsageHistoryItem[]): UsageHistoryStatsData => ({
   totalSavings: items.reduce((sum, item) => sum + item.discountPrice, 0),
   totalTransactions: items.length,
+  totalItems: items.length,
+  totalDiscount: items.reduce((sum, item) => sum + item.discountPrice, 0),
+  totalOriginal: items.reduce((sum, item) => sum + item.originalPrice, 0),
 });
 
 export const filterUsageHistory = (
