@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import banner from '@/assets/junior/banner.png';
+
 import CommonModal from '@/components/common/CommonModal'; // CommonModal 컴포넌트를 가져옵니다
+import banner from '@/assets/junior/banner.png';
 
 const EventBanner = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
