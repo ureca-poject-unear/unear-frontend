@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useAuthStore } from '@/store/auth';
-import type { UserProfile, MembershipBenefit, StatisticsData, ChartDataItem } from '@/types/myPage';
+import type { UserProfile, MembershipBenefit, StatisticsData } from '@/types/myPage';
 import type { UsageHistoryItem } from '@/types/usageHistory';
 import useCouponCount from './useCouponCount';
+import useStatisticsSummary from './useStatisticsSummary';
 
 interface UseMyPageDataReturn {
   userProfile: UserProfile;
@@ -12,11 +13,21 @@ interface UseMyPageDataReturn {
   isLoading: boolean;
   refreshData: () => Promise<void>;
   userProvider: string | null; // provider 정보 추가
+  statisticsLoading: boolean; // 통계 로딩 상태 추가
+  statisticsError: string | null; // 통계 에러 상태 추가
 }
 
 const useMyPageData = (): UseMyPageDataReturn => {
   const [isLoading, setIsLoading] = useState(false); // true로 변경하면 로딩 테스트 가능
   const couponCount = useCouponCount();
+
+  // 통계 데이터 훅 사용
+  const {
+    statisticsData,
+    isLoading: statisticsLoading,
+    error: statisticsError,
+    refreshData: refreshStatistics,
+  } = useStatisticsSummary();
 
   // Zustand store에서 사용자 정보 가져오기
   const { getUserDisplayName, getUserGrade, getUserProvider } = useAuthStore();
@@ -33,35 +44,13 @@ const useMyPageData = (): UseMyPageDataReturn => {
     };
   }, [getUserDisplayName, getUserGrade]);
 
-  // 멤버십 혜택 데이터
+  // 멤버십 혜택 데이터 - 실제 API 데이터 사용
   const membershipBenefit: MembershipBenefit = useMemo(
     () => ({
-      currentMonthSavings: '21,200원',
+      currentMonthSavings: statisticsData.accumulatedSavings, // API에서 가져온 이번달 할인액
       couponCount,
     }),
-    [couponCount]
-  );
-
-  // 통계 차트 데이터
-  const chartData: ChartDataItem[] = useMemo(
-    () => [
-      { month: '3월', value: 0 },
-      { month: '4월', value: 30 },
-      { month: '5월', value: 28 },
-      { month: '6월', value: 42 },
-      { month: '7월', value: 21, highlight: true },
-    ],
-    []
-  );
-
-  // 통계 데이터
-  const statisticsData: StatisticsData = useMemo(
-    () => ({
-      currentMonthSavings: '21,200원',
-      accumulatedSavings: '21만원',
-      chartData,
-    }),
-    [chartData]
+    [statisticsData.accumulatedSavings, couponCount]
   );
 
   // 최근 이용 내역 데이터
@@ -98,11 +87,13 @@ const useMyPageData = (): UseMyPageDataReturn => {
     []
   );
 
-  // 데이터 새로고침 함수 (향후 API 연동 시 사용)
+  // 데이터 새로고침 함수
   const refreshData = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      // TODO: API 호출로 데이터 새로고침
+      // 통계 데이터 새로고침
+      await refreshStatistics();
+      // TODO: 다른 API 호출로 데이터 새로고침
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 로딩
     } catch (error) {
       console.error('데이터 새로고침 실패:', error);
@@ -119,6 +110,8 @@ const useMyPageData = (): UseMyPageDataReturn => {
     isLoading,
     refreshData,
     userProvider: getUserProvider(), // provider 정보 추가
+    statisticsLoading,
+    statisticsError,
   };
 };
 

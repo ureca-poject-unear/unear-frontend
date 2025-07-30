@@ -17,6 +17,8 @@ const MyPage = () => {
     recentUsageHistory,
     isLoading,
     userProvider,
+    statisticsLoading,
+    statisticsError,
   } = useMyPageData();
 
   // 액션 핸들러 (로그아웃 제외)
@@ -57,10 +59,11 @@ const MyPage = () => {
 
           {/* 개인별 통계 영역 */}
           <StatisticsSection
-            currentMonthSavings={statisticsData.currentMonthSavings}
             accumulatedSavings={statisticsData.accumulatedSavings}
             chartData={statisticsData.chartData}
             onDetailClick={onStatisticsDetail}
+            isLoading={statisticsLoading}
+            error={statisticsError}
           />
 
           {/* 최근 이용 내역 영역 */}
