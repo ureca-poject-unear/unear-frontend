@@ -102,7 +102,7 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
       });
       const circle = new window.kakao.maps.Circle({
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
-        radius: 500,
+        radius: 800,
         strokeWeight: 5,
         strokeColor: '#DFA2A2',
         strokeOpacity: 1,
