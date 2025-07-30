@@ -1,31 +1,21 @@
-// src/components/JuniorPage/JuniorMarket.tsx
+// src/components/junior/JuniorMarket.tsx (수정된 최종 코드)
 
 import React, { useState, useEffect } from 'react';
+
 import BookmarkCard from '@/components/common/BookmarkCard';
-import type { StoreInfo } from '@/components/common/BookmarkCard';
-import type { Place } from '@/apis/getPlaces';
+import type { BookmarkStore } from '@/types/bookmark';
+
+import type { Place } from '@/types/map';
 import { getPlaces } from '@/apis/getPlaces';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
-import type {
-  CategoryType,
-  EventType,
-  StoreClassType,
-  StoreStatusType,
-} from '@/components/common/StoreTypeIcon';
 
-const getStoreNameColorClass = (eventTypeCode: EventType): string => {
-  switch (eventTypeCode) {
-    case 'GENERAL':
-      return 'text-blue-600';
-    case 'REQUIRE':
-      return 'text-red-600';
-    default:
-      return 'text-gray-900';
-  }
-};
+import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
+
+// [제거] 더 이상 사용되지 않으므로 함수를 삭제합니다.
+// const getStoreNameColorClass = ...
 
 const JuniorMarket = () => {
-  const [stores, setStores] = useState<StoreInfo[]>([]);
+  const [stores, setStores] = useState<BookmarkStore[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,18 +23,13 @@ const JuniorMarket = () => {
     const fetchSeoulEventStores = async () => {
       try {
         setIsLoading(true);
-
-        // 서울시 전체 영역으로 매장 검색
         const seoulBounds = {
           swLat: 37.42,
           swLng: 126.73,
           neLat: 37.7,
           neLng: 127.2,
         };
-
         const allPlacesInSeoul = await getPlaces(seoulBounds);
-        console.log('Places API Response:', allPlacesInSeoul);
-        // 이벤트가 있는 매장만 필터링 (MapContainer와 동일)
         const eventPlaces = allPlacesInSeoul.filter((p) => p.eventCode !== 'NONE');
 
         if (eventPlaces.length === 0) {
@@ -53,7 +38,6 @@ const JuniorMarket = () => {
           return;
         }
 
-        // MapContainer와 동일한 방식으로 중심 좌표 사용
         const centerLatStr = '37.544581';
         const centerLngStr = '127.055961';
 
@@ -63,41 +47,28 @@ const JuniorMarket = () => {
 
         const successfulDetails = detailResults
           .filter((result) => result.status === 'fulfilled' && result.value)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .map((result) => (result as PromiseFulfilledResult<any>).value);
 
-        detailResults.forEach((result, index) => {
-          if (result.status === 'rejected') {
-            console.error(
-              `상세 정보를 가져오는 데 실패했습니다 (placeId: ${eventPlaces[index].placeId}):`,
-              result.reason
-            );
-          }
-        });
-
-        const finalStoreInfo = successfulDetails.map((detail) => {
+        const finalStoreInfo: BookmarkStore[] = successfulDetails.map((detail) => {
           const originalPlace = eventPlaces.find((p) => p.placeId === detail.placeId)!;
           return {
             id: String(detail.placeId),
             name: detail.name,
             address: detail.address,
             hours: detail.hours,
+            distance: detail.distance,
             isBookmarked: detail.isBookmarked,
-            status: detail.status as StoreStatusType,
             category: detail.category as CategoryType,
             event: detail.eventTypeCode as EventType,
             storeClass: originalPlace.markerCode as StoreClassType,
           };
         });
 
-        // REQUIRE 이벤트 타입 매장을 제일 위로 정렬
         const sortedStores = finalStoreInfo.sort((a, b) => {
-          if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') {
-            return -1; // a를 b보다 앞에 배치
-          }
-          if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') {
-            return 1; // b를 a보다 앞에 배치
-          }
-          return 0; // 순서 유지
+          if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') return -1;
+          if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') return 1;
+          return 0;
         });
 
         setStores(sortedStores);
@@ -135,18 +106,13 @@ const JuniorMarket = () => {
       </div>
       <div className="flex flex-col items-start gap-4 mb-2">
         {stores.length > 0 ? (
-          stores.map((store) => {
-            const colorClass = getStoreNameColorClass(store.event);
-            return (
-              <BookmarkCard
-                key={store.id}
-                store={store}
-                variant="full"
-                nameColorClass={colorClass}
-                onBookmarkToggle={() => handleBookmarkToggle(store.id)}
-              />
-            );
-          })
+          stores.map((store) => (
+            <BookmarkCard
+              key={store.id}
+              store={store}
+              onBookmarkToggle={() => handleBookmarkToggle(store.id)}
+            />
+          ))
         ) : (
           <div className="p-5 text-center text-gray-500">표시할 이벤트 매장이 없습니다.</div>
         )}

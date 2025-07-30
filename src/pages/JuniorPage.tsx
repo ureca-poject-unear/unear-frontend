@@ -1,4 +1,4 @@
-// src/pages/JuniorPage.tsx
+// src/pages/JuniorPage.tsx (수정된 최종 코드)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/common/Header';
@@ -8,14 +8,18 @@ import StampRouletteCard from '@/components/junior/StampRouletteCard';
 import JuniorMap from '@/components/junior/JuniorMap';
 import TodayCouponSection from '@/components/junior/TodayCouponSection';
 import JuniorMarket from '@/components/junior/JuniorMarket';
-import type { Place } from '@/apis/getPlaces';
-import { getPlaces } from '@/apis/getPlaces'; // API 호출 함수
 
-import type { StoreType, EventType } from '@/types/Junior';
-import type { CategoryType, StoreClassType } from '@/components/common/StoreTypeIcon';
+import type { Place } from '@/types/map';
+import { getPlaces } from '@/apis/getPlaces';
 
-// API 응답 데이터(Place)를 페이지 전체에서 사용할 데이터 형태(ExtendedStoreType)로 변환
-// isStamped, date는 API에 없는 값이므로 기본값을 설정해줍니다.
+import type {
+  StoreType,
+  EventType,
+  CategoryType,
+  StoreClassType,
+  StoreStatusType,
+} from '@/types/Junior';
+
 type ExtendedStoreType = StoreType & {
   isStamped: boolean;
   date?: string;
@@ -26,17 +30,17 @@ const convertPlaceToStore = (place: Place): ExtendedStoreType => {
     id: String(place.placeId),
     lat: place.latitude,
     lng: place.longitude,
-    name: place.name,
-    address: place.address,
-    hours: '09:00 ~ 21:00', // API 응답에 따라 수정 필요
-    status: '영업중' as StoreStatusType, // API 응답에 따라 수정 필요
+    name: place.placeName,
+    address: '주소 정보 없음', // Place 타입에 주소가 없으므로 임시 처리
+    hours: '09:00 ~ 21:00',
+    status: '영업중' as StoreStatusType,
     category: place.categoryCode as CategoryType,
     storeClass: place.markerCode as StoreClassType,
     event: place.eventCode as EventType,
     isBookmarked: place.favorite,
     coupons: [],
-    isStamped: false, // API에 없으므로 기본값 false
-    date: undefined, // API에 없으므로 기본값 undefined
+    isStamped: false,
+    date: undefined,
   };
 };
 
@@ -47,18 +51,15 @@ type Stamp = {
 };
 
 const JuniorPage = () => {
-  // [수정] 초기 데이터를 빈 배열로 설정
   const [stores, setStores] = useState<ExtendedStoreType[]>([]);
   const [stamps, setStamps] = useState<Stamp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // [수정] 컴포넌트 마운트 시 API를 호출하여 모든 이벤트 매장 데이터를 가져오는 로직
   useEffect(() => {
     const fetchAllEventStores = async () => {
       try {
         setIsLoading(true);
-        // 대한민국 전체를 포함하는 넓은 좌표로 모든 매장 검색
         const allPlaces = await getPlaces({
           swLat: 33.0,
           swLng: 124.0,
@@ -66,10 +67,7 @@ const JuniorPage = () => {
           neLng: 132.0,
         });
 
-        // 이벤트가 있는 매장만 필터링
         const eventPlaces = allPlaces.filter((place) => place.eventCode !== 'NONE');
-
-        // UI에서 사용할 데이터 형태로 변환
         const storeData = eventPlaces.map(convertPlaceToStore);
         setStores(storeData);
       } catch (err) {
@@ -81,9 +79,8 @@ const JuniorPage = () => {
     };
 
     fetchAllEventStores();
-  }, []); // 빈 배열을 전달하여 최초 1회만 실행
+  }, []);
 
-  // [수정] stores 데이터가 변경될 때마다 스탬프 데이터를 재계산
   useEffect(() => {
     if (stores.length === 0) return;
 
@@ -122,7 +119,6 @@ const JuniorPage = () => {
   }, [stores]);
 
   const handleBookmarkToggle = useCallback((storeId: string) => {
-    // 이 부분도 추후에는 API 호출로 변경되어야 합니다.
     setStores((prevStores) =>
       prevStores.map((store) =>
         store.id === storeId ? { ...store, isBookmarked: !store.isBookmarked } : store
@@ -155,10 +151,13 @@ const JuniorPage = () => {
         <EventBanner />
         <div className="flex flex-col gap-3 items-center w-full">
           <StampRouletteCard stamps={stamps} />
-          {/* [수정] API로 받아온 stores 데이터를 자식 컴포넌트에 전달 */}
           <JuniorMap stores={stores} onBookmarkToggle={handleBookmarkToggle} />
           <TodayCouponSection />
-          <JuniorMarket stores={stores} onBookmarkToggle={handleBookmarkToggle} />
+          {/*
+            [수정] JuniorMarket은 자체적으로 데이터를 로드하고 상태를 관리하므로
+            아무런 props도 전달하지 않습니다.
+          */}
+          <JuniorMarket />
         </div>
       </div>
     </>

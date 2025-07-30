@@ -1,15 +1,16 @@
+// src/components/junior/MapContainer.tsx (최종 수정 코드)
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM, { type Root } from 'react-dom/client';
 import type { KakaoMap, KakaoCustomOverlay } from '@/types/kakao';
-import type { Place } from '@/apis/getPlaces';
+import type { Place } from '@/types/map';
 import { getPlaces } from '@/apis/getPlaces';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
 import type { StoreData } from '@/types/storeDetail';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
-
 import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
-
-import BookmarkCard, { type StoreInfo } from '@/components/junior/BookmarkCard';
+import BookmarkCard from '@/components/common/BookmarkCard';
+import type { BookmarkStore } from '@/types/bookmark';
 
 interface MapContainerProps {
   onMarkerSelect?: (place: Place) => void;
@@ -28,7 +29,7 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
   const [isInfoLoading, setIsInfoLoading] = useState(false);
 
   const markerOverlaysRef = useRef<KakaoCustomOverlay[]>([]);
-  const markerRootsRef = useRef<any[]>([]);
+  const markerRootsRef = useRef<Root[]>([]);
 
   const closeInfoWindow = useCallback(() => {
     infoOverlay?.setMap(null);
@@ -43,15 +44,14 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
         closeInfoWindow();
         return;
       }
-
       closeInfoWindow();
       setSelectedPlaceId(place.placeId);
       setIsInfoLoading(true);
 
       if (!map) return;
-
       try {
-        const center = map.getCenter();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const center = (map as any).getCenter();
         const fetchedDetails = await getPlaceDetail(
           place.placeId,
           String(center.getLat()),
@@ -64,7 +64,6 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
       } finally {
         setIsInfoLoading(false);
       }
-
       onMarkerSelect?.(place);
     },
     [map, selectedPlaceId, closeInfoWindow, onMarkerSelect]
@@ -94,34 +93,29 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
       console.error('Kakao Map API Key is missing');
       return;
     }
-
     const initializeMap = () => {
       const container = mapRef.current;
       if (!container) return;
-
       const mapInstance = new window.kakao.maps.Map(container, {
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         level: 5,
       });
-
       const circle = new window.kakao.maps.Circle({
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         radius: 500,
         strokeWeight: 5,
         strokeColor: '#DFA2A2',
         strokeOpacity: 1,
-        strokeStyle: 'dashed',
+        strokeStyle: 'longdash',
         fillColor: '#F316B0',
         fillOpacity: 0.08,
       });
       circle.setMap(mapInstance);
-
       const bounds = circle.getBounds();
-      mapInstance.setBounds(bounds);
-
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mapInstance as any).setBounds(bounds);
       setMap(mapInstance);
     };
-
     if (window.kakao && window.kakao.maps) {
       initializeMap();
     } else {
@@ -137,45 +131,41 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
     if (!map) return;
     const idleListener = window.kakao.maps.event.addListener(map, 'idle', fetchPlacesInViewport);
     const clickListener = window.kakao.maps.event.addListener(map, 'click', closeInfoWindow);
-
     fetchPlacesInViewport();
-
     return () => {
-      window.kakao.maps.event.removeListener(map, 'idle', idleListener);
-      window.kakao.maps.event.removeListener(map, 'click', clickListener);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window.kakao.maps.event as any).removeListener(map, 'idle', idleListener);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window.kakao.maps.event as any).removeListener(map, 'click', clickListener);
     };
   }, [map, fetchPlacesInViewport, closeInfoWindow]);
 
   useEffect(() => {
-    if (!map || !selectedPlaceId) return;
-    if (isInfoLoading || !detailedStore || infoOverlay) return;
+    if (!map || !selectedPlaceId || isInfoLoading || !detailedStore || infoOverlay) return;
 
     const originalPlace = places.find((p) => p.placeId === detailedStore.placeId);
-    const cardData: StoreInfo = {
+    const cardData: BookmarkStore = {
       id: String(detailedStore.placeId),
       name: detailedStore.name,
       address: detailedStore.address,
       hours: detailedStore.hours,
+      distance: detailedStore.distance,
       category: detailedStore.category as CategoryType,
       storeClass: (originalPlace?.markerCode as StoreClassType) || 'LOCAL',
       event: detailedStore.eventTypeCode as EventType,
-      status: detailedStore.status as StoreStatusType,
       isBookmarked: detailedStore.isBookmarked,
     };
-
     const contentNode = document.createElement('div');
     const root = ReactDOM.createRoot(contentNode);
-
     root.render(
       <BookmarkCard
         store={cardData}
-        variant="compact"
         onBookmarkToggle={() => onBookmarkToggle?.(detailedStore.placeId)}
       />
     );
-
     const positionOffset = 0.002;
-    const newInfoOverlay = new window.kakao.maps.CustomOverlay({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const overlayOptions: any = {
       content: contentNode,
       position: new window.kakao.maps.LatLng(
         detailedStore.latitude,
@@ -185,33 +175,28 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
       yAnchor: 1.1,
       zIndex: 150,
       clickable: true,
-    });
-
+    };
+    const newInfoOverlay = new window.kakao.maps.CustomOverlay(overlayOptions);
     newInfoOverlay.setMap(map);
     setInfoOverlay(newInfoOverlay);
-
     const halfInfoWindowWidth = 0.0022;
     const newCenterLng = detailedStore.longitude + positionOffset + halfInfoWindowWidth;
-    map.panTo(new window.kakao.maps.LatLng(detailedStore.latitude, newCenterLng));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (map as any).panTo(new window.kakao.maps.LatLng(detailedStore.latitude, newCenterLng));
   }, [detailedStore, isInfoLoading, map, selectedPlaceId, onBookmarkToggle, places, infoOverlay]);
 
   useEffect(() => {
     if (!map) return;
-
     markerOverlaysRef.current.forEach((overlay) => overlay.setMap(null));
     markerRootsRef.current.forEach((root) => {
-      // React 18 대응: unmount는 렌더링 이후 비동기 처리
       setTimeout(() => root.unmount(), 0);
     });
-
     markerOverlaysRef.current = [];
     markerRootsRef.current = [];
-
     places.forEach((place) => {
       const isSelected = place.placeId === selectedPlaceId;
       const contentNode = document.createElement('div');
       contentNode.style.cursor = 'pointer';
-
       const root = ReactDOM.createRoot(contentNode);
       root.render(
         <MapMarkerIcon
@@ -222,14 +207,12 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
           onClick={() => handleMarkerClick(place)}
         />
       );
-
       const customOverlay = new window.kakao.maps.CustomOverlay({
         position: new window.kakao.maps.LatLng(place.latitude, place.longitude),
         content: contentNode,
         yAnchor: 1,
         zIndex: isSelected ? 100 : 10,
       });
-
       customOverlay.setMap(map);
       markerOverlaysRef.current.push(customOverlay);
       markerRootsRef.current.push(root);
