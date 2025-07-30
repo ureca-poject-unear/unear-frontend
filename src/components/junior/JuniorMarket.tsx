@@ -1,110 +1,121 @@
-import React from 'react';
-import BookmarkCard from '../common/BookmarkCard';
-import type { CategoryType } from '@/components/common/StoreTypeIcon';
+// src/components/junior/JuniorMarket.tsx (수정된 최종 코드)
 
-type StoreStatusType = '영업중' | '휴무';
+import React, { useState, useEffect } from 'react';
 
-interface Coupon {
-  id: string;
-  title: string;
-  expiryDate: string;
-}
+import BookmarkCard from '@/components/common/BookmarkCard';
+import type { BookmarkStore } from '@/types/bookmark';
 
-interface StoreType {
-  id: string;
-  name: string;
-  address: string;
-  distance: string;
-  hours: string;
-  category: CategoryType;
-  status: StoreStatusType;
-  isBookmarked: boolean;
-  coupons: Coupon[];
-  event: 'REQUIRE' | 'GENERAL' | null;
-}
+import type { Place } from '@/types/map';
+import { getPlaces } from '@/apis/getPlaces';
+import { getPlaceDetail } from '@/apis/getPlaceDetail';
 
-const getStoreColorClass = (event: string | null): string => {
-  if (event === 'REQUIRE') return 'text-pink-400'; // 필수 이벤트
-  if (event === 'GENERAL') return 'text-primary'; // 일반 이벤트
-  return 'text-black'; // 기본 색상
-};
+import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
+
+// [제거] 더 이상 사용되지 않으므로 함수를 삭제합니다.
+// const getStoreNameColorClass = ...
 
 const JuniorMarket = () => {
-  const mockStores: StoreType[] = [
-    {
-      id: 'store1',
-      name: '스타벅스 강남점',
-      address: '서울 강남구 테헤란로 152',
-      distance: '0.2km',
-      hours: '06:00 - 22:00',
-      category: 'CAFE' as CategoryType,
-      status: '영업중',
-      isBookmarked: false,
-      coupons: [
-        {
-          id: 'coupon1',
-          title: '아메리카노 10% 할인 쿠폰',
-          expiryDate: '2025.08.16',
-        },
-      ],
-      event: 'REQUIRE',
-    },
-    {
-      id: 'store2',
-      name: '이디야 커피 역삼점',
-      address: '서울 강남구 역삼로 123',
-      distance: '0.5km',
-      hours: '07:00 - 21:00',
-      category: 'CAFE' as CategoryType,
-      status: '영업중',
-      isBookmarked: true,
-      coupons: [],
-      event: 'GENERAL',
-    },
-    {
-      id: 'store3',
-      name: '투썸플레이스 삼성점',
-      address: '서울 강남구 삼성로 456',
-      distance: '1.2km',
-      hours: '08:00 - 23:00',
-      category: 'CAFE' as CategoryType,
-      status: '영업중',
-      isBookmarked: false,
-      coupons: [
-        {
-          id: 'coupon2',
-          title: '딸기 라떼 20% 할인 쿠폰',
-          expiryDate: '2025.09.01',
-        },
-      ],
-      event: 'GENERAL',
-    },
-    {
-      id: 'store4',
-      name: '빽다방 강남점',
-      address: '서울 강남구 논현로 789',
-      distance: '0.7km',
-      hours: '06:30 - 22:30',
-      category: 'CAFE' as CategoryType,
-      status: '영업중',
-      isBookmarked: false,
-      coupons: [],
-      event: 'GENERAL',
-    },
-  ];
+  const [stores, setStores] = useState<BookmarkStore[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSeoulEventStores = async () => {
+      try {
+        setIsLoading(true);
+        const seoulBounds = {
+          swLat: 37.42,
+          swLng: 126.73,
+          neLat: 37.7,
+          neLng: 127.2,
+        };
+        const allPlacesInSeoul = await getPlaces(seoulBounds);
+        const eventPlaces = allPlacesInSeoul.filter((p) => p.eventCode !== 'NONE');
+
+        if (eventPlaces.length === 0) {
+          setStores([]);
+          setIsLoading(false);
+          return;
+        }
+
+        const centerLatStr = '37.544581';
+        const centerLngStr = '127.055961';
+
+        const detailResults = await Promise.allSettled(
+          eventPlaces.map((place) => getPlaceDetail(place.placeId, centerLatStr, centerLngStr))
+        );
+
+        const successfulDetails = detailResults
+          .filter((result) => result.status === 'fulfilled' && result.value)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((result) => (result as PromiseFulfilledResult<any>).value);
+
+        const finalStoreInfo: BookmarkStore[] = successfulDetails.map((detail) => {
+          const originalPlace = eventPlaces.find((p) => p.placeId === detail.placeId)!;
+          return {
+            id: String(detail.placeId),
+            name: detail.name,
+            address: detail.address,
+            hours: detail.hours,
+            distance: detail.distance,
+            isBookmarked: detail.isBookmarked,
+            category: detail.category as CategoryType,
+            event: detail.eventTypeCode as EventType,
+            storeClass: originalPlace.markerCode as StoreClassType,
+          };
+        });
+
+        const sortedStores = finalStoreInfo.sort((a, b) => {
+          if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') return -1;
+          if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') return 1;
+          return 0;
+        });
+
+        setStores(sortedStores);
+      } catch (err) {
+        setError('매장 정보를 불러오는 데 실패했습니다.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSeoulEventStores();
+  }, []);
+
+  const handleBookmarkToggle = (storeId: string) => {
+    setStores((prevStores) =>
+      prevStores.map((store) =>
+        store.id === storeId ? { ...store, isBookmarked: !store.isBookmarked } : store
+      )
+    );
+  };
+
+  if (isLoading) {
+    return <div className="p-5 text-center text-gray-500">매장 목록을 불러오는 중...</div>;
+  }
+
+  if (error) {
+    return <div className="p-5 text-center text-red-500">{error}</div>;
+  }
 
   return (
-    <div className="relative w-[393px] h-[351px] bg-white overflow-y-auto p-4">
-      {/* 타이틀 */}
-      <div className="mb-4">
+    <div className="relative bg-white px-5">
+      <div className="m-2 mb-4">
         <p className="text-lm font-bold text-black">이번주니어 매장</p>
       </div>
-
-      <div className="flex flex-col items-start gap-4">
-        {mockStores.map((store) => {
-          const colorClass = getStoreColorClass(store.event);
-          return <BookmarkCard key={store.id} store={store} storeNameClass={colorClass} />;
-        })}
+      <div className="flex flex-col items-start gap-4 mb-2">
+        {stores.length > 0 ? (
+          stores.map((store) => (
+            <BookmarkCard
+              key={store.id}
+              store={store}
+              onBookmarkToggle={() => handleBookmarkToggle(store.id)}
+            />
+          ))
+        ) : (
+          <div className="p-5 text-center text-gray-500">표시할 이벤트 매장이 없습니다.</div>
+        )}
       </div>
     </div>
   );
