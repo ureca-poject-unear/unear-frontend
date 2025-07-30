@@ -1,7 +1,8 @@
 // src/components/JuniorPage/JuniorMap.tsx
 
 import React from 'react';
-import MapContainer from './MapContainer';
+import MapContainer from '@/components/junior/MapContainer';
+
 import type { StoreType } from '@/types/Junior'; // [수정] 임포트 경로 변경
 
 // 부모로부터 받을 props 타입 정의

@@ -6,14 +6,10 @@ import { getPlaces } from '@/apis/getPlaces';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
 import type { StoreData } from '@/types/storeDetail';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
-import BookmarkCard from '@/components/JuniorPage/BookmarkCard';
-import type { StoreInfo } from '@/components/JuniorPage/BookmarkCard';
-import type {
-  CategoryType,
-  EventType,
-  StoreClassType,
-  StoreStatusType,
-} from '@/components/common/StoreTypeIcon';
+
+import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
+
+import BookmarkCard, { type StoreInfo } from '@/components/junior/BookmarkCard';
 
 interface MapContainerProps {
   onMarkerSelect?: (place: Place) => void;

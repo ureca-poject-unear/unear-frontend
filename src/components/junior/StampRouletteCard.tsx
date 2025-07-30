@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // [추가] useNavigate 훅 임포트
 import MiniButton from '@/components/common/MiniButton';
 import CommonModal from '@/components/common/CommonModal';
-import ProbabilityRoulette from '@/components/JuniorPage/ProbabilityRoulette';
+import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette';
 
 type Stamp = {
   name: string;

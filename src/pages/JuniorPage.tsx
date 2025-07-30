@@ -2,19 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/common/Header';
+
 import EventBanner from '@/components/JuniorPage/EventBanner';
 import StampRouletteCard from '@/components/JuniorPage/StampRouletteCard';
 import JuniorMap from '@/components/JuniorPage/JuniorMap';
 import TodayCouponSection from '@/components/JuniorPage/TodayCouponSection';
 import JuniorMarket from '@/components/JuniorPage/JuniorMarket';
-import { getPlaces } from '@/apis/getPlaces'; // API 호출 함수
 import type { Place } from '@/apis/getPlaces';
+import { getPlaces } from '@/apis/getPlaces'; // API 호출 함수
+
 import type { StoreType, EventType } from '@/types/Junior';
-import type {
-  CategoryType,
-  StoreClassType,
-  StoreStatusType,
-} from '@/components/common/StoreTypeIcon';
+import type { CategoryType, StoreClassType } from '@/components/common/StoreTypeIcon';
 
 // API 응답 데이터(Place)를 페이지 전체에서 사용할 데이터 형태(ExtendedStoreType)로 변환
 // isStamped, date는 API에 없는 값이므로 기본값을 설정해줍니다.
