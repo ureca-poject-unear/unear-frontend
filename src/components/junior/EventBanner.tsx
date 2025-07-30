@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import CommonModal from '@/components/common/CommonModal'; // CommonModal 컴포넌트를 가져옵니다
-import banner from '@/assets/junior/banner.png';
+import Banner from '@/assets/junior/banner.png';
 
 const EventBanner = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
@@ -28,7 +28,7 @@ const EventBanner = () => {
           </p>
         </div>
         <img
-          src={banner}
+          src={Banner}
           alt="이벤트 이미지"
           className="w-[109px] h-[109px] absolute left-[283.5px] top-[5.5px] object-cover"
         />
@@ -93,7 +93,7 @@ const EventBanner = () => {
             </div>
             {/* Banner Image - placed absolutely on top of other content if design dictates */}
             <img
-              src={banner}
+              src={Banner}
               alt="이벤트 이미지"
               className="absolute top-[5.5px] right-[5.5px] w-[109px] h-[109px] object-cover"
             />
