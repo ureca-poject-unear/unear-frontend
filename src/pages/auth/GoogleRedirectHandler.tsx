@@ -7,15 +7,10 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { showErrorToast } from '@/utils/toast';
 import axiosInstance from '@/apis/axiosInstance';
 
-// 사용자 정보 타입 정의
-interface UserInfo {
-  isProfileComplete?: boolean;
-}
-
 const GoogleRedirectHandler: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login, userInfo } = useAuth();
+  const { login } = useAuth();
   const hasProcessed = useRef(false); // 중복 실행 방지
   const [loadingMessage, setLoadingMessage] = useState('구글 로그인 처리 중...');
   const [hasError, setHasError] = useState(false);
@@ -71,11 +66,10 @@ const GoogleRedirectHandler: React.FC = () => {
             username: userData.username,
           });
 
-          // OAuth 리다이렉트 진행 중 플래그 설정
+          // OAuth 리다이렉트 진행 중 플래그 설정 (CompleteProfilePage에서 깜빡임 방지용)
           sessionStorage.setItem('oauth_redirect_in_progress', 'true');
-          sessionStorage.setItem('profile_check_completed', 'true'); // 프로필 확인 완료 플래그
 
-          // 프로필 완성 여부에 따라 즉시 분기
+          // 프로필 완성 여부에 따라 즉시 분기 (중복 확인 없이 단순 분기)
           if (userData.isProfileComplete === true) {
             console.log('✅ 프로필 완성됨 - 메인페이지로 즉시 이동');
             setLoadingMessage('메인 페이지로 이동 중...');
@@ -83,6 +77,7 @@ const GoogleRedirectHandler: React.FC = () => {
           } else {
             console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
             setLoadingMessage('추가 정보 입력 페이지로 이동 중...');
+            // CompleteProfilePage는 미완성 사용자만 온다고 가정하므로 재확인 불필요
             navigate('/complete-profile', { replace: true });
           }
         } catch (apiError) {
