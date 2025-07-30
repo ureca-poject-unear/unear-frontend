@@ -18,11 +18,6 @@ interface LoginError {
   message?: string;
 }
 
-// 사용자 정보 타입 정의
-interface UserInfo {
-  isProfileComplete?: boolean;
-}
-
 const NaverAuthHandler = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

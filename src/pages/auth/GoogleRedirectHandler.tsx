@@ -7,15 +7,10 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { showErrorToast } from '@/utils/toast';
 import axiosInstance from '@/apis/axiosInstance';
 
-// 사용자 정보 타입 정의
-interface UserInfo {
-  isProfileComplete?: boolean;
-}
-
 const GoogleRedirectHandler: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login, userInfo } = useAuth();
+  const { login } = useAuth();
   const hasProcessed = useRef(false); // 중복 실행 방지
   const [loadingMessage, setLoadingMessage] = useState('구글 로그인 처리 중...');
   const [hasError, setHasError] = useState(false);

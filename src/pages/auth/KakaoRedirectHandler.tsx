@@ -23,15 +23,10 @@ interface LoginError {
   message?: string;
 }
 
-// 사용자 정보 타입 정의
-interface UserInfo {
-  isProfileComplete?: boolean;
-}
-
 const KakaoRedirectHandler: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, checkAuthStatus } = useAuth();
+  const { login } = useAuth();
   const [loadingMessage, setLoadingMessage] = useState('카카오 로그인 처리 중...');
   const [hasError, setHasError] = useState(false);
   const hasProcessed = useRef(false); // 중복 실행 방지
