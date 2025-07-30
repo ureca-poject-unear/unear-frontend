@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Mousewheel } from 'swiper/modules';
+import 'swiper/css';
 import CalendarIcon from '@/assets/my/calender.svg?react';
 import ArrowIcon from '@/assets/common/arrowUpIcon.svg?react';
 import '../statistics/animations.css'; // 애니메이션 CSS 임포트
@@ -76,41 +79,55 @@ const UsageHistoryFilter: React.FC<UsageHistoryFilterProps> = ({ onFilterChange 
 
       {/* 필터 옵션들 - 애니메이션용 CSS 클래스 조건부 적용 */}
       <div className={`mt-3 space-y-6 ${isExpanded ? 'expand-height' : 'collapse-height'}`}>
-        {/* 가로 스크롤 가능한 카테고리 필터 */}
+        {/* 스와이프 가능한 카테고리 필터 */}
         <div>
           <h4 className="text-sm font-semibold text-black mb-2">카테고리</h4>
-          <div
-            className="flex overflow-x-auto pl-0.5 gap-3 py-1"
-            style={{ maxWidth: '100%', WebkitOverflowScrolling: 'touch' }}
-          >
-            {categoryOptions.map((option) => (
-              <div key={option.id} className="flex-shrink-0" style={{ width: 80 }}>
-                <FilterButton
-                  text={option.label}
-                  onClick={() => handleCategorySelect(option)}
-                  isActive={option.isActive}
-                />
-              </div>
-            ))}
+          <div className="-mx-5 pl-[1px]">
+            <Swiper
+              modules={[Mousewheel]}
+              slidesPerView="auto"
+              spaceBetween={12}
+              mousewheel={{ forceToAxis: true }}
+              slideToClickedSlide={true}
+              className="!overflow-visible px-5"
+              style={{ paddingLeft: '20px', paddingRight: '20px' }}
+            >
+              {categoryOptions.map((option) => (
+                <SwiperSlide key={option.id} style={{ width: 'auto' }} className="!w-auto">
+                  <FilterButton
+                    text={option.label}
+                    onClick={() => handleCategorySelect(option)}
+                    isActive={option.isActive}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
 
-        {/* 날짜 필터 (카테고리처럼 스크롤 가능하게 변경) */}
+        {/* 스와이프 가능한 날짜 필터 */}
         <div>
           <h4 className="text-sm font-semibold text-black mb-2">날짜</h4>
-          <div
-            className="flex overflow-x-auto pl-0.5 gap-3 py-1"
-            style={{ maxWidth: '100%', WebkitOverflowScrolling: 'touch' }}
-          >
-            {periodOptions.map((option) => (
-              <div key={option.id} className="flex-shrink-0" style={{ width: 80 }}>
-                <FilterButton
-                  text={option.label}
-                  onClick={() => handlePeriodSelect(option)}
-                  isActive={option.isActive}
-                />
-              </div>
-            ))}
+          <div className="-mx-5 pl-[1px]">
+            <Swiper
+              modules={[Mousewheel]}
+              slidesPerView="auto"
+              spaceBetween={12}
+              mousewheel={{ forceToAxis: true }}
+              slideToClickedSlide={true}
+              className="!overflow-visible px-5"
+              style={{ paddingLeft: '20px', paddingRight: '20px' }}
+            >
+              {periodOptions.map((option) => (
+                <SwiperSlide key={option.id} style={{ width: 'auto' }} className="!w-auto">
+                  <FilterButton
+                    text={option.label}
+                    onClick={() => handlePeriodSelect(option)}
+                    isActive={option.isActive}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
       </div>

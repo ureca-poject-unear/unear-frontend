@@ -19,13 +19,16 @@ interface FormData {
 // API 에러 응답 타입
 interface ApiErrorResponse {
   response?: {
-    data?: {
-      codeName?: string;
-      message?: string;
-      data?: {
-        fieldErrors?: Record<string, string>;
-      };
-    };
+    status?: number;
+    data?:
+      | string
+      | {
+          codeName?: string;
+          message?: string;
+          data?: {
+            fieldErrors?: Record<string, string>;
+          };
+        };
   };
 }
 
@@ -146,11 +149,20 @@ const SignUpPage = () => {
       console.error('이메일 인증번호 전송 실패:', error);
       const apiError = error as ApiErrorResponse;
 
-      if (apiError.response?.data?.codeName === 'DUPLICATED_EMAIL') {
-        setEmailExistsError(true);
-        showErrorToast('이미 가입된 이메일입니다.');
+      // 상태 코드가 400이고 응답에 "이미 가입된 이메일"이 포함된 경우
+      if (apiError.response?.status === 400) {
+        const responseData = apiError.response.data;
+        const errorMessage =
+          typeof responseData === 'string' ? responseData : responseData?.message || '';
+
+        if (errorMessage.includes('이미 가입된 이메일')) {
+          setEmailExistsError(true);
+          showErrorToast('이미 가입된 이메일입니다.');
+        } else {
+          showErrorToast(errorMessage || '인증번호 전송에 실패했습니다.');
+        }
       } else {
-        showErrorToast(apiError.response?.data?.message || '인증번호 전송에 실패했습니다.');
+        showErrorToast('인증번호 전송에 실패했습니다.');
       }
     } finally {
       setIsLoading(false);

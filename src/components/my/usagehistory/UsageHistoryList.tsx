@@ -1,10 +1,12 @@
 import type { UsageHistoryItem as UsageHistoryItemType } from '@/types/usageHistory';
 import UsageHistoryItem from './UsageHistoryItem';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 interface UsageHistoryListProps {
   items: UsageHistoryItemType[];
   hasMoreItems: boolean;
-  onLoadMore: () => void;
+  onLoadMore: () => Promise<void>;
+  isLoadingMore?: boolean;
   emptyMessage?: string;
 }
 
@@ -12,6 +14,7 @@ const UsageHistoryList = ({
   items,
   hasMoreItems,
   onLoadMore,
+  isLoadingMore = false,
   emptyMessage = '해당 조건에 맞는 이용 내역이 없습니다.',
 }: UsageHistoryListProps) => {
   if (items.length === 0) {
@@ -40,9 +43,17 @@ const UsageHistoryList = ({
         <div className="pt-1">
           <button
             onClick={onLoadMore}
-            className="w-full pt-2.5 pb-2 text-sm text-center text-black font-semibold bg-white border rounded-lg hover:bg-gray-100 transition-colors"
+            disabled={isLoadingMore}
+            className="w-full pt-2.5 pb-2 text-sm text-center text-black font-semibold bg-white border rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            더보기
+            {isLoadingMore ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner size="sm" />
+                <span>로딩 중...</span>
+              </div>
+            ) : (
+              '더보기'
+            )}
           </button>
         </div>
       )}

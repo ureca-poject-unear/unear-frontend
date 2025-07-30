@@ -10,8 +10,15 @@ import useMyPageHandlers from '@/hooks/my/useMyPageHandlers';
 
 const MyPage = () => {
   // 데이터 관리
-  const { userProfile, membershipBenefit, statisticsData, recentUsageHistory, isLoading } =
-    useMyPageData();
+  const {
+    userProfile,
+    membershipBenefit,
+    statisticsData,
+    recentUsageHistory,
+    isLoading,
+    userProvider,
+    error,
+  } = useMyPageData();
 
   // 액션 핸들러 (로그아웃 제외)
   const {
@@ -36,6 +43,16 @@ const MyPage = () => {
             </p>
           </div>
         </div>
+      ) : error ? (
+        <div className="bg-background">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+            <p className="text-sm font-regular text-gray-600 text-center px-5">
+              데이터를 불러오는 중 오류가 발생했습니다.
+              <br />
+              잠시 후 다시 시도해주세요.
+            </p>
+          </div>
+        </div>
       ) : (
         <>
           {/* 사용자 정보 영역 - 로그아웃은 컴포넌트 내부에서 처리 */}
@@ -51,7 +68,6 @@ const MyPage = () => {
 
           {/* 개인별 통계 영역 */}
           <StatisticsSection
-            currentMonthSavings={statisticsData.currentMonthSavings}
             accumulatedSavings={statisticsData.accumulatedSavings}
             chartData={statisticsData.chartData}
             onDetailClick={onStatisticsDetail}
@@ -64,7 +80,7 @@ const MyPage = () => {
           />
 
           {/* 계정 관리 영역 */}
-          <AccountManagementSection onChangePassword={onChangePassword} />
+          <AccountManagementSection onChangePassword={onChangePassword} provider={userProvider} />
         </>
       )}
     </>

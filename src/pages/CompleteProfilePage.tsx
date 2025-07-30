@@ -46,7 +46,7 @@ const CompleteProfilePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true); // 초기 로딩 상태
 
-  // 데이터 로딩 및 검증 (OAuth 리다이렉트 시 중복 확인 방지)
+  // 데이터 로딩 및 검증 (OAuth에서 온 경우 단순화)
   useEffect(() => {
     const fetchAndVerifyUser = async () => {
       const accessToken = getStoredAccessToken();
@@ -56,23 +56,21 @@ const CompleteProfilePage: React.FC = () => {
         return;
       }
 
-      // OAuth 리다이렉트에서 이미 프로필 확인을 완료했는지 체크
-      const profileCheckCompleted = sessionStorage.getItem('profile_check_completed');
+      // OAuth 리다이렉트에서 온 경우 중복 확인 방지 (깜빡임 방지용)
       const oauthInProgress = sessionStorage.getItem('oauth_redirect_in_progress');
 
-      if (profileCheckCompleted && oauthInProgress) {
-        console.log('🔄 OAuth 리다이렉트에서 이미 프로필 확인 완료 - 중복 확인 건너뜀');
-        // 플래그 제거
-        sessionStorage.removeItem('profile_check_completed');
+      if (oauthInProgress) {
+        console.log('🔄 OAuth 리다이렉트에서 온 사용자 - 기본 정보만 로드');
+        // 플래그 제거 (일회성)
         sessionStorage.removeItem('oauth_redirect_in_progress');
 
         try {
-          // 기본 사용자 정보만 로드 (프로필 완료 상태 재확인 안 함)
+          // OAuth에서 이미 프로필 상태를 확인했으므로 기본 사용자 정보만 로드
           const response = await axiosInstance.get('/users/me');
           const result = response.data as MeApiResponse;
           setUser({ email: result.data.email });
           setForm((prev) => ({ ...prev, name: result.data.username }));
-          setIsInitializing(false); // 초기화 완료
+          setIsInitializing(false);
           return;
         } catch (error) {
           console.error('API Error:', error);
@@ -82,7 +80,7 @@ const CompleteProfilePage: React.FC = () => {
         }
       }
 
-      // 일반적인 접근 시에만 프로필 완료 상태 확인
+      // 일반적인 접근 (직접 URL 입력 등)시에만 프로필 완료 상태 확인
       try {
         const response = await axiosInstance.get('/users/me');
         const result = response.data as MeApiResponse;
@@ -95,7 +93,7 @@ const CompleteProfilePage: React.FC = () => {
 
         setUser({ email: result.data.email });
         setForm((prev) => ({ ...prev, name: result.data.username }));
-        setIsInitializing(false); // 초기화 완료
+        setIsInitializing(false);
       } catch (error) {
         console.error('API Error:', error);
         showErrorToast('오류가 발생했습니다. 다시 로그인해주세요.');
@@ -188,7 +186,7 @@ const CompleteProfilePage: React.FC = () => {
             // 4. 추가 대기 시간 (AuthProvider 상태 업데이트 대기)
             await new Promise((resolve) => setTimeout(resolve, 500));
 
-            showSuccessToast('추가 정보 입력이 완료되었습니다! 서비스를 시작합니다.');
+            showSuccessToast('추가 정보 입력이 완료되었습니다!');
 
             // 프로필 완료 후 메인으로 이동
             navigate('/', { replace: true });

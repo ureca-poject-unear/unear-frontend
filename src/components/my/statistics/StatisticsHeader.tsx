@@ -8,19 +8,22 @@ import type { CategoryHighlight } from '@/hooks/my/statistics/useCategoryHighlig
 import './animations.css';
 
 interface StatisticsHeaderProps {
+  currentYear: number;
   currentMonth: number;
   totalDiscountAmount: number;
   progressBars: ProgressBar[];
   highlightedCategory: CategoryHighlight;
   onPrevMonth: () => void;
   onNextMonth: () => void;
+  canMoveToPrev: boolean;
+  canMoveToNext: boolean;
   onBarClick: (
     category: string,
     position: { x: number; y: number },
     percentage: number,
     categoryName: string
   ) => void;
-  onTooltipClose?: () => void; // 툴팁 닫기 핸들러 추가
+  onTooltipClose?: () => void;
   formatCurrency: (amount: number) => string;
 }
 
@@ -31,12 +34,15 @@ export interface StatisticsHeaderRef {
 const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
   (
     {
+      currentYear,
       currentMonth,
       totalDiscountAmount,
       progressBars,
       highlightedCategory,
       onPrevMonth,
       onNextMonth,
+      canMoveToPrev,
+      canMoveToNext,
       onBarClick,
       onTooltipClose,
       formatCurrency,
@@ -87,6 +93,18 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
       const clickY = rect.bottom;
 
       onBarClick(bar.category, { x: clickX, y: clickY }, bar.displayPercentage, bar.categoryName);
+    };
+
+    // 날짜 표시 포맷팅 함수
+    const formatDateDisplay = (year: number, month: number): string => {
+      const currentYear = new Date().getFullYear();
+
+      // 현재 년도면 월만 표시, 다른 년도면 년도도 표시
+      if (year === currentYear) {
+        return `${month}월`;
+      } else {
+        return `${year}년 ${month}월`;
+      }
     };
 
     const handlePrevMonth = () => {
@@ -153,15 +171,15 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
 
           {/* 월 네비게이션 */}
           <div className="flex items-center justify-center mb-4">
-            <button onClick={handlePrevMonth} disabled={currentMonth <= 1}>
-              <BackIcon
-                className={`w-5 h-5 ${currentMonth <= 1 ? 'text-gray-300' : 'text-black'}`}
-              />
+            <button onClick={handlePrevMonth} disabled={!canMoveToPrev}>
+              <BackIcon className={`w-5 h-5 ${!canMoveToPrev ? 'text-gray-300' : 'text-black'}`} />
             </button>
-            <span className="mx-2 pt-1 text-lm font-semibold text-black">{currentMonth}월</span>
-            <button onClick={handleNextMonth} disabled={currentMonth >= 7}>
+            <span className="mx-2 pt-1 text-lm font-semibold text-black">
+              {formatDateDisplay(currentYear, currentMonth)}
+            </span>
+            <button onClick={handleNextMonth} disabled={!canMoveToNext}>
               <BackIcon
-                className={`w-5 h-5 transform rotate-180 ${currentMonth >= 7 ? 'text-gray-300' : 'text-black'}`}
+                className={`w-5 h-5 transform rotate-180 ${!canMoveToNext ? 'text-gray-300' : 'text-black'}`}
               />
             </button>
           </div>

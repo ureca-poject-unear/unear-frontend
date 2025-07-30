@@ -13,7 +13,6 @@ export interface MembershipBenefit {
 
 // 통계 관련 타입
 export interface StatisticsData {
-  currentMonthSavings: string;
   accumulatedSavings: string;
   chartData: ChartDataItem[];
 }
