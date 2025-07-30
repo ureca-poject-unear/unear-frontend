@@ -15,7 +15,7 @@ import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
 import ChangePasswordPage from '@/pages/ChangePasswordPage';
 
-import KakaoRedirectHandler from '@/pages/auth/KakaoRedirectHandler';
+import KakaoCallback from '@/pages/auth/KakaoCallback';
 import CompleteProfilePage from '@/pages/CompleteProfilePage';
 import GoogleRedirectHandler from '@/pages/auth/GoogleRedirectHandler';
 import NaverAuthHandler from '@/pages/auth/NaverAuthHandler';
@@ -174,8 +174,13 @@ const router = createBrowserRouter([
       // 공개 라우트들 (로그인 불필요)
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignUpPage /> },
-      { path: '/login/oauth2/code/kakao', element: <KakaoRedirectHandler /> },
+
+      { path: '/complete-profile', element: <CompleteProfilePage /> },
+
       { path: '/login/oauth2/code/google', element: <GoogleRedirectHandler /> },
+
+      { path: '/login/oauth2/code/kakao', element: <KakaoCallback /> },
+
       { path: '/login/oauth2/code/naver', element: <NaverAuthHandler /> },
     ],
   },

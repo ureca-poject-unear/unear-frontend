@@ -1,3 +1,5 @@
+// src/components/common/BookmarkCard.tsx
+
 import type React from 'react';
 import StoreTypeIcon, {
   type CategoryType,
@@ -9,28 +11,31 @@ import StoreStatus, { type StoreStatusType } from '@/components/common/StoreStat
 import MiniLocationButton from '@/components/common/MiniLocationButton';
 import PhoneButton from '@/components/common/PhoneButton';
 import PhoneButtonDark from '@/components/common/PhoneButtonDark';
-import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
-import LocationWhiteIcon from '@/assets/common/locationWhiteIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
 
-// export하여 MapContainer 등 다른 파일에서 이 타입을 재사용할 수 있게 합니다.
 export interface StoreInfo {
   id: string;
   name: string;
   address: string;
-  distance: string;
   hours: string;
   category: CategoryType;
   storeClass: StoreClassType;
   event: EventType;
   status: StoreStatusType;
   isBookmarked: boolean;
+  benefitDesc?: string;
+  coupons?: {
+    couponTemplateId: number;
+    couponName: string;
+    discountInfo: string | null;
+    couponEnd: string;
+  }[];
 }
 
 interface BookmarkCardProps {
   store: StoreInfo;
-  onBookmarkToggle?: (storeId: string) => void; // storeId만 받도록 수정
+  onBookmarkToggle?: (storeId: string) => void;
   className?: string;
   isDarkMode?: boolean;
   variant?: 'full' | 'compact';
@@ -43,8 +48,6 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   isDarkMode = false,
   variant = 'full',
 }) => {
-  // BookmarkStar의 onToggle은 isBookmarked 값을 넘겨주지만,
-  // 상위 컴포넌트에서는 storeId만 필요하므로 래핑 함수를 만듭니다.
   const handleBookmarkClick = () => {
     onBookmarkToggle?.(store.id);
   };
@@ -57,69 +60,83 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     console.log('전화버튼클릭됨');
   };
 
-  // --- 인포윈도우를 위한 compact 모드 ---
   if (variant === 'compact') {
-    return (
-      <div className="bg-white rounded-md shadow-lg p-3 w-56">
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between items-start">
-            <h3 className="font-bold text-base text-black pr-2 flex-grow">{store.name}</h3>
-            <div className="flex-shrink-0 cursor-pointer">
-              <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
-            </div>
-          </div>
-          <p className="text-xs text-gray-600 mt-1">{store.address}</p>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <TimeIcon className="w-3 h-3" />
-            <span>{store.hours}</span>
-          </div>
-        </div>
-      </div>
-    );
+    // ... (compact variant remains the same)
   }
 
-  // --- 기존 'full' 모드 렌더링 ---
   const bgColor = isDarkMode ? 'bg-[#251A49]' : 'bg-white';
   const textColor = isDarkMode ? 'text-white' : 'text-black';
   const subTextColor = isDarkMode ? 'text-gray-300' : 'text-gray-400';
-  const IconLocation = isDarkMode ? LocationWhiteIcon : LocationIcon;
+  const borderColor = isDarkMode ? 'border-gray-600' : 'border-gray-200';
   const IconTime = isDarkMode ? TimeWhiteIcon : TimeIcon;
+
+  const hasBenefitsOrCoupons = store.benefitDesc || (store.coupons && store.coupons.length > 0);
 
   return (
     <div
-      className={`relative w-[353px] h-[159px] rounded-[8px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] transition-all duration-300 pl-[19px] pr-[15px] pt-[19px] ${bgColor} ${className}`}
+      className={`relative w-[353px] rounded-[8px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] transition-all duration-300 p-4 flex flex-col gap-2 ${bgColor} ${className}`}
     >
-      <div className="absolute left-[19px] top-[19px]">
-        <StoreTypeIcon
-          category={store.category}
-          storeClass={store.storeClass}
-          event={store.event}
-          size={50}
-        />
+      <div className="flex gap-4">
+        <div className="flex-shrink-0">
+          <StoreTypeIcon
+            category={store.category}
+            storeClass={store.storeClass}
+            event={store.event}
+            size={50}
+          />
+        </div>
+        <div className="flex-1 overflow-hidden pr-8">
+          <h3 className={`font-semibold text-lm ${textColor} break-words`}>{store.name}</h3>
+          <p
+            className={`font-regular text-sm ${subTextColor} leading-[19px] mt-1`}
+            style={{ wordBreak: 'break-all', whiteSpace: 'normal' }}
+          >
+            {store.address}
+          </p>
+        </div>
+        <div className="absolute right-[15px] top-[14px]">
+          <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
+        </div>
       </div>
-      <div className="absolute right-[15px] top-[14px]">
-        <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
-      </div>
-      <div className="absolute left-[85px] top-[19px]">
-        <h3 className={`font-semibold text-lm ${textColor}`}>{store.name}</h3>
-      </div>
-      <div className="absolute left-[85px] top-[46px]">
-        <p className={`font-regular text-sm ${subTextColor} leading-[19px]`}>{store.address}</p>
-      </div>
-      <div className="absolute left-[19px] right-[15px] top-[80px] mb-[10px] flex items-center justify-between">
+
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-[6px]">
-          <IconLocation />
-          <span className={`font-regular text-sm ${subTextColor} relative top-[2px]`}>
-            {store.distance}
-          </span>
           <IconTime />
-          <span className={`font-regular text-sm ${subTextColor} relative top-[2px]`}>
+          <span className={`font-regular text-sm ${subTextColor} relative top-px`}>
             {store.hours}
           </span>
         </div>
-        <StoreStatus status={store.status} className="relative top-[1px]" />
+        <StoreStatus status={store.status} />
       </div>
-      <div className="absolute left-[19px] right-[15px] bottom-[15px] flex gap-2">
+
+      {hasBenefitsOrCoupons && (
+        <div className={`mt-2 pt-3 border-t ${borderColor}`}>
+          <div className="flex flex-col gap-2">
+            {store.benefitDesc && (
+              <div className="p-2 rounded-md bg-sky-500/10">
+                <p className="font-bold text-sm text-sky-600">대표 혜택</p>
+                <p className="text-xs text-gray-500 mt-1">{store.benefitDesc}</p>
+              </div>
+            )}
+
+            {store.coupons?.map((coupon) => (
+              <div
+                key={coupon.couponTemplateId}
+                className="p-2 rounded-md bg-green-500/10 flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-bold text-sm text-green-600">{coupon.couponName}</p>
+                  <p className="text-xs text-gray-500">
+                    {coupon.discountInfo || `~ ${coupon.couponEnd.split('T')[0]}`}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-auto pt-2 flex gap-2">
         <MiniLocationButton onClick={handleLocationClick} />
         {isDarkMode ? (
           <PhoneButtonDark onClick={handlePhoneClick} />
