@@ -47,17 +47,17 @@ const BottomSheetEvent = ({ isOpen, onClose }: BottomSheetEventProps) => {
         {/* 아이콘들 */}
         <div className="absolute left-[63px] top-[369px] flex gap-[40px] z-10">
           {/* 프랜차이즈 매장 아이콘 */}
-          <div className="w-[34px] h-[34px] rounded-full bg-[#E6007E] flex items-center justify-center">
-            <CoffeeIcon className="w-5 h-5 text-white" />
-          </div>
-
-          {/* 소상공인 매장 아이콘 */}
           <div className="w-[34px] h-[34px] rounded-full bg-[#FF860D] flex items-center justify-center">
             <CoffeeIcon className="w-5 h-5 text-white" />
           </div>
 
-          {/* 이번주니어 매장 아이콘 */}
+          {/* 소상공인 매장 아이콘 */}
           <div className="w-[34px] h-[34px] rounded-full bg-[#3B82F6] flex items-center justify-center">
+            <CoffeeIcon className="w-5 h-5 text-white" />
+          </div>
+
+          {/* 이번주니어 매장 아이콘 */}
+          <div className="w-[34px] h-[34px] rounded-full bg-primary flex items-center justify-center">
             <CoffeeIcon className="w-5 h-5 text-white" />
           </div>
 
