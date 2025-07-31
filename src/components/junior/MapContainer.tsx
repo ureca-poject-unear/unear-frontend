@@ -106,7 +106,7 @@ const MapContainer = ({ onMarkerSelect, onBookmarkToggle }: MapContainerProps) =
         strokeWeight: 5,
         strokeColor: '#DFA2A2',
         strokeOpacity: 1,
-        strokeStyle: 'longdash',
+        strokeStyle: 'shortdash',
         fillColor: '#F316B0',
         fillOpacity: 0.08,
       });
