@@ -1,4 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+
+// 상품의 타입을 정의합니다.
+interface Prize {
+  id: number;
+  prizeName: string;
+  probability: number;
+}
 
 // Tailwind 클래스명 → 실제 색상값 매핑 (conic-gradient에 색상값 필요)
 const tailwindColors = {
@@ -6,8 +13,8 @@ const tailwindColors = {
   'bg-pink-100': '#FCE7F3',
 };
 
-// prizeData를 컴포넌트 밖으로 빼서 초기값 계산 시에도 참조할 수 있도록 함
-const prizeData = [
+// prizeData에 Prize[] 타입을 명시합니다.
+const prizeData: Prize[] = [
   { id: 1, prizeName: '스타벅스\n아메리카노', probability: 90 },
   { id: 2, prizeName: '베스킨라빈스\n파인트', probability: 0.75 },
   { id: 3, prizeName: 'LG\ngram', probability: 0.15 },
@@ -26,34 +33,39 @@ const ProbabilityRoulette = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [apiMessage, setApiMessage] = useState('');
 
+  // 로컬스토리지 키를 상수로 관리하여 실수를 방지합니다.
+  const ROULETTE_HAS_SPUN_KEY = 'rouletteHasSpun';
+  const ROULETTE_RESULT_KEY = 'rouletteResult';
+
   // 로컬스토리지 값으로 상태 초기화
   const [hasSpun, setHasSpun] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('rouletteHasSpun') === 'true';
+      return localStorage.getItem(ROULETTE_HAS_SPUN_KEY) === 'true';
     }
     return false;
   });
 
-  const [result, setResult] = useState<any>(() => {
+  // [수정 1] useState의 제네릭 타입을 <Prize | null>로 명확히 지정합니다.
+  const [result, setResult] = useState<Prize | null>(() => {
     if (typeof window !== 'undefined') {
-      const savedResult = localStorage.getItem('rouletteResult');
-      return savedResult ? JSON.parse(savedResult) : null;
+      const savedResult = localStorage.getItem(ROULETTE_RESULT_KEY);
+      return savedResult ? (JSON.parse(savedResult) as Prize) : null;
     }
     return null;
   });
 
   const [showResult, setShowResult] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('rouletteHasSpun') === 'true';
+      return localStorage.getItem(ROULETTE_HAS_SPUN_KEY) === 'true';
     }
     return false;
   });
 
   const [rotation, setRotation] = useState(() => {
     if (typeof window !== 'undefined') {
-      const savedResultItem = localStorage.getItem('rouletteResult');
+      const savedResultItem = localStorage.getItem(ROULETTE_RESULT_KEY);
       if (savedResultItem) {
-        const savedResult = JSON.parse(savedResultItem);
+        const savedResult = JSON.parse(savedResultItem) as Prize;
         const savedIndex = prizeData.findIndex((item) => item.id === savedResult.id);
         if (savedIndex !== -1) {
           return 360 - savedIndex * sectionAngle - sectionAngle / 2;
@@ -63,8 +75,8 @@ const ProbabilityRoulette = () => {
     return 0;
   });
 
-  // 백엔드로 결과를 전송하는 함수
-  const sendResultToBackend = async (prize) => {
+  // [수정 2] prize 매개변수에 Prize 타입을 명시합니다.
+  const sendResultToBackend = async (prize: Prize) => {
     setIsSaving(true);
     setApiMessage('');
 
@@ -82,10 +94,9 @@ const ProbabilityRoulette = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          // [핵심 수정] body에 participated 필드를 추가합니다.
           body: JSON.stringify({
             reward: prize.prizeName.replace('\n', ' '),
-            participated: 1, // 참여했으므로 true 값을 함께 보냅니다.
+            participated: 1,
           }),
         }
       );
@@ -99,10 +110,15 @@ const ProbabilityRoulette = () => {
       console.log('서버 저장 성공:', responseData);
     } catch (error) {
       console.error('API 요청 오류:', error);
-      if (error.message.includes('Failed to fetch')) {
-        setApiMessage('오류: 서버에 연결할 수 없습니다. 네트워크나 CORS 설정을 확인해주세요.');
+      // [수정 3] catch 블록의 error 타입을 안전하게 처리합니다.
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          setApiMessage('오류: 서버에 연결할 수 없습니다. 네트워크나 CORS 설정을 확인해주세요.');
+        } else {
+          setApiMessage(`오류: ${error.message}`);
+        }
       } else {
-        setApiMessage(`오류: ${error.message}`);
+        setApiMessage('알 수 없는 타입의 오류가 발생했습니다.');
       }
     } finally {
       setIsSaving(false);
@@ -139,8 +155,9 @@ const ProbabilityRoulette = () => {
       setIsSpinning(false);
       setShowResult(true);
 
-      localStorage.setItem('hasSpunRoulette', 'true');
-      localStorage.setItem('rouletteResult', JSON.stringify(finalResult));
+      // [수정 4] 로컬스토리지 저장 시 키 값을 통일합니다.
+      localStorage.setItem(ROULETTE_HAS_SPUN_KEY, 'true');
+      localStorage.setItem(ROULETTE_RESULT_KEY, JSON.stringify(finalResult));
 
       sendResultToBackend(finalResult);
     }, 4000);
@@ -164,7 +181,7 @@ const ProbabilityRoulette = () => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-6 text-white">
       <div className="relative w-80 h-80 max-w-sm rounded-full bg-gray-100 shadow-2xl mb-8">
-        {/* ... 룰렛 판 UI ... */}
+        {/* ... (UI 부분은 동일) ... */}
         {/* 핀 */}
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
           <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[15px] border-l-transparent border-r-transparent border-b-pink-500" />
