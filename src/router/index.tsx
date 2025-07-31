@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/membership/detail/:benefitId',
+        path: '/membership/detail/:franchiseId',
         element: (
           <ProtectedRoute>
             <MembershipDetailPage />
