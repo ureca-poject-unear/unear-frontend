@@ -98,7 +98,7 @@ const TodayCouponSection: React.FC = () => {
   };
 
   useEffect(() => {
-    const couponId = 45; // 백엔드와 약속된 실제 쿠폰 템플릿 ID
+    const couponId = 326; // 백엔드와 약속된 실제 쿠폰 템플릿 ID
     checkCouponStatus(couponId);
   }, []);
 

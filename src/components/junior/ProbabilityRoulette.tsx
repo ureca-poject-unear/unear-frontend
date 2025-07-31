@@ -1,14 +1,21 @@
+// src/components/junior/ProbabilityRoulette.tsx (수정된 최종 코드)
+
 import { useState } from 'react';
 
 // 상품의 타입을 정의합니다.
-interface Prize {
+export interface Prize {
   id: number;
   prizeName: string;
   probability: number;
 }
 
-// Tailwind 클래스명 → 실제 색상값 매핑 (conic-gradient에 색상값 필요)
-const tailwindColors = {
+// 부모 컴포넌트로부터 받을 props의 타입을 정의합니다.
+interface Props {
+  onFinish: (prize: Prize) => void; // 룰렛이 멈추면 호출될 콜백 함수
+}
+
+// Tailwind 클래스명 → 실제 색상값 매핑
+const tailwindColors: { [key: string]: string } = {
   'bg-white': '#FFFFFF',
   'bg-pink-100': '#FCE7F3',
 };
@@ -25,105 +32,9 @@ const prizeData: Prize[] = [
 
 const sectionAngle = 360 / prizeData.length;
 
-// 룰렛 이벤트 ID를 상수로 정의 (이 값은 실제 이벤트 ID에 맞춰야 합니다)
-const ROULETTE_EVENT_ID = 1;
-
-const ProbabilityRoulette = () => {
+const ProbabilityRoulette: React.FC<Props> = ({ onFinish }) => {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [apiMessage, setApiMessage] = useState('');
-
-  // 로컬스토리지 키를 상수로 관리하여 실수를 방지합니다.
-  const ROULETTE_HAS_SPUN_KEY = 'rouletteHasSpun';
-  const ROULETTE_RESULT_KEY = 'rouletteResult';
-
-  // 로컬스토리지 값으로 상태 초기화
-  const [hasSpun, setHasSpun] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(ROULETTE_HAS_SPUN_KEY) === 'true';
-    }
-    return false;
-  });
-
-  // [수정 1] useState의 제네릭 타입을 <Prize | null>로 명확히 지정합니다.
-  const [result, setResult] = useState<Prize | null>(() => {
-    if (typeof window !== 'undefined') {
-      const savedResult = localStorage.getItem(ROULETTE_RESULT_KEY);
-      return savedResult ? (JSON.parse(savedResult) as Prize) : null;
-    }
-    return null;
-  });
-
-  const [showResult, setShowResult] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(ROULETTE_HAS_SPUN_KEY) === 'true';
-    }
-    return false;
-  });
-
-  const [rotation, setRotation] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedResultItem = localStorage.getItem(ROULETTE_RESULT_KEY);
-      if (savedResultItem) {
-        const savedResult = JSON.parse(savedResultItem) as Prize;
-        const savedIndex = prizeData.findIndex((item) => item.id === savedResult.id);
-        if (savedIndex !== -1) {
-          return 360 - savedIndex * sectionAngle - sectionAngle / 2;
-        }
-      }
-    }
-    return 0;
-  });
-
-  // [수정 2] prize 매개변수에 Prize 타입을 명시합니다.
-  const sendResultToBackend = async (prize: Prize) => {
-    setIsSaving(true);
-    setApiMessage('');
-
-    try {
-      const token = sessionStorage.getItem('temp_access_token');
-      if (!token) {
-        throw new Error('로그인 정보가 없습니다. 다시 로그인해주세요.');
-      }
-
-      const response = await fetch(
-        `https://dev.unear.site/api/app/roulette/spin/${ROULETTE_EVENT_ID}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            reward: prize.prizeName.replace('\n', ' '),
-            participated: 1,
-          }),
-        }
-      );
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || '알 수 없는 오류가 발생했습니다.');
-      }
-
-      console.log('서버 저장 성공:', responseData);
-    } catch (error) {
-      console.error('API 요청 오류:', error);
-      // [수정 3] catch 블록의 error 타입을 안전하게 처리합니다.
-      if (error instanceof Error) {
-        if (error.message.includes('Failed to fetch')) {
-          setApiMessage('오류: 서버에 연결할 수 없습니다. 네트워크나 CORS 설정을 확인해주세요.');
-        } else {
-          setApiMessage(`오류: ${error.message}`);
-        }
-      } else {
-        setApiMessage('알 수 없는 타입의 오류가 발생했습니다.');
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const [rotation, setRotation] = useState(0);
 
   const getRandomResult = () => {
     const random = Math.random() * 100;
@@ -132,35 +43,30 @@ const ProbabilityRoulette = () => {
       cumulative += prizeData[i].probability;
       if (random <= cumulative) return i;
     }
-    return 0;
+    return 0; // 혹시 모를 예외 상황 대비
   };
 
   const handleClick = () => {
-    if (isSpinning || hasSpun || isSaving) return;
+    if (isSpinning) return;
     setIsSpinning(true);
-    setShowResult(false);
-    setApiMessage('');
 
     const selectedIndex = getRandomResult();
-    const minFullSpins = 3;
+    const minFullSpins = 4; // 최소 회전 바퀴 수
+    // 최종 각도 계산: (최소 회전 수 * 360) + (목표 아이템 위치 각도) + (약간의 랜덤성)
     const targetRotation =
       360 * minFullSpins + (360 - selectedIndex * sectionAngle - sectionAngle / 2);
 
     setRotation(targetRotation);
-    setHasSpun(true);
 
+    // CSS transition 시간과 동일하게 설정
     setTimeout(() => {
       const finalResult = prizeData[selectedIndex];
-      setResult(finalResult);
-      setIsSpinning(false);
-      setShowResult(true);
+      // [핵심] 애니메이션 종료 후, 부모에게 결과값을 전달
+      onFinish(finalResult);
 
-      // [수정 4] 로컬스토리지 저장 시 키 값을 통일합니다.
-      localStorage.setItem(ROULETTE_HAS_SPUN_KEY, 'true');
-      localStorage.setItem(ROULETTE_RESULT_KEY, JSON.stringify(finalResult));
-
-      sendResultToBackend(finalResult);
-    }, 4000);
+      // 스핀이 끝나면 UI 상태를 초기화할 수 있지만,
+      // 모달이 닫히므로 굳이 isSpinning을 false로 바꿀 필요는 없습니다.
+    }, 4000); // transition duration 4s
   };
 
   const generateConicGradient = () => {
@@ -179,11 +85,10 @@ const ProbabilityRoulette = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-white">
+    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-black">
       <div className="relative w-80 h-80 max-w-sm rounded-full bg-gray-100 shadow-2xl mb-8">
-        {/* ... (UI 부분은 동일) ... */}
         {/* 핀 */}
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 rotate-180 z-20">
           <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[15px] border-l-transparent border-r-transparent border-b-pink-500" />
         </div>
 
@@ -236,36 +141,17 @@ const ProbabilityRoulette = () => {
           <button
             className="w-20 h-20 rounded-full bg-pink-500 text-white text-lg font-bold flex items-center justify-center hover:bg-pink-600 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleClick}
-            disabled={isSpinning || hasSpun || isSaving}
+            disabled={isSpinning}
           >
-            {isSpinning || isSaving ? '' : hasSpun ? '완료' : '도전'}
+            {isSpinning ? '' : '도전'}
           </button>
         </div>
       </div>
-
-      {/* 결과 표시 */}
-      {showResult && result && (
-        <div className="p-4 bg-white text-black rounded-xl shadow-xl animate-bounce max-w-sm w-full text-center">
-          <p className="text-lg text-pink-500 font-semibold">
-            {result.prizeName.replace('\n', ' ')}
-          </p>
-        </div>
-      )}
-
-      {/* 로딩 및 API 메시지 표시 */}
-      {(isSpinning || isSaving) && (
+      {isSpinning && (
         <div className="mt-4 flex items-center gap-2">
-          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-          <span className="text-sm">
-            {isSpinning ? '두근두근...' : '결과를 저장하고 있어요...'}
-          </span>
+          <div className="animate-spin w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full"></div>
+          <span className="text-sm text-black">두근두근...</span>
         </div>
-      )}
-
-      {apiMessage && (
-        <p className="mt-2 text-sm text-center font-semibold text-white bg-black bg-opacity-30 px-3 py-1 rounded-full">
-          {apiMessage}
-        </p>
       )}
     </div>
   );
