@@ -397,6 +397,8 @@ const MapPage = () => {
           onCouponClick={(userCouponId, brand) => {
             console.log('Coupon clicked:', userCouponId, brand);
           }}
+          mapRef={mapRef}
+          onMarkerClick={handleMarkerClick}
         />
       )}
     </div>

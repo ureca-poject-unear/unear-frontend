@@ -11,6 +11,7 @@ import type { StoreData } from '@/types/storeDetail';
 import type { UserCouponDetail } from '@/types/coupon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
 import type { CategoryType } from '@/components/common/StoreTypeIcon';
+import type { MapContainerRef } from '@/components/map/MapContainer';
 
 interface Props {
   results: Place[];
@@ -22,6 +23,8 @@ interface Props {
   onBookmarkToggle: (placeId: number) => void;
   onCouponDownloaded: () => void;
   onCouponClick: (userCouponId: number, brand: string) => void;
+  mapRef: React.RefObject<MapContainerRef | null>;
+  onMarkerClick: (placeId: number, lat: string, lng: string) => void;
 }
 
 const BottomSheetSearchList = ({
@@ -33,6 +36,8 @@ const BottomSheetSearchList = ({
   currentLng,
   onCouponDownloaded,
   onCouponClick,
+  mapRef,
+  onMarkerClick,
 }: Props) => {
   const [storeList, setStoreList] = useState<StoreData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -168,7 +173,16 @@ const BottomSheetSearchList = ({
                       discountInfo: coupon.discountInfo,
                     })),
                   }}
-                  onLocationClick={() => {}}
+                  onLocationClick={(lat, lng) => {
+                    if (!mapRef?.current) {
+                      console.warn('mapRef is not available');
+                      return;
+                    }
+                    mapRef.current.setCenter(lat, lng);
+                    mapRef.current.setSelectedMarker(store.placeId);
+                    onClose();
+                    onMarkerClick(store.placeId, String(lat), String(lng));
+                  }}
                   onBookmarkToggle={() => handleBookmarkToggle(store.placeId)}
                   onCouponDownloaded={() => handleCouponDownloaded(store.placeId)}
                   onCouponClick={(userCouponId) => handleCardClick(userCouponId, store.name)}

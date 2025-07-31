@@ -128,6 +128,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       },
       selectMarker: (placeId: number) => {
         setSelectedPlaceId(placeId);
+        selectedPlaceIdRef.current = placeId;
       },
       getCenter: () => {
         const map = mapInstanceRef.current;
