@@ -1,12 +1,10 @@
-// src/components/junior/StampRouletteCard.tsx (수정된 최종 코드)
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MiniButton from '@/components/common/MiniButton';
 import CommonModal from '@/components/common/CommonModal';
 import type { Prize } from '@/components/junior/ProbabilityRoulette';
-import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette'; // Prize 타입을 함께 import
-import { sendRouletteResult } from '@/apis/roulette'; // 수정된 API 함수를 import
+import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette';
+import { sendRouletteResult } from '@/apis/roulette';
 
 type Stamp = {
   name: string;
@@ -30,11 +28,19 @@ const StampRouletteCard: React.FC<Props> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const [isRouletteSpun, setIsRouletteSpun] = useState(initialIsSpun);
-  const [isProcessing, setIsProcessing] = useState(false); // 'isSpinning'에서 'isProcessing'으로 이름 변경 (API 통신 포함)
+  // localStorage에서 값을 읽어와 초기 상태를 설정합니다.
+  const [isRouletteSpun, setIsRouletteSpun] = useState(() => {
+    const hasSpun = localStorage.getItem('rouletteHasSpun');
+    // initialIsSpun은 서버에서 내려주는 초기값으로 우선 고려하고,
+    // localStorage 값으로 덮어씁니다.
+    return initialIsSpun || hasSpun === 'true';
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    setIsRouletteSpun(initialIsSpun);
+    // initialIsSpun prop이 변경될 때도 localStorage 값을 함께 고려하여 상태를 업데이트합니다.
+    const hasSpun = localStorage.getItem('rouletteHasSpun');
+    setIsRouletteSpun(initialIsSpun || hasSpun === 'true');
   }, [initialIsSpun]);
 
   const displayStamps: Stamp[] = [...stamps];
@@ -59,27 +65,25 @@ const StampRouletteCard: React.FC<Props> = ({
       navigate('/login');
       return;
     }
-    // 단순히 모달만 열어줍니다.
     setIsModalOpen(true);
   };
 
-  // [핵심] ProbabilityRoulette 컴포넌트가 결과를 반환하면 호출될 함수
   const handleRouletteFinish = async (prize: Prize) => {
-    setIsProcessing(true); // 처리 시작
-    setIsModalOpen(false); // 모달 먼저 닫기
+    setIsProcessing(true);
+    setIsModalOpen(false);
 
     try {
-      // API를 호출하여 결과 값을 백엔드에 전송
       await sendRouletteResult(eventId, prize.prizeName);
-      setIsRouletteSpun(true); // 참여 완료 상태로 변경
+
+      // API 호출 성공 시 localStorage에 상태를 저장하고, React 상태를 업데이트합니다.
+      localStorage.setItem('rouletteHasSpun', 'true'); // [핵심] 로컬 스토리지에 기록
+      setIsRouletteSpun(true);
+
       alert(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨되셨습니다!`);
     } catch (error) {
-      // 에러 처리
       alert(error instanceof Error ? error.message : '룰렛 결과 저장 중 오류가 발생했습니다.');
-      // 실패 시, 룰렛을 다시 돌릴 수 있도록 상태를 원복시킬지 여부는 정책에 따라 결정
-      // 예: setIsRouletteSpun(false);
     } finally {
-      setIsProcessing(false); // 처리 종료
+      setIsProcessing(false);
     }
   };
 
@@ -206,10 +210,6 @@ const StampRouletteCard: React.FC<Props> = ({
         </div>
       </div>
       <CommonModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="행운의 룰렛">
-        {/*
-          ProbabilityRoulette 컴포넌트에 onFinish 콜백 함수를 전달합니다.
-          룰렛이 멈추면 이 함수가 결과값과 함께 호출됩니다.
-        */}
         <ProbabilityRoulette onFinish={handleRouletteFinish} />
       </CommonModal>
     </div>
