@@ -17,6 +17,7 @@ import type { UserCoupon, UserCouponDetail } from '@/types/coupon';
 import type { NearbyStore, NearbyCoupon } from '@/types/store';
 import type { MapContainerRef } from '@/components/map/MapContainer';
 import type { RefObject } from 'react';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 interface BottomSheetCouponProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
   const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [nearbyStores, setNearbyStores] = useState<NearbyStore[]>([]);
   const [shouldRefreshNearby, setShouldRefreshNearby] = useState(false);
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
+  const [isLoadingNearbyStores, setIsLoadingNearbyStores] = useState(false);
 
   const handleCardClick = async (couponId: number) => {
     try {
@@ -97,8 +100,10 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
 
   useEffect(() => {
     const fetchCoupons = async () => {
+      setIsLoadingCoupons(true);
       const { coupons } = await getUserCoupons();
       setCoupons(coupons);
+      setIsLoadingCoupons(false);
     };
 
     fetchCoupons();
@@ -113,20 +118,24 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
           alert('위치 정보를 사용할 수 없습니다.');
           return;
         }
+        setIsLoadingNearbyStores(true);
 
         navigator.geolocation.getCurrentPosition(
           async ({ coords }) => {
             const stores = await getNearbyStores(coords.latitude, coords.longitude);
             setNearbyStores(stores);
             setShouldRefreshNearby(false);
+            setIsLoadingNearbyStores(false);
           },
           (err) => {
             console.error('위치 정보 실패:', err);
             alert('위치 정보를 가져올 수 없습니다.');
+            setIsLoadingNearbyStores(false);
           }
         );
       } catch (e) {
         console.error('근처 매장 불러오기 실패:', e);
+        setIsLoadingNearbyStores(false);
       }
     };
 
@@ -175,131 +184,141 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
 
           {/* 콘텐츠 영역: 스크롤 대상 */}
           <div className="flex-1 overflow-y-auto">
-            {activeTab === 'couponbox' && (
-              <div className="space-y-4">
-                {/* 곧 만료 예정 */}
-                <div className="mt-4 ml-5 mr-5">
-                  <div className="flex items-center gap-x-2 mb-2">
-                    <ClockIcon className="w-4 h-4 shrink-0" />
-                    <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
-                      곧 만료 예정
-                    </span>
-                    <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
-                      <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                        {expiringSoonCoupons.length}개
+            {activeTab === 'couponbox' &&
+              (isLoadingCoupons ? (
+                <div className="flex justify-center items-center h-full">
+                  <LoadingSpinner size="lg" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* 곧 만료 예정 */}
+                  <div className="mt-4 ml-5 mr-5">
+                    <div className="flex items-center gap-x-2 mb-2">
+                      <ClockIcon className="w-4 h-4 shrink-0" />
+                      <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
+                        곧 만료 예정
                       </span>
+                      <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
+                        <span className="text-s font-semibold text-pink-700 mt-[3px]">
+                          {expiringSoonCoupons.length}개
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {expiringSoonCoupons.map((coupon) => (
+                        <CouponCard
+                          key={`soon-${coupon.userCouponId}`}
+                          brand={coupon.name}
+                          title={coupon.couponName}
+                          validUntil={coupon.couponEnd}
+                          category={coupon.categoryCode}
+                          storeClass={coupon.markerCode}
+                          onClick={() => handleCardClick(coupon.userCouponId)}
+                        />
+                      ))}
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    {expiringSoonCoupons.map((coupon) => (
-                      <CouponCard
-                        key={`soon-${coupon.userCouponId}`}
-                        brand={coupon.name}
-                        title={coupon.couponName}
-                        validUntil={coupon.couponEnd}
-                        category={coupon.categoryCode}
-                        storeClass={coupon.markerCode}
-                        onClick={() => handleCardClick(coupon.userCouponId)}
-                      />
-                    ))}
+                  {/* 전체 쿠폰 */}
+                  <div className="mt-6 ml-5 mr-5 pb-[10px]">
+                    <div className="flex items-center gap-x-2 mb-2">
+                      <MapCouponIcon className="w-5 h-5 shrink-0" />
+                      <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
+                        전체 쿠폰
+                      </span>
+                      <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
+                        <span className="text-s font-semibold text-pink-700 mt-[3px]">
+                          {coupons.length}개
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-[14px]">
+                      {coupons.map((coupon) => (
+                        <CouponCard
+                          key={`all-${coupon.userCouponId}`}
+                          brand={coupon.name}
+                          title={coupon.couponName}
+                          validUntil={coupon.couponEnd}
+                          category={coupon.categoryCode}
+                          storeClass={coupon.markerCode}
+                          onClick={() => handleCardClick(coupon.userCouponId)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
+              ))}
 
-                {/* 전체 쿠폰 */}
-                <div className="mt-6 ml-5 mr-5 pb-[10px]">
+            {activeTab === 'nearby' &&
+              (isLoadingNearbyStores ? (
+                <div className="flex justify-center items-center h-full">
+                  <LoadingSpinner size="lg" />
+                </div>
+              ) : (
+                <div className="mt-4 ml-5 mr-5 pb-[10px]">
                   <div className="flex items-center gap-x-2 mb-2">
-                    <MapCouponIcon className="w-5 h-5 shrink-0" />
+                    <MarkerIcon className="w-4 h-4 shrink-0" />
                     <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
-                      전체 쿠폰
+                      가까운 매장
                     </span>
                     <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
                       <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                        {coupons.length}개
+                        {nearbyStores.length}개
                       </span>
                     </div>
                   </div>
+                  <div className="flex flex-col items-center gap-[23px]">
+                    {nearbyStores.map((store) => {
+                      const now = new Date();
+                      const currentHour = now.getHours();
+                      const openHour = Number(store.startTime);
+                      const closeHour = Number(store.endTime);
 
-                  <div className="space-y-[14px]">
-                    {coupons.map((coupon) => (
-                      <CouponCard
-                        key={`all-${coupon.userCouponId}`}
-                        brand={coupon.name}
-                        title={coupon.couponName}
-                        validUntil={coupon.couponEnd}
-                        category={coupon.categoryCode}
-                        storeClass={coupon.markerCode}
-                        onClick={() => handleCardClick(coupon.userCouponId)}
-                      />
-                    ))}
+                      const isOpen = currentHour >= openHour && currentHour < closeHour;
+                      const status: StoreStatusType = isOpen ? '영업중' : '영업종료';
+
+                      return (
+                        <StoreCouponCard
+                          key={`${store.placeId}-${store.favorite}`}
+                          store={{
+                            id: String(store.placeId),
+                            name: store.name,
+                            address: store.address,
+                            distance: `${store.distanceKm}km`,
+                            hours: `${store.startTime}:00 - ${store.endTime}:00`,
+                            category: store.categoryCode as CategoryType,
+                            status,
+                            isBookmarked: store.favorite,
+                            latitude: store.latitude,
+                            longitude: store.longitude,
+                            tel: store.tel,
+                            coupons: store.coupons.map((coupon: NearbyCoupon) => ({
+                              id: String(coupon.couponTemplateId),
+                              title: coupon.couponName,
+                              expiryDate: coupon.couponEnd.split('T')[0].replace(/-/g, '.'),
+                              downloaded: coupon.downloaded,
+                              userCouponId: coupon.userCouponId,
+                              discountCode: coupon.discountCode,
+                              membershipCode: coupon.membershipCode,
+                              discountInfo: coupon.discountInfo,
+                            })),
+                          }}
+                          onLocationClick={(lat, lng) => {
+                            if (!mapRef.current) return;
+                            mapRef.current.setCenter(lat, lng);
+                            onClose();
+                          }}
+                          onBookmarkToggle={handleBookmarkToggle}
+                          onCouponDownloaded={handleCouponDownloaded}
+                          onCouponClick={handleCardClick}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'nearby' && (
-              <div className="mt-4 ml-5 mr-5 pb-[10px]">
-                <div className="flex items-center gap-x-2 mb-2">
-                  <MarkerIcon className="w-4 h-4 shrink-0" />
-                  <span className="text-lm font-semibold whitespace-nowrap relative top-[2px]">
-                    가까운 매장
-                  </span>
-                  <div className="w-[48px] h-[18px] bg-pink-100 rounded-[12px] flex items-center justify-center flex-shrink-0 relative top-[1px]">
-                    <span className="text-s font-semibold text-pink-700 mt-[3px]">
-                      {nearbyStores.length}개
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center gap-[23px]">
-                  {nearbyStores.map((store) => {
-                    const now = new Date();
-                    const currentHour = now.getHours();
-                    const openHour = Number(store.startTime);
-                    const closeHour = Number(store.endTime);
-
-                    const isOpen = currentHour >= openHour && currentHour < closeHour;
-                    const status: StoreStatusType = isOpen ? '영업중' : '영업종료';
-
-                    return (
-                      <StoreCouponCard
-                        key={`${store.placeId}-${store.favorite}`}
-                        store={{
-                          id: String(store.placeId),
-                          name: store.name,
-                          address: store.address,
-                          distance: `${store.distanceKm}km`,
-                          hours: `${store.startTime}:00 - ${store.endTime}:00`,
-                          category: store.categoryCode as CategoryType,
-                          status,
-                          isBookmarked: store.favorite,
-                          latitude: store.latitude,
-                          longitude: store.longitude,
-                          tel: store.tel,
-                          coupons: store.coupons.map((coupon: NearbyCoupon) => ({
-                            id: String(coupon.couponTemplateId),
-                            title: coupon.couponName,
-                            expiryDate: coupon.couponEnd.split('T')[0].replace(/-/g, '.'),
-                            downloaded: coupon.downloaded,
-                            userCouponId: coupon.userCouponId,
-                            discountCode: coupon.discountCode,
-                            membershipCode: coupon.membershipCode,
-                            discountInfo: coupon.discountInfo,
-                          })),
-                        }}
-                        onLocationClick={(lat, lng) => {
-                          if (!mapRef.current) return;
-                          mapRef.current.setCenter(lat, lng);
-                          onClose();
-                        }}
-                        onBookmarkToggle={handleBookmarkToggle}
-                        onCouponDownloaded={handleCouponDownloaded}
-                        onCouponClick={handleCardClick}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+              ))}
           </div>
         </div>
       </BottomSheet>
