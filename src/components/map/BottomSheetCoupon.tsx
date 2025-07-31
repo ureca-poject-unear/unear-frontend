@@ -23,9 +23,10 @@ interface BottomSheetCouponProps {
   isOpen: boolean;
   onClose: () => void;
   mapRef: RefObject<MapContainerRef | null>;
+  onMarkerClick: (placeId: number, lat: string, lng: string) => void;
 }
 
-const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) => {
+const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomSheetCouponProps) => {
   const [activeTab, setActiveTab] = useState<'couponbox' | 'nearby'>('couponbox');
   const [selectedCoupon, setSelectedCoupon] = useState<UserCouponDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,7 +63,6 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
     } catch (error) {
       console.error('즐겨찾기 변경 실패:', error);
       alert('즐겨찾기 변경에 실패했습니다.');
-      // 실패했으므로 원래대로 롤백
       setNearbyStores((prev) =>
         prev.map((store) =>
           String(store.placeId) === storeId ? { ...store, favorite: isBookmarked } : store
@@ -308,7 +308,9 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef }: BottomSheetCouponProps) 
                           onLocationClick={(lat, lng) => {
                             if (!mapRef.current) return;
                             mapRef.current.setCenter(lat, lng);
+                            mapRef.current.selectMarker?.(Number(store.placeId));
                             onClose();
+                            onMarkerClick(Number(store.placeId), String(lat), String(lng));
                           }}
                           onBookmarkToggle={handleBookmarkToggle}
                           onCouponDownloaded={handleCouponDownloaded}

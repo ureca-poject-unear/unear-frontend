@@ -216,6 +216,7 @@ const MapPage = () => {
         isOpen={isCouponOpen}
         onClose={() => setIsCouponOpen(false)}
         mapRef={mapRef}
+        onMarkerClick={handleMarkerClick}
       />
       <BottomSheetBarcode
         userName={displayName}
