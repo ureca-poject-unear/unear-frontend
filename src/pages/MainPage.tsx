@@ -138,18 +138,13 @@ const MainPage = () => {
           onClick={handleEventClick}
           className="mt-3 relative rounded-[20px] overflow-hidden block w-full"
         >
-          <img src={EventBannerImage} alt="이벤트 배너" className="w-full h-[353px] object-cover" />
-
-          {/* 이벤트 바로가기 오버레이 */}
-          <div className="absolute inset-0 flex items-end justify-center pb-[18px]">
-            <span className="text-sm font-semibold text-gray-500 underline">이벤트 바로가기</span>
-          </div>
+          <img src={EventBannerImage} alt="이벤트 배너" className="w-full object-cover" />
         </button>
 
         {/* 스토리 배너 */}
         <button
           onClick={handleStoryClick}
-          className="w-full mt-3 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
+          className="w-full mt-1 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
           style={{
             backgroundImage: `url(${StoryBackgroundImage})`,
             backgroundSize: 'cover',
