@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import StoreTypeIcon from './StoreTypeIcon';
 import BookmarkStar from './BookmarkStar';
 import StoreStatus, { type StoreStatusType } from './StoreStatus';
@@ -28,12 +29,26 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   isDarkMode = false,
 }) => {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+  const navigate = useNavigate();
   const handleBookmarkToggle = () => {
     onBookmarkToggle?.(store.id);
   };
 
   const handleLocationClick = () => {
-    console.log('위치보기버튼 클릭됨');
+    // React Router state를 통해 지도 페이지로 이동하면서 매장 정보 전달
+    const focusStoreData = {
+      placeId: store.placeId,
+      placeName: store.name,
+      searchKeyword: store.name,
+      latitude: store.latitude,
+      longitude: store.longitude,
+    };
+
+    navigate('/map', {
+      state: {
+        focusStore: focusStoreData,
+      },
+    });
   };
 
   const handlePhoneClick = () => {
