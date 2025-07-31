@@ -11,6 +11,7 @@ export interface MapContainerRef {
   fetchPlaces: () => void;
   getBounds: () => ReturnType<typeof window.kakao.maps.Map.prototype.getBounds> | null;
   deselectMarker?: () => void;
+  selectMarker?: (placeId: number) => void;
 }
 
 interface MapContainerProps {
@@ -111,6 +112,9 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       },
       getBounds: () => {
         return mapInstanceRef.current?.getBounds() || null;
+      },
+      selectMarker: (placeId: number) => {
+        setSelectedPlaceId(placeId);
       },
     }));
 

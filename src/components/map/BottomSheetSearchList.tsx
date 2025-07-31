@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Place } from '@/types/map';
 import BottomSheet from '@/components/common/BottomSheet';
 import StoreCouponCard from '@/components/common/StoreCouponCard';
