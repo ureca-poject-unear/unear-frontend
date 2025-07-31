@@ -63,7 +63,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           className={
             `w-full h-[46px] pl-4 pr-12 ` +
             `border-2 border-gray-400 rounded-[12px] ` +
-            `text-sm font-regular placeholder-gray-500 ` +
+            `text-m font-regular placeholder-gray-500 ` +
             `focus:outline-none focus:border-primary ` +
             `disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed ` +
             `transition-colors duration-200`
