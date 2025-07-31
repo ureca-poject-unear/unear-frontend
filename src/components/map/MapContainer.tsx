@@ -13,6 +13,7 @@ export interface MapContainerRef {
   deselectMarker?: () => void;
   selectMarker?: (placeId: number) => void;
   setSelectedMarker: (placeId: number) => void;
+  getCenter: () => { lat: number; lng: number } | null;
 }
 
 interface MapContainerProps {
@@ -46,9 +47,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
     const staticCircleRef = useRef<KakaoCircle | null>(null);
     const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
+    const selectedPlaceIdRef = useRef<number | null>(null);
+    const isSettingCenterRef = useRef(false);
 
     const clearSelectedMarker = () => {
       setSelectedPlaceId(null);
+      selectedPlaceIdRef.current = null;
       onMarkerDeselect?.();
     };
 
@@ -104,11 +108,16 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       },
       setSelectedMarker: (placeId) => {
         setSelectedPlaceId(placeId);
+        selectedPlaceIdRef.current = placeId;
       },
       setCenter: (lat, lng) => {
         const map = mapInstanceRef.current;
         if (map) {
+          isSettingCenterRef.current = true;
           map.setCenter(new window.kakao.maps.LatLng(lat, lng));
+          setTimeout(() => {
+            isSettingCenterRef.current = false;
+          }, 500);
         }
       },
       fetchPlaces: () => {
@@ -119,6 +128,15 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       },
       selectMarker: (placeId: number) => {
         setSelectedPlaceId(placeId);
+      },
+      getCenter: () => {
+        const map = mapInstanceRef.current;
+        if (!map) return null;
+        const center = map.getCenter();
+        return {
+          lat: center.getLat(),
+          lng: center.getLng(),
+        };
       },
     }));
 
@@ -154,7 +172,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                 category={place.categoryCode}
                 storeClass={place.markerCode}
                 event={place.eventCode}
-                isSelected={selectedPlaceId === place.placeId}
+                isSelected={selectedPlaceIdRef.current === place.placeId}
               />
             </div>
           );
@@ -164,17 +182,20 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             markerElement.setAttribute('data-place-id', String(place.placeId));
             markerElement.setAttribute('data-lat', String(place.latitude));
             markerElement.setAttribute('data-lng', String(place.longitude));
+            const isAlreadySelected = selectedPlaceIdRef.current === place.placeId;
 
-            markerElement.addEventListener('click', () => {
-              const placeId = Number(markerElement.getAttribute('data-place-id'));
-              const lat = markerElement.getAttribute('data-lat');
-              const lng = markerElement.getAttribute('data-lng');
-
-              if (placeId && lat && lng) {
-                setSelectedPlaceId(placeId);
-                onMarkerClick(placeId, lat, lng);
-              }
-            });
+            if (!isAlreadySelected) {
+              markerElement.addEventListener('click', () => {
+                const placeId = Number(markerElement.getAttribute('data-place-id'));
+                const lat = markerElement.getAttribute('data-lat');
+                const lng = markerElement.getAttribute('data-lng');
+                if (placeId && lat && lng) {
+                  setSelectedPlaceId(placeId);
+                  selectedPlaceIdRef.current = placeId;
+                  onMarkerClick(placeId, lat, lng);
+                }
+              });
+            }
           }
 
           const overlay = new window.kakao.maps.CustomOverlay({
@@ -253,7 +274,10 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             showCurrentLocation();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
-              renderMarkers();
+              // idle 이벤트가 발생했지만 중심 이동 중이면 무시
+              if (!isSettingCenterRef.current) {
+                renderMarkers();
+              }
             });
 
             renderMarkers();

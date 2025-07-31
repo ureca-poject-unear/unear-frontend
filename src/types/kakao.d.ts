@@ -9,6 +9,7 @@ export interface KakaoMap {
   setCenter(latlng: KakaoLatLng): void;
   setLevel(level: number): void;
   getBounds(): KakaoMapBounds;
+  getCenter(): KakaoLatLng;
 }
 
 export interface KakaoMapBounds {
