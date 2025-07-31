@@ -1,131 +1,138 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { showErrorToast } from '@/utils/toast';
 import axiosInstance from '@/apis/axiosInstance';
 
-// API 응답 타입 정의
-interface NaverLoginResponse {
-  message?: string;
-  data?: {
-    accessToken?: string;
-    refreshToken?: string;
-  };
-}
-
-// 에러 타입 정의
-interface LoginError {
-  message?: string;
-}
-
-const NaverAuthHandler = () => {
+const NaverAuthHandler: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const hasProcessed = useRef(false); // 중복 실행 방지
   const [loadingMessage, setLoadingMessage] = useState('네이버 로그인 처리 중...');
   const [hasError, setHasError] = useState(false);
-  const hasProcessed = useRef(false);
 
   useEffect(() => {
+    // 이미 처리했으면 무시
     if (hasProcessed.current) {
       return;
     }
 
     const handleNaverLogin = async (): Promise<void> => {
+      // 처리 시작 플래그 설정
       hasProcessed.current = true;
 
       try {
-        setLoadingMessage('네이버 인가 코드 확인 중...');
+        setLoadingMessage('네이버 로그인 토큰 확인 중...');
 
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
+        // 1. URL에서 백엔드가 보내준 토큰을 추출합니다.
+        const accessToken = searchParams.get('accessToken');
+        const refreshToken = searchParams.get('refreshToken'); // 혹시 있다면
 
-        if (!code || !state) {
-          throw new Error('네이버 로그인 파라미터가 누락되었습니다.');
-        }
-
-        console.log('네이버 OAuth 처리 중...', { code, state });
-
-        setLoadingMessage('네이버 서버와 연동 중...');
-
-        // 백엔드에 Naver code 전달하여 토큰 받아오기
-        const response = await fetch('https://dev.unear.site/api/auth/naver', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code, state }),
+        console.log('🔍 Naver OAuth 토큰 확인:', {
+          accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : null,
+          refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : null,
         });
 
-        const result = (await response.json()) as NaverLoginResponse;
-
-        if (!response.ok) {
-          throw new Error(result.message || '네이버 로그인에 실패했습니다.');
+        if (!accessToken) {
+          throw new Error('로그인에 실패했습니다. 토큰이 제공되지 않았습니다.');
         }
 
-        console.log('네이버 로그인 성공:', result);
+        // 2. AuthProvider의 login 함수를 사용하여 토큰을 저장하고 사용자 정보를 자동 로드
+        setLoadingMessage('사용자 정보를 불러오는 중...');
+        console.log('🔄 로그인 처리 및 사용자 정보 로드 중...');
+        await login(accessToken, refreshToken || undefined);
 
-        if (result.data?.accessToken) {
-          setLoadingMessage('사용자 정보를 불러오는 중...');
+        console.log('✅ 로그인 및 사용자 정보 로드 완료');
 
-          // AuthProvider의 login 함수 사용
-          await login(result.data.accessToken, result.data.refreshToken);
-          console.log('✅ 네이버 로그인 및 사용자 정보 로드 완료');
+        // 3. 인증 상태 확인 (네트워크 에러 시 간단한 대기 후 진행)
+        setLoadingMessage('인증 상태 확인 중...');
 
-          // 인증 상태 확인
-          setLoadingMessage('인증 상태 확인 중...');
+        // 짧은 대기 시간으로 AuthProvider 상태 업데이트 보장
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초로 증가
 
-          // 짧은 대기 시간으로 AuthProvider 상태 업데이트 보장
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        // 프로필 완료 상태를 직접 API로 확인 (AuthProvider 상태 대신)
+        setLoadingMessage('프로필 상태 확인 중...');
 
-          // 프로필 완료 상태를 직접 API로 확인 (AuthProvider 상태 대신)
-          setLoadingMessage('프로필 상태 확인 중...');
+        try {
+          const userResponse = await axiosInstance.get('/users/me');
+          const userData = userResponse.data.data;
 
-          try {
-            const userResponse = await axiosInstance.get('/users/me');
-            const userData = userResponse.data.data;
+          console.log('🔍 직접 API로 사용자 정보 확인:', {
+            isProfileComplete: userData.isProfileComplete,
+            username: userData.username,
+          });
 
-            console.log('🔍 직접 API로 사용자 정보 확인:', {
-              isProfileComplete: userData.isProfileComplete,
-              username: userData.username,
-            });
+          // OAuth 리다이렉트 진행 중 플래그 설정 (CompleteProfilePage에서 깜빡임 방지용)
+          sessionStorage.setItem('oauth_redirect_in_progress', 'true');
 
-            // OAuth 리다이렉트 진행 중 플래그 설정 (CompleteProfilePage에서 깜빡임 방지용)
-            sessionStorage.setItem('oauth_redirect_in_progress', 'true');
-
-            // 프로필 완성 여부에 따라 즉시 분기 (중복 확인 없이 단순 분기)
-            if (userData.isProfileComplete === true) {
-              console.log('✅ 프로필 완성됨 - 메인페이지로 즉시 이동');
-              setLoadingMessage('메인 페이지로 이동 중...');
-              navigate('/', { replace: true });
-            } else {
-              console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
-              setLoadingMessage('추가 정보 입력 페이지로 이동 중...');
-              // CompleteProfilePage는 미완성 사용자만 온다고 가정하므로 재확인 불필요
-              navigate('/complete-profile', { replace: true });
-            }
-          } catch (apiError) {
-            console.error('❌ 프로필 상태 확인 실패:', apiError);
-            // API 실패 시 기본적으로 완성 페이지로 이동
-            sessionStorage.setItem('oauth_redirect_in_progress', 'true');
+          // 프로필 완성 여부에 따라 즉시 분기 (중복 확인 없이 단순 분기)
+          if (userData.isProfileComplete === true) {
+            console.log('✅ 프로필 완성됨 - 메인페이지로 즉시 이동');
+            setLoadingMessage('메인 페이지로 이동 중...');
+            navigate('/', { replace: true });
+          } else {
+            console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
+            setLoadingMessage('추가 정보 입력 페이지로 이동 중...');
+            // CompleteProfilePage는 미완성 사용자만 온다고 가정하므로 재확인 불필요
             navigate('/complete-profile', { replace: true });
           }
-        } else {
-          throw new Error('백엔드에서 accessToken을 받지 못했습니다.');
+        } catch (apiError) {
+          console.error('❌ 프로필 상태 확인 실패:', apiError);
+          // API 실패 시 기본적으로 완성 페이지로 이동
+          sessionStorage.setItem('oauth_redirect_in_progress', 'true');
+          navigate('/complete-profile', { replace: true });
         }
       } catch (error: unknown) {
         console.error('❌ 네이버 로그인 처리 중 오류:', error);
         setHasError(true);
+        setLoadingMessage('로그인 처리 중 오류가 발생했습니다.');
 
-        const loginError = error as LoginError;
-        const errorMessage = loginError.message || '네이버 로그인 처리 중 오류가 발생했습니다.';
+        const axiosError = error as {
+          response?: {
+            status?: number;
+            data?: {
+              message?: string;
+            };
+          };
+          request?: unknown;
+          message?: string;
+        };
 
+        let errorMessage = '네이버 로그인 처리 중 오류가 발생했습니다.';
+
+        if (axiosError.response) {
+          // 서버 응답 에러
+          console.error('서버 응답 에러:', {
+            status: axiosError.response.status,
+            data: axiosError.response.data,
+          });
+
+          if (axiosError.response.status === 401) {
+            errorMessage = '인증에 실패했습니다. 토큰이 유효하지 않습니다.';
+          } else if (axiosError.response.status === 404) {
+            errorMessage = '사용자 정보를 찾을 수 없습니다.';
+          } else if (axiosError.response.status && axiosError.response.status >= 500) {
+            errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+          } else {
+            errorMessage = `서버 오류 (${axiosError.response.status}): ${axiosError.response.data?.message || '알 수 없는 오류'}`;
+          }
+        } else if (axiosError.request) {
+          // 네트워크 에러
+          console.error('네트워크 에러:', axiosError.request);
+          errorMessage = '네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.';
+        } else {
+          // 기타 에러
+          errorMessage = axiosError.message || '알 수 없는 오류가 발생했습니다.';
+        }
+
+        // 에러 메시지 표시 및 로그인 페이지로 이동
+        showErrorToast(errorMessage);
         setLoadingMessage(errorMessage);
-
-        // 에러 발생 시 3초 후 로그인 페이지로 이동
         setTimeout(() => {
           navigate('/login', { replace: true });
-        }, 3000);
+        }, 3000); // 3초 후 로그인 페이지로 이동
       }
     };
 
