@@ -113,6 +113,7 @@ export default function MembershipDetailPage() {
     <div className="w-full max-w-[393px] bg-background">
       {/* 공통 헤더 사용 */}
       <Header title="혜택 상세" />
+      <div className="bg-white px-5 pt-6"></div>
 
       {/* 프랜차이즈 로고 */}
       <div className="flex justify-center mb-4">
