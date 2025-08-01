@@ -129,11 +129,8 @@ export default function MembershipDetailPage() {
 
             {/* 실제 이미지 */}
             <img
-              src={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${benefitData.img}`}
+              src={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${benefitData.imageUrl}`}
               alt={benefitData.franchiseName}
-              onError={(e) => {
-                e.currentTarget.src = '/images/default-franchise.png'; // fallback
-              }}
               className="w-[37px] h-[37px] object-contain"
             />
           </div>
