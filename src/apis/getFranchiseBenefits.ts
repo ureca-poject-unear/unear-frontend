@@ -4,7 +4,6 @@ import type { FranchiseBenefitResponse } from '@/types/franchise';
 export const getFranchiseBenefits = async (params: {
   page: number;
   size: number;
-  categoryCode?: string;
   franchiseName?: string;
 }): Promise<FranchiseBenefitResponse> => {
   const res = await axiosInstance.get('/benefits/franchise', { params });

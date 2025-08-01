@@ -6,21 +6,19 @@ import CategoryFilter from '@/components/membership/CategoryFilter';
 import MembershipCard from '@/components/common/MembershipCard';
 import type { FranchiseBenefitItem, GradeType } from '@/types/franchise';
 import { getFranchiseBenefits } from '@/apis/getFranchiseBenefits';
-
 export default function MembershipPage() {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [franchiseList, setFranchiseList] = useState<FranchiseBenefitItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState('');
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchFranchiseBenefits = async () => {
       try {
-        console.log('📡 [MembershipPage] API 호출 시작');
+        console.log(':위성_안테나: [MembershipPage] API 호출 시작');
         const res = await getFranchiseBenefits({ page: 0, size: 100 }); // 전체 조회
-        console.log('📝 [MembershipPage] API 응답:', res);
-        console.log('📝 [MembershipPage] 첫번째 아이템:', res.content[0]);
+        console.log(':메모: [MembershipPage] API 응답:', res);
+        console.log(':메모: [MembershipPage] 첫번째 아이템:', res.content[0]);
         setFranchiseList(res.content);
       } catch (error) {
         console.error('프랜차이즈 혜택 불러오기 실패:', error);
@@ -28,13 +26,10 @@ export default function MembershipPage() {
         setLoading(false);
       }
     };
-
     fetchFranchiseBenefits();
   }, []);
-
   const filterByCategory = (category: string) => {
     if (category === '전체') return franchiseList;
-
     // categoryCode -> 한글 매핑
     const categoryMap: Record<string, string> = {
       CAFE: '카페',
@@ -45,10 +40,8 @@ export default function MembershipPage() {
       BAKERY: '베이커리',
       SHOPPING: '쇼핑',
     };
-
     return franchiseList.filter((item) => categoryMap[item.categoryCode] === category);
   };
-
   // 검색 기능 추가
   const handleSearch = async (keyword: string) => {
     setSearchKeyword(keyword);
@@ -58,7 +51,6 @@ export default function MembershipPage() {
       setFranchiseList(res.content);
       return;
     }
-
     try {
       const res = await getFranchiseBenefits({
         page: 0,
@@ -70,18 +62,14 @@ export default function MembershipPage() {
       console.error('검색 실패:', error);
     }
   };
-
   const filteredList = filterByCategory(selectedCategory);
-
   return (
     <div className="w-full max-w-[393px] bg-background">
       <Header title="혜택 안내" />
-
       {/* SearchBar */}
       <div className="mt-4 px-5">
         <SearchBar onSearch={handleSearch} />
       </div>
-
       {/* 필터 + 결과 + 카드 리스트 묶음 */}
       <div className="bg-white mt-4">
         {/* Category Filter */}
@@ -89,12 +77,10 @@ export default function MembershipPage() {
           selectedCategory={selectedCategory}
           onSelectCategory={(category) => setSelectedCategory(category)}
         />
-
         {/* 결과 개수 */}
         <div className="text-sm text-black font-semibold px-5 my-2.5">
           총 <span className="text-primary font-semibold">{filteredList.length}개</span>
         </div>
-
         {/* 카드 리스트 */}
         <div className="flex flex-col gap-3 items-center pb-5">
           {loading ? (
@@ -107,21 +93,20 @@ export default function MembershipPage() {
                 ...(card.hasVip ? (['VIP'] as const) : []),
                 ...(card.hasBasic ? (['우수'] as const) : []),
               ];
-
               return (
                 <MembershipCard
                   key={card.franchiseId}
                   name={card.franchiseName}
-                  description={card.description || card.franchiseName}
+                  description={card.description}
                   grade={gradeList}
-                  imageUrl={card.franchiseImageUrl || '/assets/common/default.png'}
+                  imageUrl={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${card.franchiseImageUrl}`}
                   onClick={() =>
                     navigate(`/membership/detail/${card.franchiseId}`, {
                       state: {
                         franchiseId: card.franchiseId,
                         franchiseName: card.franchiseName,
                         franchiseImageUrl: card.franchiseImageUrl,
-                        description: card.description,
+                        description: card.franchiseName,
                         categoryCode: card.categoryCode,
                         hasVvip: card.hasVvip,
                         hasVip: card.hasVip,
