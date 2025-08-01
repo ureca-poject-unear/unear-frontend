@@ -9,6 +9,7 @@ export interface MembershipPolicy {
 }
 
 export interface BenefitDetailResponse {
+  img: any;
   franchiseId: number;
   franchiseName: string;
   imageUrl: string;
