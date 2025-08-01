@@ -110,7 +110,7 @@ export default function MembershipDetailPage() {
       <div className="bg-white px-5 pt-6">
         {/* 프랜차이즈 로고 */}
         <div className="flex justify-center mb-4">
-          <div className="relative w-[64.46px] h-[63px]">
+          <div className="relative w-[64px] h-[64px] flex items-center justify-center">
             {/* SVG 배경 원형 + 테두리 */}
             <svg
               width={65}
@@ -131,7 +131,7 @@ export default function MembershipDetailPage() {
             <img
               src={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${benefitData.imageUrl}`}
               alt={benefitData.franchiseName}
-              className="w-[37px] h-[37px] object-contain"
+              className="w-[37px] h-[37px] object-contain relative z-10"
             />
           </div>
         </div>
