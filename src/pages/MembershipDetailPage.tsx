@@ -119,7 +119,7 @@ export default function MembershipDetailPage() {
         <div className="flex justify-center mb-4">
           <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
             <img
-              src={benefitData.imageUrl || '/assets/common/default.png'}
+              src={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${benefitData.imageUrl}`}
               alt={benefitData.franchiseName}
               className="w-12 h-12 object-contain"
             />
