@@ -90,11 +90,9 @@ const MapPage = () => {
     }
   }, [benefitCategories]);
 
-  // 북마크에서 넘어온 state 처리
   useEffect(() => {
     const focusStore = location.state?.focusStore;
     if (focusStore) {
-      // 방법 1: 좌표 정보가 있는 경우 직접 지도 이동 및 마커 클릭
       if (focusStore.latitude && focusStore.longitude) {
         const focusOnStore = () => {
           const map = mapRef.current;
@@ -105,15 +103,10 @@ const MapPage = () => {
           }
 
           try {
-            // 다른 마커 비활성화
             map.deselectMarker?.();
-
-            // 좌표 이동
             map.setCenter(focusStore.latitude, focusStore.longitude);
 
-            // 마커 클릭 대기 시간 더 단축
             setTimeout(() => {
-              // 마커 클릭 전에 선택 상태를 먼저 설정
               map.setSelectedMarker(focusStore.placeId);
 
               handleMarkerClick(
@@ -130,18 +123,12 @@ const MapPage = () => {
         setTimeout(() => {
           focusOnStore();
         }, 500);
-      }
-      // 방법 2: 좌표 정보가 없는 경우 검색으로 처리
-      else if (focusStore.searchKeyword) {
-        // 검색 실행 (기존 handleSearch 로직 활용)
+      } else if (focusStore.searchKeyword) {
         const performSearch = async () => {
           try {
             setSearchKeyword(focusStore.searchKeyword);
-
-            // 현재 지도 중심점 기준으로 검색
             const map = mapRef.current;
             if (!map || !map.getBounds) {
-              // 지도가 아직 준비되지 않았다면 잠시 후 재시도
               setTimeout(() => performSearch(), 500);
               return;
             }
@@ -173,10 +160,8 @@ const MapPage = () => {
               setSearchResults(results);
               setSearchOpen(true);
 
-              // placeId로 정확히 매칭되는 매장 찾기
               const exactMatch = results.find((result) => result.placeId === focusStore.placeId);
 
-              // 정확한 매칭이 없으면 이름으로 매칭
               const nameMatch = !exactMatch
                 ? results.find(
                     (result) =>
@@ -194,7 +179,7 @@ const MapPage = () => {
                     String(matchedStore.latitude),
                     String(matchedStore.longitude)
                   );
-                }, 1000); // 지도 렌더링 완료 후 클릭
+                }, 1000);
               }
             } else {
               showInfoToast(`'${focusStore.placeName}' 매장을 찾을 수 없습니다.`);
@@ -207,8 +192,6 @@ const MapPage = () => {
 
         performSearch();
       }
-
-      // state 정리 (뒤로가기 시 재실행 방지)
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
