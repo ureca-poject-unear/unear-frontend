@@ -11,23 +11,41 @@ import Grade from '@/components/common/Grade';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
 import MembershipBrandBanner from '@/components/main/MembershipBrandBanner';
 import MembershipBenefitModal from '@/components/main/MembershipBenefitModal';
+import LoadingScreen from '@/components/common/LoadingScreen';
+import { getUserInfo } from '@/apis/userInfo';
 
 const MainPage = () => {
   const [isBarcodeSheetOpen, setIsBarcodeSheetOpen] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
+  const [isUserDataLoading, setIsUserDataLoading] = useState(true);
   const navigate = useNavigate();
 
   // Zustand 스토어에서 사용자 정보 가져오기
   const { userInfo, getUserDisplayName, getUserGrade, getBarcodeNumber } = useAuthStore();
 
-  // 컴포넌트 마운트 시 사용자 정보 확인
+  // 사용자 정보 완전 로드 확인
   useEffect(() => {
-    if (userInfo) {
-      console.log('🔍 현재 사용자 정보:', userInfo);
-    } else {
-      console.log('⚠️ 사용자 정보가 없습니다. AuthProvider에서 자동으로 로드됩니다.');
-    }
-  }, [userInfo]);
+    const ensureUserDataLoaded = async () => {
+      try {
+        // userInfo가 없거나 기본값인 경우 API 호출
+        if (!userInfo || getUserDisplayName() === '유니어') {
+          console.log('🔄 사용자 정보 로딩 시작...');
+          await getUserInfo();
+
+          // 잠시 대기 (상태 업데이트 시간 확보)
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }
+
+        console.log('✅ 사용자 정보 로드 완료');
+      } catch (error) {
+        console.error('❌ 사용자 정보 로드 실패:', error);
+      } finally {
+        setIsUserDataLoading(false);
+      }
+    };
+
+    ensureUserDataLoaded();
+  }, [userInfo, getUserDisplayName]);
 
   const handleBarcodeClick = () => {
     setIsBarcodeSheetOpen(true);
@@ -44,6 +62,15 @@ const MainPage = () => {
   const handleStoryClick = () => {
     navigate('/story'); // 스토리 페이지로 이동
   };
+
+  // 사용자 데이터가 로딩 중이면 로딩 화면 표시
+  if (isUserDataLoading) {
+    return (
+      <div className="w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative bg-background">
+        <LoadingScreen message="메인페이지를 준비하고 있습니다..." />
+      </div>
+    );
+  }
 
   // 사용자 표시명, 등급, 바코드 번호 가져오기
   const displayName = getUserDisplayName();
@@ -111,18 +138,13 @@ const MainPage = () => {
           onClick={handleEventClick}
           className="mt-3 relative rounded-[20px] overflow-hidden block w-full"
         >
-          <img src={EventBannerImage} alt="이벤트 배너" className="w-full h-[353px] object-cover" />
-
-          {/* 이벤트 바로가기 오버레이 */}
-          <div className="absolute inset-0 flex items-end justify-center pb-[18px]">
-            <span className="text-sm font-semibold text-gray-500 underline">이벤트 바로가기</span>
-          </div>
+          <img src={EventBannerImage} alt="이벤트 배너" className="w-full object-cover" />
         </button>
 
         {/* 스토리 배너 */}
         <button
           onClick={handleStoryClick}
-          className="w-full mt-3 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
+          className="w-full mt-1 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
           style={{
             backgroundImage: `url(${StoryBackgroundImage})`,
             backgroundSize: 'cover',
