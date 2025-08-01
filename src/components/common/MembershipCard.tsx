@@ -39,11 +39,11 @@ export default function MembershipCard({
       {/* 콘텐츠 영역 */}
       <div className="flex justify-start items-center absolute left-2 top-2.5 gap-3">
         {/* 원형 이미지 */}
-        <div className="relative w-[64.46px] h-[63px]">
+        <div className="relative w-[64px] h-[64px]">
           <svg
-            width={65}
-            height={63}
-            viewBox="0 0 65 63"
+            width={64}
+            height={64}
+            viewBox="0 0 64 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="absolute left-0 top-0"
