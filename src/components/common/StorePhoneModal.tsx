@@ -137,9 +137,13 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
               </div>
 
               {/* 하단 버튼들 */}
-              <div className="flex gap-[20px]">
-                <LocationButton onClick={handleLocationView} />
-                <CallButton onClick={handlePhoneCall} />
+              <div className="flex gap-5">
+                <div className="flex-1">
+                  <LocationButton onClick={handleLocationView} width="w-full" />
+                </div>
+                <div className="flex-1">
+                  <CallButton onClick={handlePhoneCall} width="w-full" />
+                </div>
               </div>
             </div>
           </div>

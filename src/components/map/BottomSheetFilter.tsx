@@ -117,7 +117,14 @@ export default function BottomSheetFilter({
         {/* 업종 선택 */}
         <section>
           <p className="text-lm font-semibold mb-2.5">업종 선택</p>
-          <div className="flex flex-wrap gap-x-[11px] gap-y-2">
+          <div
+            className="grid items-center gap-y-2.5"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fit, 80px)',
+              justifyContent: 'space-between',
+              gap: '10px 11px',
+            }}
+          >
             {CATEGORY_LIST.map((item) => (
               <FilterButton
                 key={item}
@@ -132,7 +139,14 @@ export default function BottomSheetFilter({
         {/* 혜택 유형 */}
         <section>
           <p className="text-lm font-semibold mb-2.5">혜택 유형</p>
-          <div className="flex flex-wrap gap-x-[11px] gap-y-2">
+          <div
+            className="grid items-center gap-y-2.5"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fit, 80px)',
+              justifyContent: 'space-between',
+              gap: '10px 11px',
+            }}
+          >
             {BENEFIT_LIST.map((item) => (
               <FilterButton
                 key={item}
