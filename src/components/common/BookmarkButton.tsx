@@ -8,7 +8,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({ label = '즐겨찾기',
     <button
       type="button"
       onClick={onClick}
-      className="w-[166px] h-[100px] rounded-xl border border-zinc-400 bg-white hover:bg-zinc-100 relative"
+      className="w-full h-[100px] rounded-xl border border-zinc-400 bg-white hover:bg-zinc-100 relative"
     >
       {/* 정확한 가운데 정렬을 위한 방식 */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2">
