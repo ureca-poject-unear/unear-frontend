@@ -54,43 +54,44 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
-      <div className="relative w-full max-w-[393px]">
+      {/* 배경: 서비스 영역 내에서만 어둡게 처리 */}
+      <div className="w-full max-w-[600px] mx-auto flex flex-col items-center h-screen relative">
         <div
-          className="absolute inset-0 bottom-[65px] bg-black bg-opacity-40"
+          className="absolute inset-0 bottom-[65px] bg-black bg-opacity-50 px-5 flex items-center justify-center"
           onClick={handleBackdropClick}
-        />
-
-        {/* 모달 컨테이너 */}
-        <div className="absolute inset-0 bottom-[65px] flex items-center justify-center px-5">
-          <div className="w-full max-w-[353px] bg-white rounded-[16px] overflow-hidden shadow-lg">
+        >
+          {/* 모달 박스 */}
+          <div
+            className="relative z-10 bg-white w-full max-h-[80vh] rounded-[16px] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* 헤더 영역 */}
-            <div className="px-5 pt-[24px] pb-0 relative">
-              {/* 매장명과 닫기 버튼 */}
-              <div className="flex items-start justify-between mb-3">
-                <h2 className="text-lm font-semibold text-black leading-tight flex-1 pr-3">
+            <div className="px-6 pt-[24px] pb-5 relative">
+              {/* 닫기 버튼 */}
+              <button className="absolute top-4 right-4" onClick={onClose} aria-label="모달 닫기">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-[#333]"
+                >
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {/* 매장명 */}
+              <div className="mb-3">
+                <h2 className="text-lm font-semibold text-black leading-tight pr-10">
                   {store.name}
                 </h2>
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200 flex-shrink-0"
-                  aria-label="모달 닫기"
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M18 6L6 18M6 6L18 18"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
               </div>
 
               {/* 주소 */}
@@ -136,7 +137,7 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
               </div>
 
               {/* 하단 버튼들 */}
-              <div className="flex gap-[20px] pb-5">
+              <div className="flex gap-[20px]">
                 <LocationButton onClick={handleLocationView} />
                 <CallButton onClick={handlePhoneCall} />
               </div>
