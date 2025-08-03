@@ -1,7 +1,6 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { showToast } from '@/utils/toast';
-import { X } from 'lucide-react';
 import type {
   KakaoMap,
   KakaoCustomOverlay,
@@ -14,6 +13,7 @@ import type {
 } from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
 import MapMarkerIcon from '../common/MapMarkerIcon';
+import PlaceNameLabel from './PlaceNameLabel';
 import { getPlaces } from '@/apis/getPlaces';
 
 export interface MapContainerRef {
@@ -429,6 +429,17 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
         const newMarkers: KakaoMarker[] = places.map((place) => {
           const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
+
+          // 마커와 텍스트를 포함하는 컨테이너 생성
+          const containerElement = document.createElement('div');
+          containerElement.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+          `;
+
+          // 마커 렌더링
           const markerHTML = ReactDOMServer.renderToString(
             <MapMarkerIcon
               category={place.categoryCode}
@@ -438,9 +449,9 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             />
           );
 
-          const el = document.createElement('div');
-          el.innerHTML = markerHTML;
-          const markerElement = el.firstElementChild as HTMLElement;
+          const markerEl = document.createElement('div');
+          markerEl.innerHTML = markerHTML;
+          const markerElement = markerEl.firstElementChild as HTMLElement;
 
           if (markerElement) {
             markerElement.addEventListener('click', () => {
@@ -450,9 +461,41 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             });
           }
 
+          // 마커를 컨테이너에 추가
+          containerElement.appendChild(markerElement);
+
+          // 지도 레벨 6 이하에서 장소명 텍스트 추가
+          if (currentLevel <= 6) {
+            const textHTML = ReactDOMServer.renderToString(
+              <PlaceNameLabel
+                placeName={place.placeName}
+                onClick={() => {
+                  setSelectedPlaceId(place.placeId);
+                  selectedPlaceIdRef.current = place.placeId;
+                  onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
+                }}
+              />
+            );
+
+            const textEl = document.createElement('div');
+            textEl.innerHTML = textHTML;
+            const textElement = textEl.firstElementChild as HTMLElement;
+
+            if (textElement) {
+              // 클릭 이벤트 리스너 추가
+              textElement.addEventListener('click', () => {
+                setSelectedPlaceId(place.placeId);
+                selectedPlaceIdRef.current = place.placeId;
+                onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
+              });
+
+              containerElement.appendChild(textElement);
+            }
+          }
+
           const customOverlay = new window.kakao.maps.CustomOverlay({
             position,
-            content: markerElement,
+            content: containerElement,
             yAnchor: 0.5,
             zIndex: 1,
           });
@@ -635,6 +678,11 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               if (!isSettingCenterRef.current) {
                 renderMarkers();
               }
+            });
+
+            // 지도 레벨 변경 이벤트 리스너 추가
+            window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
+              renderMarkers();
             });
 
             // 로드뷰 모드일 때 지도 클릭 이벤트 추가
