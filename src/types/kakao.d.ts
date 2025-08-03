@@ -8,6 +8,7 @@ export interface KakaoLatLng {
 export interface KakaoMap {
   setCenter(latlng: KakaoLatLng): void;
   setLevel(level: number): void;
+  getLevel(): number;
   getBounds(): KakaoMapBounds;
   getCenter(): KakaoLatLng;
 }
@@ -21,6 +22,7 @@ export interface KakaoMarker {
   setPosition(latlng: KakaoLatLng): void;
   setMap(map: KakaoMap | null): void;
   getPosition(): KakaoLatLng;
+  setOpacity(opacity: number): void;
 }
 
 export interface KakaoCustomOverlay {
@@ -41,6 +43,14 @@ export interface KakaoCircle {
   getBounds(): KakaoMapBounds;
 }
 
+export interface KakaoMarkerClusterer {
+  addMarkers(markers: KakaoMarker[]): void;
+  removeMarkers(markers: KakaoMarker[]): void;
+  clear(): void;
+  getMarkers(): KakaoMarker[];
+  setMap(map: KakaoMap | null): void;
+}
+
 declare global {
   interface Window {
     kakao: {
@@ -50,7 +60,11 @@ declare global {
           container: HTMLElement,
           options: { center: KakaoLatLng; level: number }
         ) => KakaoMap;
-        Marker: new (options: { map: KakaoMap; position: KakaoLatLng }) => KakaoMarker;
+        Marker: new (options: {
+          position: KakaoLatLng;
+          title?: string;
+          map?: KakaoMap;
+        }) => KakaoMarker;
         CustomOverlay: new (options: {
           position: KakaoLatLng;
           content: Node;
@@ -73,6 +87,13 @@ declare global {
           fillColor?: string;
           fillOpacity?: number;
         }) => KakaoCircle;
+        MarkerClusterer: new (options: {
+          map: KakaoMap;
+          averageCenter?: boolean;
+          minLevel?: number;
+          disableClickZoom?: boolean;
+          minClusterSize?: number;
+        }) => KakaoMarkerClusterer;
         event: KakaoEvent;
         load(callback: () => void): void;
       };

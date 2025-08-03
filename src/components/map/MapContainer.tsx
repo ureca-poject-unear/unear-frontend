@@ -1,6 +1,12 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
+import type {
+  KakaoMap,
+  KakaoCustomOverlay,
+  KakaoCircle,
+  KakaoMarkerClusterer,
+  KakaoMarker,
+} from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
 import MapMarkerIcon from '../common/MapMarkerIcon';
 import { getPlaces } from '@/apis/getPlaces';
@@ -41,7 +47,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
     const mapInstanceRef = useRef<KakaoMap | null>(null);
     const overlayRef = useRef<KakaoCustomOverlay | null>(null);
-    const markersRef = useRef<KakaoCustomOverlay[]>([]);
     const currentLocationRef = useRef<{ lat: number; lng: number } | null>(null);
     const [isLocationShown, setIsLocationShown] = useState(false);
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
@@ -49,6 +54,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
     const selectedPlaceIdRef = useRef<number | null>(null);
     const isSettingCenterRef = useRef(false);
+    const clustererRef = useRef<KakaoMarkerClusterer | null>(null);
+    const markerInstancesRef = useRef<KakaoMarker[]>([]);
 
     const clearSelectedMarker = () => {
       setSelectedPlaceId(null);
@@ -143,12 +150,13 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     const renderMarkers = async () => {
       const map = mapInstanceRef.current;
-      if (!map) return;
+      const clusterer = clustererRef.current;
+      if (!map || !clusterer) return;
 
       const bounds = map.getBounds();
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
-
+      const currentLevel = map.getLevel();
       try {
         const places = await getPlaces({
           swLat: sw.getLat(),
@@ -160,55 +168,71 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           benefitCategories,
         });
 
-        markersRef.current.forEach((marker) => marker.setMap(null));
-        markersRef.current = [];
+        markerInstancesRef.current.forEach((m) => m.setMap(null));
+        clusterer.removeMarkers(markerInstancesRef.current);
+        clusterer.clear();
+        markerInstancesRef.current = [];
 
-        places.forEach((place) => {
+        if (places.length === 0) {
+          if (!isLocationShown && currentLocationRef.current) {
+            renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
+          }
+          return;
+        }
+
+        const newMarkers: KakaoMarker[] = places.map((place) => {
           const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
-
-          const el = document.createElement('div');
-          el.innerHTML = ReactDOMServer.renderToString(
-            <div style={{ cursor: 'pointer' }}>
-              <MapMarkerIcon
-                category={place.categoryCode}
-                storeClass={place.markerCode}
-                event={place.eventCode}
-                isSelected={selectedPlaceIdRef.current === place.placeId}
-              />
-            </div>
+          const markerHTML = ReactDOMServer.renderToString(
+            <MapMarkerIcon
+              category={place.categoryCode}
+              storeClass={place.markerCode}
+              event={place.eventCode}
+              isSelected={selectedPlaceId === place.placeId}
+            />
           );
 
-          const markerElement = el.firstElementChild;
-          if (markerElement) {
-            markerElement.setAttribute('data-place-id', String(place.placeId));
-            markerElement.setAttribute('data-lat', String(place.latitude));
-            markerElement.setAttribute('data-lng', String(place.longitude));
-            const isAlreadySelected = selectedPlaceIdRef.current === place.placeId;
+          const el = document.createElement('div');
+          el.innerHTML = markerHTML;
+          const markerElement = el.firstElementChild as HTMLElement;
 
-            if (!isAlreadySelected) {
-              markerElement.addEventListener('click', () => {
-                const placeId = Number(markerElement.getAttribute('data-place-id'));
-                const lat = markerElement.getAttribute('data-lat');
-                const lng = markerElement.getAttribute('data-lng');
-                if (placeId && lat && lng) {
-                  setSelectedPlaceId(placeId);
-                  selectedPlaceIdRef.current = placeId;
-                  onMarkerClick(placeId, lat, lng);
-                }
-              });
-            }
+          if (markerElement) {
+            markerElement.addEventListener('click', () => {
+              setSelectedPlaceId(place.placeId);
+              selectedPlaceIdRef.current = place.placeId;
+              onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
+            });
           }
 
-          const overlay = new window.kakao.maps.CustomOverlay({
+          const customOverlay = new window.kakao.maps.CustomOverlay({
             position,
-            content: markerElement as Node,
-            yAnchor: 1,
+            content: markerElement,
+            yAnchor: 0.5,
             zIndex: 1,
           });
 
-          overlay.setMap(map);
-          markersRef.current.push(overlay);
+          const marker = new window.kakao.maps.Marker({ position });
+          marker.setOpacity(0);
+
+          const originalSetMap = marker.setMap;
+          marker.setMap = function (mapInstance) {
+            originalSetMap.call(this, mapInstance);
+            customOverlay.setMap(mapInstance);
+          };
+
+          return marker;
         });
+
+        markerInstancesRef.current = newMarkers;
+        console.log(currentLevel, '현재레벨');
+        const currentZoom = mapInstanceRef.current?.getLevel?.();
+
+        if (places.length <= 3) {
+          newMarkers.forEach((marker) => marker.setMap(map));
+        } else if (currentZoom !== undefined && currentZoom <= 6) {
+          newMarkers.forEach((marker) => marker.setMap(map));
+        } else {
+          clusterer.addMarkers(newMarkers);
+        }
 
         if (!isLocationShown && currentLocationRef.current) {
           renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
@@ -242,7 +266,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       }
 
       const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&autoload=false`;
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&autoload=false&libraries=clusterer`;
       script.async = true;
       document.head.appendChild(script);
 
@@ -258,6 +282,20 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             });
 
             mapInstanceRef.current = map;
+
+            try {
+              const clusterer = new window.kakao.maps.MarkerClusterer({
+                map,
+                averageCenter: true,
+                minLevel: 4,
+                disableClickZoom: true,
+                minClusterSize: 3,
+              });
+              clustererRef.current = clusterer;
+            } catch (error) {
+              console.error('클러스터러 초기화 실패:', error);
+              clustererRef.current = null;
+            }
 
             const staticCircle = new window.kakao.maps.Circle({
               center: new window.kakao.maps.LatLng(37.544581, 127.055961),
@@ -275,7 +313,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             showCurrentLocation();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
-              // idle 이벤트가 발생했지만 중심 이동 중이면 무시
               if (!isSettingCenterRef.current) {
                 renderMarkers();
               }
@@ -290,6 +327,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         document.head.removeChild(script);
         if (staticCircleRef.current) {
           staticCircleRef.current.setMap(null);
+        }
+        if (clustererRef.current && markerInstancesRef.current.length > 0) {
+          clustererRef.current.removeMarkers(markerInstancesRef.current);
+        }
+        if (overlayRef.current) {
+          overlayRef.current.setMap(null);
         }
       };
     }, [kakaoMapKey]);
