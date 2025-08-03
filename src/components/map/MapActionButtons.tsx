@@ -27,9 +27,9 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         {/* 이벤트 버튼 */}
         <button
           onClick={onEventClick}
-          className="relative w-[45px] h-[45px] drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] transition-transform duration-300"
+          className="relative w-[45px] h-[45px] transition-transform duration-300"
         >
-          <div className="absolute inset-0 bg-white rounded-full" />
+          <div className="absolute inset-0 bg-white drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] hover:bg-gray-50 active:bg-gray-100 rounded-full" />
           <EventIcon className="absolute top-[9px] left-1/2 -translate-x-1/2 w-[21px] h-[21px]" />
           <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-semibold leading-[8px] text-[#333]">
             이벤트
@@ -39,9 +39,9 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         {/* 쿠폰 버튼 */}
         <button
           onClick={onCouponClick}
-          className="relative w-[45px] h-[45px] drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] transition-transform duration-300"
+          className="relative w-[45px] h-[45px] transition-transform duration-300"
         >
-          <div className="absolute inset-0 bg-white rounded-full" />
+          <div className="absolute inset-0 bg-white drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] hover:bg-gray-50 active:bg-gray-100 rounded-full" />
           <MapCouponIcon className="absolute top-[9px] left-1/2 -translate-x-1/2 w-[22.5px] h-[22.5px]" />
           <span className="absolute bottom-[5px] left-1/2 -translate-x-1/2 text-[6px] font-semibold leading-[8px] text-[#333]">
             쿠폰
@@ -51,9 +51,9 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         {/* 바코드 버튼 */}
         <button
           onClick={onBarcodeClick}
-          className="relative w-[45px] h-[45px] drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] transition-transform duration-300"
+          className="relative w-[45px] h-[45px] transition-transform"
         >
-          <div className="absolute inset-0 bg-white rounded-full" />
+          <div className="absolute inset-0 bg-white drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] hover:bg-gray-50 active:bg-gray-100 rounded-full" />
           <BarcodeIcon className="absolute top-[7px] left-1/2 -translate-x-1/2 w-[25px] h-[25px]" />
           <span className="absolute bottom-[6px] left-1/2 -translate-x-1/2 text-[6px] font-semibold leading-[8px] text-[#333]">
             바코드
@@ -64,13 +64,13 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
       {/* 화살표 토글 버튼 */}
       <button
         onClick={() => setIsExpanded((prev) => !prev)}
-        className="relative w-[45px] h-[45px] mt-[10px] drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] transition-transform"
+        className="relative w-[45px] h-[45px] mt-[10px] transition-transform"
       >
-        <div className="absolute inset-0 bg-white rounded-full" />
+        <div className="absolute inset-0 bg-white drop-shadow-[0_0_4px_rgba(0,0,0,0.25)] hover:bg-gray-50 active:bg-gray-100 rounded-full" />
         {isExpanded ? (
-          <MapDownArrowIcon className="absolute top-[6px] left-[10px] w-[25px] h-[33px]" />
+          <MapDownArrowIcon className="absolute top-[6px] left-1/2 -translate-x-1/2 w-[25px] h-[33px]" />
         ) : (
-          <MapUpArrowIcon className="absolute top-[6px] left-[10px] w-[25px] h-[33px]" />
+          <MapUpArrowIcon className="absolute top-[6px] left-1/2 -translate-x-1/2 w-[25px] h-[33px]" />
         )}
       </button>
     </div>
