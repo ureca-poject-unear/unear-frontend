@@ -25,7 +25,7 @@ const Default = () => {
         <Outlet />
       </main>
 
-      {pathname !== '/login' && <BottomNavigator />}
+      {!isAuthPage && <BottomNavigator />}
     </div>
   );
 };

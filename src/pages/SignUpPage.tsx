@@ -535,11 +535,11 @@ const SignUpPage = () => {
         </div>
 
         {/* 회원가입 버튼 */}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 px-5">
           <button
             onClick={handleSubmit}
             disabled={!isSignUpActive || isLoading}
-            className={`w-[353px] h-[50px] rounded-xl font-semibold text-white transition-colors ${
+            className={`w-full h-[50px] rounded-xl font-semibold text-white transition-colors ${
               isSignUpActive && !isLoading
                 ? 'bg-primary hover:bg-[#d1006b]'
                 : 'bg-zinc-300 cursor-not-allowed'
@@ -550,7 +550,7 @@ const SignUpPage = () => {
         </div>
 
         {/* 로그인 안내 */}
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center px-5">
           <p className="text-sm text-[#666]">이미 계정이 있으신가요?</p>
           <p
             className="text-sm font-semibold text-primary cursor-pointer"
