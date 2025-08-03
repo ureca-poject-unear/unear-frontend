@@ -11,6 +11,7 @@ import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import LocationWhiteIcon from '@/assets/common/locationWhiteIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
 import PhoneIcon from '@/assets/common/phone.svg?react';
+import PhoneDarkIcon from '@/assets/common/PhoneDark.svg?react';
 import type { BookmarkStore } from '@/types/bookmark';
 import { getOperatingStatus } from '@/utils/operatingHours';
 
@@ -60,6 +61,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   const subTextColor = isDarkMode ? 'text-gray-300' : 'text-gray-400';
   const IconLocation = isDarkMode ? LocationWhiteIcon : LocationIcon;
   const IconTime = isDarkMode ? TimeWhiteIcon : TimeIcon;
+  const IconPhone = isDarkMode ? (isPhoneHovered ? PhoneIcon : PhoneDarkIcon) : PhoneIcon;
 
   // 전화 버튼 스타일
   const phoneButtonBaseStyle = isDarkMode
@@ -136,7 +138,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
             onMouseLeave={() => setIsPhoneHovered(false)}
             aria-label="전화 버튼"
           >
-            <PhoneIcon className="w-5 h-5" />
+            <IconPhone className="w-5 h-5" />
           </button>
         </div>
       </div>

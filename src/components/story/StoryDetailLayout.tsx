@@ -13,7 +13,7 @@ const StoryDetailLayout = ({
   backgroundImage,
 }: StoryDetailLayoutProps) => {
   return (
-    <div className="w-full max-w-[393px] mx-auto relative overflow-hidden min-h-[calc(100vh-105px)]">
+    <div className="w-full max-w-[600px] mx-auto relative overflow-hidden min-h-[calc(100vh-105px)]">
       <Header
         title={headerTitle}
         bgColor="bg-story"
@@ -37,7 +37,7 @@ const StoryDetailLayout = ({
       />
 
       {/* 컨텐츠 */}
-      <div className="relative z-30 mx-5 flex flex-col flex-1 min-h-[calc(100vh-105px)]">
+      <div className="relative z-30 mx-5 sm:mx-8 md:mx-12 flex flex-col flex-1 min-h-[calc(100vh-105px)]">
         {children}
       </div>
     </div>
