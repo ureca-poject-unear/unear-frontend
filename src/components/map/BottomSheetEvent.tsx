@@ -7,9 +7,10 @@ import { Link } from 'react-router-dom';
 interface BottomSheetEventProps {
   isOpen: boolean;
   onClose: () => void;
+  onMoveToJuniorLocation?: () => void;
 }
 
-const BottomSheetEvent = ({ isOpen, onClose }: BottomSheetEventProps) => {
+const BottomSheetEvent = ({ isOpen, onClose, onMoveToJuniorLocation }: BottomSheetEventProps) => {
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding={true}>
       <div className="relative w-full h-[531px] bg-white rounded-t-[20px] overflow-hidden">
@@ -21,7 +22,7 @@ const BottomSheetEvent = ({ isOpen, onClose }: BottomSheetEventProps) => {
         <h1 className="absolute left-1/2 -translate-x-1/2 top-[40px] font-bold text-[40px] leading-[54px] text-[#333333] text-center w-[148px] z-10">
           동네탐험
         </h1>
-        <h2 className="absolute left-1/2 -translate-x-1/2 top-[86px] font-bold text-[48px] leading-[64px] text-[#333333] text-center w-[133px] z-10">
+        <h2 className="absolute left-1/2 -translate-x-1/2 top-[86px] font-bold text-[48px] leading-[64px] text-primary text-center w-[133px] z-10">
           성수편
         </h2>
 
@@ -92,12 +93,23 @@ const BottomSheetEvent = ({ isOpen, onClose }: BottomSheetEventProps) => {
         </div>
 
         {/* 이번주니어 이동 링크 영역 */}
-        <Link
-          to="/junior"
-          className="absolute left-1/2 -translate-x-1/2 top-[486px] font-semibold text-[16px] leading-[21px] text-[#333333] underline w-[201px] text-center z-10"
-        >
-          이번주니어 매장 확인하러 가기
-        </Link>
+        <div className="absolute left-1/2 -translate-x-1/2 top-[486px] flex z-10">
+          <Link
+            to="/junior"
+            className="font-semibold text-[16px] leading-[21px] text-[#333333] underline w-[165px] text-center"
+          >
+            이번주니어 매장 확인
+          </Link>
+          <button
+            onClick={() => {
+              onMoveToJuniorLocation?.();
+              onClose();
+            }}
+            className="font-semibold text-[16px] leading-[21px] text-[#333333] underline w-[165px] text-center"
+          >
+            이번주니어 위치 확인
+          </button>
+        </div>
       </div>
     </BottomSheet>
   );
