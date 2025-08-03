@@ -220,6 +220,11 @@ const MapPage = () => {
     mapRef.current?.showCurrentLocation();
   };
 
+  const handleMoveToJuniorLocation = () => {
+    mapRef.current?.setCenter(37.544581, 127.055961);
+    mapRef.current?.setLevel(6);
+  };
+
   const handleSearch = async (keyword: string) => {
     if (!keyword.trim()) return;
     setSearchKeyword(keyword);
@@ -345,7 +350,11 @@ const MapPage = () => {
           benefitCategories={benefitCategories}
         />
       )}
-      <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
+      <BottomSheetEvent
+        isOpen={isEventOpen}
+        onClose={() => setIsEventOpen(false)}
+        onMoveToJuniorLocation={handleMoveToJuniorLocation}
+      />
       <BottomSheetCoupon
         isOpen={isCouponOpen}
         onClose={() => setIsCouponOpen(false)}

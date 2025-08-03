@@ -19,6 +19,7 @@ import { getPlaces } from '@/apis/getPlaces';
 export interface MapContainerRef {
   showCurrentLocation: () => void;
   setCenter: (lat: number, lng: number) => void;
+  setLevel: (level: number) => void;
   fetchPlaces: () => void;
   getBounds: () => ReturnType<typeof window.kakao.maps.Map.prototype.getBounds> | null;
   deselectMarker?: () => void;
@@ -362,7 +363,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           map.setCenter(new window.kakao.maps.LatLng(lat, lng));
           setTimeout(() => {
             isSettingCenterRef.current = false;
+            renderMarkers();
           }, 500);
+        }
+      },
+      setLevel: (level) => {
+        const map = mapInstanceRef.current;
+        if (map) {
+          map.setLevel(level);
         }
       },
       fetchPlaces: () => {
