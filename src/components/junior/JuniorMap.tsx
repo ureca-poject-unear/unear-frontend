@@ -19,18 +19,20 @@ const JuniorMap = ({ onBookmarkToggle }: JuniorMapProps) => {
   };
 
   return (
-    <div className="px-5 bg-white">
+    <div className="w-full bg-white">
       {/* 지도 위쪽 텍스트 */}
-      <div className="m-4">
+      <div className="px-5 py-4">
         <p className="text-lm font-bold text-black">이번주니어 지역</p>
       </div>
 
       {/* 지도 */}
-      <div className="relative h-[280px] w-[352px] mb-4">
-        {/*
-          [수정] MapContainer는 자체적으로 데이터를 로드하므로 stores 프롭을 전달하지 않습니다.
-        */}
-        <MapContainer onBookmarkToggle={handleBookmarkToggleAdapter} />
+      <div className="px-5 pb-4">
+        <div className="relative w-full h-[280px] max-w-[calc(100%-0px)] mx-auto mb-4">
+          {/*
+            [수정] MapContainer는 자체적으로 데이터를 로드하므로 stores 프롭을 전달하지 않습니다.
+          */}
+          <MapContainer onBookmarkToggle={handleBookmarkToggleAdapter} />
+        </div>
       </div>
     </div>
   );
