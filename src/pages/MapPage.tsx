@@ -50,6 +50,14 @@ const MapPage = () => {
   const [isSearchOpen, setSearchOpen] = useState(false);
   const [currentLat, setCurrentLat] = useState<number | null>(null);
   const [currentLng, setCurrentLng] = useState<number | null>(null);
+  const [isLoadviewActive, setIsLoadviewActive] = useState(false);
+  const [isRoadviewOpen, setIsRoadviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (isRoadviewOpen) {
+      // 로드뷰가 열렸을 때
+    }
+  }, [isRoadviewOpen]);
 
   const ALL_CATEGORY_CODES = [
     'FOOD',
@@ -295,30 +303,48 @@ const MapPage = () => {
         shouldRestoreLocation={false}
         onMarkerClick={handleMarkerClick}
         onMarkerDeselect={() => {}}
+        onLoadviewStateChange={(isActive) => {
+          setIsLoadviewActive(isActive);
+        }}
+        onRoadviewStateChange={(isOpen) => {
+          setIsRoadviewOpen(isOpen);
+        }}
       />
 
-      {/* 상단 검색바 */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
-        <SearchBar onSearch={handleSearch} />
-      </div>
+      {/* 상단 검색바 - 로드뷰 화면이 열렸을 때만 숨김 */}
+      {!isRoadviewOpen && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+      )}
 
-      {/* 좌측 하단 버튼 그룹 */}
-      <MapActionButtons
-        onEventClick={() => setIsEventOpen(true)}
-        onBarcodeClick={() => setIsBarcodeOpen(true)}
-        onCouponClick={() => setIsCouponOpen(true)}
-      />
-      {/* 우측 하단 위치 버튼 */}
-      <MapLocationButton onClick={handleCurrentLocation} />
+      {/* 좌측 하단 버튼 그룹 - 로드뷰 화면이 열렸을 때만 숨김 */}
+      {!isRoadviewOpen && (
+        <MapActionButtons
+          onEventClick={() => setIsEventOpen(true)}
+          onBarcodeClick={() => setIsBarcodeOpen(true)}
+          onCouponClick={() => setIsCouponOpen(true)}
+        />
+      )}
 
-      {/* 우측 상단 필터링/즐겨찾기 버튼 */}
-      <MapTopRightButtons
-        onToggleFilter={() => setIsFilterOpen(true)}
-        onToggleBookmark={() => setIsBookmarkOnly((prev) => !prev)}
-        isBookmarkOnly={isBookmarkOnly}
-        categoryCodes={categoryCodes}
-        benefitCategories={benefitCategories}
-      />
+      {/* 우측 하단 위치 버튼 - 로드뷰 화면이 열렸을 때만 숨김 */}
+      {!isRoadviewOpen && <MapLocationButton onClick={handleCurrentLocation} />}
+
+      {/* 우측 상단 필터링/즐겨찾기 버튼 - 로드뷰 화면이 열렸을 때만 숨김 */}
+      {!isRoadviewOpen && (
+        <MapTopRightButtons
+          onToggleFilter={() => setIsFilterOpen(true)}
+          onToggleBookmark={() => setIsBookmarkOnly((prev) => !prev)}
+          onToggleLoadview={(isActive) => {
+            setIsLoadviewActive(isActive);
+            mapRef.current?.toggleLoadview?.(isActive);
+          }}
+          isBookmarkOnly={isBookmarkOnly}
+          isLoadviewActive={isLoadviewActive}
+          categoryCodes={categoryCodes}
+          benefitCategories={benefitCategories}
+        />
+      )}
       <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
       <BottomSheetCoupon
         isOpen={isCouponOpen}
