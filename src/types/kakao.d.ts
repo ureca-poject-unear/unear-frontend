@@ -93,6 +93,22 @@ declare global {
           minLevel?: number;
           disableClickZoom?: boolean;
           minClusterSize?: number;
+          gridSize?: number;
+          calculator?: number[];
+          styles?: Array<{
+            width: string;
+            height: string;
+            background: string;
+            borderRadius: string;
+            color: string;
+            textAlign: string;
+            fontWeight: string;
+            fontSize: string;
+            lineHeight: string;
+            border?: string;
+            boxShadow: string;
+            opacity?: string;
+          }>;
         }) => KakaoMarkerClusterer;
         event: KakaoEvent;
         load(callback: () => void): void;
