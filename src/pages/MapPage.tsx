@@ -89,6 +89,112 @@ const MapPage = () => {
   }, [benefitCategories]);
 
   useEffect(() => {
+    const focusStore = location.state?.focusStore;
+    if (focusStore) {
+      if (focusStore.latitude && focusStore.longitude) {
+        const focusOnStore = () => {
+          const map = mapRef.current;
+
+          if (!map || !map.setCenter) {
+            setTimeout(() => focusOnStore(), 300);
+            return;
+          }
+
+          try {
+            map.deselectMarker?.();
+            map.setCenter(focusStore.latitude, focusStore.longitude);
+
+            setTimeout(() => {
+              map.setSelectedMarker(focusStore.placeId);
+
+              handleMarkerClick(
+                focusStore.placeId,
+                String(focusStore.latitude),
+                String(focusStore.longitude)
+              );
+            }, 600);
+          } catch (error) {
+            console.error('지도 중심 이동 실패:', error);
+          }
+        };
+
+        setTimeout(() => {
+          focusOnStore();
+        }, 500);
+      } else if (focusStore.searchKeyword) {
+        const performSearch = async () => {
+          try {
+            setSearchKeyword(focusStore.searchKeyword);
+            const map = mapRef.current;
+            if (!map || !map.getBounds) {
+              setTimeout(() => performSearch(), 500);
+              return;
+            }
+
+            const bounds = map.getBounds();
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+            const centerLat = (sw.getLat() + ne.getLat()) / 2;
+            const centerLng = (sw.getLng() + ne.getLng()) / 2;
+
+            setCurrentLat(centerLat);
+            setCurrentLng(centerLng);
+
+            const delta = 0.09;
+            const swLat = centerLat - delta;
+            const swLng = centerLng - delta;
+            const neLat = centerLat + delta;
+            const neLng = centerLng + delta;
+
+            const results = await getPlacesForSearch({
+              keyword: focusStore.searchKeyword,
+              southWestLatitude: swLat,
+              southWestLongitude: swLng,
+              northEastLatitude: neLat,
+              northEastLongitude: neLng,
+            });
+
+            if (results.length > 0) {
+              setSearchResults(results);
+              setSearchOpen(true);
+
+              const exactMatch = results.find((result) => result.placeId === focusStore.placeId);
+
+              const nameMatch = !exactMatch
+                ? results.find(
+                    (result) =>
+                      result.placeName.includes(focusStore.placeName) ||
+                      focusStore.placeName.includes(result.placeName)
+                  )
+                : null;
+
+              const matchedStore = exactMatch || nameMatch;
+
+              if (matchedStore) {
+                setTimeout(() => {
+                  handleMarkerClick(
+                    matchedStore.placeId,
+                    String(matchedStore.latitude),
+                    String(matchedStore.longitude)
+                  );
+                }, 1000);
+              }
+            } else {
+              showInfoToast(`'${focusStore.placeName}' 매장을 찾을 수 없습니다.`);
+            }
+          } catch (error) {
+            console.error('북마크 위치 검색 실패:', error);
+            showInfoToast('매장 검색 중 오류가 발생했습니다.');
+          }
+        };
+
+        performSearch();
+      }
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
     const handleRefreshStores = () => {
       console.log('🔄 [refreshMapStores] 이벤트 수신됨 - 지도 재요청');
       mapRef.current?.fetchPlaces();
@@ -272,6 +378,8 @@ const MapPage = () => {
           onCouponClick={(userCouponId, brand) => {
             console.log('Coupon clicked:', userCouponId, brand);
           }}
+          mapRef={mapRef}
+          onMarkerClick={handleMarkerClick}
         />
       )}
     </div>

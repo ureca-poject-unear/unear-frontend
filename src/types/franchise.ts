@@ -5,6 +5,7 @@ export interface FranchiseBenefitItem {
   franchiseName: string;
   franchiseImageUrl: string;
   categoryCode: string;
+  description: string;
   hasVvip: boolean;
   hasVip: boolean;
   hasBasic: boolean;

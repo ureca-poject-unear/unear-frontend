@@ -99,7 +99,6 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
     try {
       await toggleFavorite(store.placeId);
 
-      // 즐겨찾기 ON 상태에서 해제했다면 목록 갱신 요청
       if (prev === true && next === false && localStorage.getItem('isBookmarkOnly') === 'true') {
         window.dispatchEvent(new Event('refreshMapStores'));
       }
@@ -114,7 +113,20 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
   }, [store]);
 
   const handleLocationClick = () => {
-    mapRef.current?.setCenter(store.latitude, store.longitude);
+    const currentCenter = mapRef.current?.getCenter?.();
+
+    const currentLat = currentCenter?.lat;
+    const currentLng = currentCenter?.lng;
+
+    const targetLat = Number(store.latitude);
+    const targetLng = Number(store.longitude);
+
+    const isDifferent =
+      !currentLat || !currentLng || currentLat !== targetLat || currentLng !== targetLng;
+
+    if (isDifferent) {
+      mapRef.current?.setCenter(targetLat, targetLng);
+    }
   };
 
   const handlePhoneClick = () => {

@@ -1,16 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import GradeMini from './GradeMini';
-
 type GradeType = 'VIP' | 'VVIP' | '우수';
-
 type MembershipCardProps = {
   name: string;
   description: string;
   grade: GradeType | GradeType[];
   imageUrl: string;
-  onClick?: () => void; // 클릭 이벤트 핸들러 추가
+  onClick?: () => void;
 };
-
 export default function MembershipCard({
   name,
   description,
@@ -19,16 +16,14 @@ export default function MembershipCard({
   onClick,
 }: MembershipCardProps) {
   const navigate = useNavigate();
-
+  const imageSrc = imageUrl;
   const handleClick = () => {
     if (onClick) {
       onClick();
     } else {
-      // 기본 동작: 상세페이지로 이동 (name 기준, 필요시 id로 변경)
       navigate(`/membership/detail/${encodeURIComponent(name)}`);
     }
   };
-
   return (
     <div
       className="relative w-[353px] h-[85px] cursor-pointer"
@@ -41,15 +36,14 @@ export default function MembershipCard({
     >
       {/* 배경 테두리 박스 */}
       <div className="absolute left-0 top-0 w-full h-full rounded-[12px] border-[0.5px] border-gray-400 bg-white" />
-
       {/* 콘텐츠 영역 */}
       <div className="flex justify-start items-center absolute left-2 top-2.5 gap-3">
         {/* 원형 이미지 */}
-        <div className="relative w-[64.46px] h-[63px]">
+        <div className="relative w-[64px] h-[64px]">
           <svg
-            width={65}
-            height={63}
-            viewBox="0 0 65 63"
+            width={64}
+            height={64}
+            viewBox="0 0 64 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="absolute left-0 top-0"
@@ -61,19 +55,20 @@ export default function MembershipCard({
             />
           </svg>
           <img
-            src={imageUrl}
+            src={imageSrc}
             alt={name}
-            className="absolute left-[13.5px] top-[12.5px] w-[37.43px] h-[37.43px] object-contain"
+            onError={(e) => {
+              e.currentTarget.src = '/images/default-franchise.png'; // fallback 이미지
+            }}
+            className="absolute left-[13.5px] top-[12.5px] w-[37px] h-[37px] object-contain"
           />
         </div>
-
         {/* 텍스트 정보 */}
         <div className="flex flex-col w-[249.92px]">
           <div className="flex flex-col gap-[2px]">
             <p className="text-xs font-bold text-black">{name}</p>
             <p className="text-s font-bold text-black truncate">{description}</p>
           </div>
-
           {/* 등급 뱃지 */}
           <div className="mt-[6px] flex items-center gap-1.5">
             {Array.isArray(grade) ? (
