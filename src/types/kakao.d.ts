@@ -11,6 +11,8 @@ export interface KakaoMap {
   getLevel(): number;
   getBounds(): KakaoMapBounds;
   getCenter(): KakaoLatLng;
+  addOverlayMapTypeId(mapTypeId: string): void;
+  removeOverlayMapTypeId(mapTypeId: string): void;
 }
 
 export interface KakaoMapBounds {
@@ -28,13 +30,27 @@ export interface KakaoMarker {
 export interface KakaoCustomOverlay {
   setMap(map: KakaoMap | null): void;
   setPosition(position: KakaoLatLng): void;
+  getContent(): Node;
+}
+
+export interface KakaoRoadview {
+  setPanoId(panoId: string, position: KakaoLatLng): void;
+  relayout(): void;
+}
+
+export interface KakaoRoadviewClient {
+  getNearestPanoId(
+    position: KakaoLatLng,
+    radius: number,
+    callback: (panoId: string | null) => void
+  ): void;
 }
 
 export interface KakaoEvent {
   addListener(
-    target: KakaoMap | KakaoMarker | KakaoCustomOverlay,
+    target: KakaoMap | KakaoMarker | KakaoCustomOverlay | KakaoRoadview,
     type: string,
-    handler: () => void
+    handler: (event?: { latLng?: KakaoLatLng }) => void
   ): void;
 }
 
@@ -112,6 +128,11 @@ declare global {
         }) => KakaoMarkerClusterer;
         event: KakaoEvent;
         load(callback: () => void): void;
+        Roadview: new (container: HTMLElement) => KakaoRoadview;
+        RoadviewClient: new () => KakaoRoadviewClient;
+        MapTypeId: {
+          ROADVIEW: string;
+        };
       };
     };
   }
