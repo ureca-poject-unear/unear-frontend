@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import CouponCard from '@/components/common/CouponCard';
 import StoreCouponCard from '@/components/common/StoreCouponCard';
+import EmptyState from '@/components/common/EmptyState';
 import ClockIcon from '@/assets/map/mapCouponWatchIcon.svg?react';
 import MarkerIcon from '@/assets/map/mapCouponLocationIcon.svg?react';
 import MapCouponIcon from '@/assets/map/mapCouponSheetIcon.svg?react';
@@ -234,19 +235,25 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
                       </div>
                     </div>
 
-                    <div className="space-y-[14px]">
-                      {coupons.map((coupon) => (
-                        <CouponCard
-                          key={`all-${coupon.userCouponId}`}
-                          brand={coupon.name}
-                          title={coupon.couponName}
-                          validUntil={coupon.couponEnd}
-                          category={coupon.categoryCode}
-                          storeClass={coupon.markerCode}
-                          onClick={() => handleCardClick(coupon.userCouponId)}
-                        />
-                      ))}
-                    </div>
+                    {coupons.length === 0 ? (
+                      <div className="flex justify-center items-center py-8">
+                        <EmptyState message="사용할 수 있는 쿠폰이 없어요" />
+                      </div>
+                    ) : (
+                      <div className="space-y-[14px]">
+                        {coupons.map((coupon) => (
+                          <CouponCard
+                            key={`all-${coupon.userCouponId}`}
+                            brand={coupon.name}
+                            title={coupon.couponName}
+                            validUntil={coupon.couponEnd}
+                            category={coupon.categoryCode}
+                            storeClass={coupon.markerCode}
+                            onClick={() => handleCardClick(coupon.userCouponId)}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
