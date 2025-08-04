@@ -1,19 +1,32 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
+import { showToast } from '@/utils/toast';
+import type {
+  KakaoMap,
+  KakaoCustomOverlay,
+  KakaoCircle,
+  KakaoMarkerClusterer,
+  KakaoMarker,
+  KakaoLatLng,
+  KakaoRoadview,
+  KakaoRoadviewClient,
+} from '@/types/kakao';
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
 import MapMarkerIcon from '../common/MapMarkerIcon';
+import PlaceNameLabel from './PlaceNameLabel';
 import { getPlaces } from '@/apis/getPlaces';
 
 export interface MapContainerRef {
   showCurrentLocation: () => void;
   setCenter: (lat: number, lng: number) => void;
+  setLevel: (level: number) => void;
   fetchPlaces: () => void;
   getBounds: () => ReturnType<typeof window.kakao.maps.Map.prototype.getBounds> | null;
   deselectMarker?: () => void;
   selectMarker?: (placeId: number) => void;
   setSelectedMarker: (placeId: number) => void;
   getCenter: () => { lat: number; lng: number } | null;
+  toggleLoadview: (isActive: boolean) => void;
 }
 
 interface MapContainerProps {
@@ -23,6 +36,8 @@ interface MapContainerProps {
   shouldRestoreLocation: boolean;
   onMarkerClick: (placeId: number, latitude: string, longitude: string) => void;
   onMarkerDeselect?: () => void;
+  onLoadviewStateChange?: (isActive: boolean) => void;
+  onRoadviewStateChange?: (isOpen: boolean) => void;
 }
 
 const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
@@ -34,6 +49,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       shouldRestoreLocation,
       onMarkerClick,
       onMarkerDeselect,
+      onLoadviewStateChange,
+      onRoadviewStateChange,
     },
     ref
   ) => {
@@ -41,7 +58,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
     const mapInstanceRef = useRef<KakaoMap | null>(null);
     const overlayRef = useRef<KakaoCustomOverlay | null>(null);
-    const markersRef = useRef<KakaoCustomOverlay[]>([]);
     const currentLocationRef = useRef<{ lat: number; lng: number } | null>(null);
     const [isLocationShown, setIsLocationShown] = useState(false);
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
@@ -49,11 +65,241 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
     const selectedPlaceIdRef = useRef<number | null>(null);
     const isSettingCenterRef = useRef(false);
+    const clustererRef = useRef<KakaoMarkerClusterer | null>(null);
+    const markerInstancesRef = useRef<KakaoMarker[]>([]);
+    const [isLoadviewActive, setIsLoadviewActive] = useState(false);
+    const isLoadviewActiveRef = useRef(false);
+    const loadviewOverlaysRef = useRef<KakaoCustomOverlay[]>([]);
+    const roadviewRef = useRef<KakaoRoadview | null>(null);
+    const roadviewClientRef = useRef<KakaoRoadviewClient | null>(null);
+    const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    // isLoadviewActive 상태가 변경될 때마다 로드뷰 도로 표시 상태 업데이트
+    useEffect(() => {
+      console.log('isLoadviewActive useEffect 트리거됨:', isLoadviewActive);
+      if (isLoadviewActive) {
+        showLoadviewRoads();
+      } else {
+        clearLoadviewRoads();
+      }
+    }, [isLoadviewActive]);
 
     const clearSelectedMarker = () => {
       setSelectedPlaceId(null);
       selectedPlaceIdRef.current = null;
       onMarkerDeselect?.();
+    };
+
+    const toggleLoadview = (isActive: boolean) => {
+      console.log('toggleLoadview 호출됨:', isActive);
+      setIsLoadviewActive(isActive);
+      isLoadviewActiveRef.current = isActive;
+      onLoadviewStateChange?.(isActive);
+      console.log('isLoadviewActive 상태 업데이트됨:', isActive);
+    };
+
+    const showLoadviewRoads = () => {
+      const map = mapInstanceRef.current;
+      if (!map) return;
+
+      console.log('로드뷰 도로 표시 시작');
+
+      // 기존 로드뷰 오버레이 제거
+      clearLoadviewRoads();
+
+      // 로드뷰 도로 오버레이 활성화
+      try {
+        map.addOverlayMapTypeId(window.kakao.maps.MapTypeId.ROADVIEW);
+        console.log('로드뷰 도로 오버레이 활성화 완료');
+      } catch (error) {
+        console.error('로드뷰 도로 오버레이 활성화 실패:', error);
+      }
+
+      showToast('지도에서 로드뷰 도로를 클릭하세요.');
+    };
+
+    const openLoadview = (lat: number, lng: number) => {
+      console.log('로드뷰 열기 시도:', lat, lng);
+
+      if (!roadviewRef.current || !roadviewClientRef.current) {
+        console.log('로드뷰 객체가 없어서 초기화합니다.');
+        initializeRoadview();
+      }
+
+      const position = new window.kakao.maps.LatLng(lat, lng);
+
+      // 로드뷰 컨테이너 표시
+      const roadviewContainer = document.getElementById('roadview-container');
+      if (roadviewContainer) {
+        // 맵 컨테이너 내에서 절대 위치로 설정
+        roadviewContainer.style.position = 'absolute';
+        roadviewContainer.style.top = '0';
+        roadviewContainer.style.left = '0';
+        roadviewContainer.style.width = '100%';
+        roadviewContainer.style.height = '100%';
+        roadviewContainer.style.zIndex = '1000';
+        roadviewContainer.style.display = 'block';
+        roadviewContainer.style.overflow = 'hidden';
+
+        // 로드뷰 화면 상태 설정
+        onRoadviewStateChange?.(true);
+
+        console.log('로드뷰 컨테이너 표시됨');
+        console.log(
+          '로드뷰 컨테이너 크기:',
+          roadviewContainer.offsetWidth,
+          'x',
+          roadviewContainer.offsetHeight
+        );
+        console.log('로드뷰 컨테이너 스타일:', roadviewContainer.style.cssText);
+      } else {
+        console.error('로드뷰 컨테이너를 찾을 수 없습니다.');
+        return;
+      }
+
+      // 가장 가까운 로드뷰 파노ID 찾기
+      console.log('가장 가까운 로드뷰 파노ID 찾는 중...');
+      if (roadviewClientRef.current) {
+        roadviewClientRef.current.getNearestPanoId(position, 50, (panoId: string | null) => {
+          console.log('파노ID 결과:', panoId);
+          if (panoId === null) {
+            showToast('이 위치에서는 로드뷰를 사용할 수 없습니다.');
+            if (roadviewContainer) {
+              roadviewContainer.style.display = 'none';
+            }
+            // 로드뷰 화면 상태를 비활성화 (UI가 사라지지 않도록)
+            onRoadviewStateChange?.(false);
+          } else {
+            // 로드뷰 실행
+            console.log('로드뷰 실행 중...');
+            if (roadviewRef.current) {
+              roadviewRef.current.setPanoId(panoId, position);
+
+              // 약간의 지연 후 relayout 호출
+              setTimeout(() => {
+                if (roadviewRef.current) {
+                  roadviewRef.current.relayout();
+                  console.log('로드뷰 relayout 완료');
+                }
+                // 로드뷰가 성공적으로 로드된 후 닫기 버튼 표시
+                if (closeButtonRef.current) {
+                  closeButtonRef.current.style.display = 'flex';
+                }
+              }, 100);
+
+              console.log('로드뷰 실행 완료');
+            }
+          }
+        });
+      }
+    };
+
+    const clearLoadviewRoads = () => {
+      loadviewOverlaysRef.current.forEach((overlay) => {
+        if (overlay && overlay.setMap) {
+          overlay.setMap(null);
+        }
+      });
+      loadviewOverlaysRef.current = [];
+
+      // 로드뷰 도로 오버레이 제거
+      const map = mapInstanceRef.current;
+      if (map) {
+        try {
+          map.removeOverlayMapTypeId(window.kakao.maps.MapTypeId.ROADVIEW);
+        } catch (error) {
+          console.log('로드뷰 도로 오버레이 제거 실패:', error);
+        }
+      }
+    };
+
+    const initializeRoadview = () => {
+      if (!window.kakao || !window.kakao.maps) {
+        console.error('카카오맵 API가 로드되지 않았습니다.');
+        return;
+      }
+
+      console.log('로드뷰 초기화 시작');
+
+      // 기존 로드뷰 컨테이너가 있다면 제거
+      const existingContainer = document.getElementById('roadview-container');
+      if (existingContainer) {
+        existingContainer.remove();
+      }
+
+      // 로드뷰 컨테이너 생성
+      const roadviewContainer = document.createElement('div');
+      roadviewContainer.id = 'roadview-container';
+      roadviewContainer.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1000;
+          background: white;
+          display: none;
+          overflow: hidden;
+        `;
+
+      // 닫기 버튼 생성
+      const closeButton = document.createElement('button');
+      closeButtonRef.current = closeButton;
+      closeButton.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        `;
+      closeButton.style.cssText = `
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          width: 40px;
+          height: 40px;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          z-index: 9999;
+          display: none;
+          align-items: center;
+          justify-content: center;
+        `;
+
+      // 로드뷰 컨테이너를 맵 컨테이너에 추가
+      const mapContainer = mapRef.current;
+      if (mapContainer) {
+        mapContainer.appendChild(roadviewContainer);
+        mapContainer.appendChild(closeButton); // 닫기 버튼을 맵 컨테이너에 직접 추가
+
+        // 클릭 이벤트 리스너 추가
+        closeButton.addEventListener('click', () => {
+          roadviewContainer.style.display = 'none';
+          closeButton.style.display = 'none'; // 닫기 버튼도 숨김
+          // 로드뷰 화면 상태를 비활성화
+          onRoadviewStateChange?.(false);
+        });
+      }
+
+      // 로드뷰 객체 생성
+      try {
+        roadviewRef.current = new window.kakao.maps.Roadview(roadviewContainer);
+        roadviewClientRef.current = new window.kakao.maps.RoadviewClient();
+        console.log('로드뷰 객체 생성 완료:', roadviewRef.current, roadviewClientRef.current);
+
+        // 로드뷰가 로드되었는지 확인하는 이벤트 리스너 추가
+        window.kakao.maps.event.addListener(roadviewRef.current, 'init', () => {
+          console.log('로드뷰 초기화 완료');
+        });
+
+        window.kakao.maps.event.addListener(roadviewRef.current, 'panorama_changed', () => {
+          console.log('로드뷰 파노라마 변경됨');
+        });
+      } catch (error) {
+        console.error('로드뷰 객체 생성 실패:', error);
+      }
     };
 
     const renderCurrentLocation = (lat: number, lng: number) => {
@@ -117,7 +363,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           map.setCenter(new window.kakao.maps.LatLng(lat, lng));
           setTimeout(() => {
             isSettingCenterRef.current = false;
+            renderMarkers();
           }, 500);
+        }
+      },
+      setLevel: (level) => {
+        const map = mapInstanceRef.current;
+        if (map) {
+          map.setLevel(level);
         }
       },
       fetchPlaces: () => {
@@ -139,16 +392,18 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           lng: center.getLng(),
         };
       },
+      toggleLoadview,
     }));
 
     const renderMarkers = async () => {
       const map = mapInstanceRef.current;
-      if (!map) return;
+      const clusterer = clustererRef.current;
+      if (!map || !clusterer) return;
 
       const bounds = map.getBounds();
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
-
+      const currentLevel = map.getLevel();
       try {
         const places = await getPlaces({
           swLat: sw.getLat(),
@@ -160,55 +415,114 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           benefitCategories,
         });
 
-        markersRef.current.forEach((marker) => marker.setMap(null));
-        markersRef.current = [];
+        markerInstancesRef.current.forEach((m) => m.setMap(null));
+        clusterer.removeMarkers(markerInstancesRef.current);
+        clusterer.clear();
+        markerInstancesRef.current = [];
 
-        places.forEach((place) => {
+        if (places.length === 0) {
+          if (!isLocationShown && currentLocationRef.current) {
+            renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
+          }
+          return;
+        }
+
+        const newMarkers: KakaoMarker[] = places.map((place) => {
           const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
 
-          const el = document.createElement('div');
-          el.innerHTML = ReactDOMServer.renderToString(
-            <div style={{ cursor: 'pointer' }}>
-              <MapMarkerIcon
-                category={place.categoryCode}
-                storeClass={place.markerCode}
-                event={place.eventCode}
-                isSelected={selectedPlaceIdRef.current === place.placeId}
-              />
-            </div>
+          // 마커와 텍스트를 포함하는 컨테이너 생성
+          const containerElement = document.createElement('div');
+          containerElement.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+          `;
+
+          // 마커 렌더링
+          const markerHTML = ReactDOMServer.renderToString(
+            <MapMarkerIcon
+              category={place.categoryCode}
+              storeClass={place.markerCode}
+              event={place.eventCode}
+              isSelected={selectedPlaceId === place.placeId}
+            />
           );
 
-          const markerElement = el.firstElementChild;
-          if (markerElement) {
-            markerElement.setAttribute('data-place-id', String(place.placeId));
-            markerElement.setAttribute('data-lat', String(place.latitude));
-            markerElement.setAttribute('data-lng', String(place.longitude));
-            const isAlreadySelected = selectedPlaceIdRef.current === place.placeId;
+          const markerEl = document.createElement('div');
+          markerEl.innerHTML = markerHTML;
+          const markerElement = markerEl.firstElementChild as HTMLElement;
 
-            if (!isAlreadySelected) {
-              markerElement.addEventListener('click', () => {
-                const placeId = Number(markerElement.getAttribute('data-place-id'));
-                const lat = markerElement.getAttribute('data-lat');
-                const lng = markerElement.getAttribute('data-lng');
-                if (placeId && lat && lng) {
-                  setSelectedPlaceId(placeId);
-                  selectedPlaceIdRef.current = placeId;
-                  onMarkerClick(placeId, lat, lng);
-                }
+          if (markerElement) {
+            markerElement.addEventListener('click', () => {
+              setSelectedPlaceId(place.placeId);
+              selectedPlaceIdRef.current = place.placeId;
+              onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
+            });
+          }
+
+          // 마커를 컨테이너에 추가
+          containerElement.appendChild(markerElement);
+
+          // 지도 레벨 6 이하에서 장소명 텍스트 추가
+          if (currentLevel <= 6) {
+            const textHTML = ReactDOMServer.renderToString(
+              <PlaceNameLabel
+                placeName={place.placeName}
+                onClick={() => {
+                  setSelectedPlaceId(place.placeId);
+                  selectedPlaceIdRef.current = place.placeId;
+                  onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
+                }}
+              />
+            );
+
+            const textEl = document.createElement('div');
+            textEl.innerHTML = textHTML;
+            const textElement = textEl.firstElementChild as HTMLElement;
+
+            if (textElement) {
+              // 클릭 이벤트 리스너 추가
+              textElement.addEventListener('click', () => {
+                setSelectedPlaceId(place.placeId);
+                selectedPlaceIdRef.current = place.placeId;
+                onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
               });
+
+              containerElement.appendChild(textElement);
             }
           }
 
-          const overlay = new window.kakao.maps.CustomOverlay({
+          const customOverlay = new window.kakao.maps.CustomOverlay({
             position,
-            content: markerElement as Node,
-            yAnchor: 1,
+            content: containerElement,
+            yAnchor: 0.5,
             zIndex: 1,
           });
 
-          overlay.setMap(map);
-          markersRef.current.push(overlay);
+          const marker = new window.kakao.maps.Marker({ position });
+          marker.setOpacity(0);
+
+          const originalSetMap = marker.setMap;
+          marker.setMap = function (mapInstance) {
+            originalSetMap.call(this, mapInstance);
+            customOverlay.setMap(mapInstance);
+          };
+
+          return marker;
         });
+
+        markerInstancesRef.current = newMarkers;
+        console.log(currentLevel, '현재레벨');
+        const currentZoom = mapInstanceRef.current?.getLevel?.();
+
+        if (places.length <= 3) {
+          newMarkers.forEach((marker) => marker.setMap(map));
+        } else if (currentZoom !== undefined && currentZoom <= 6) {
+          newMarkers.forEach((marker) => marker.setMap(map));
+        } else {
+          clusterer.addMarkers(newMarkers);
+        }
 
         if (!isLocationShown && currentLocationRef.current) {
           renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
@@ -242,7 +556,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       }
 
       const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&autoload=false`;
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&autoload=false&libraries=clusterer`;
       script.async = true;
       document.head.appendChild(script);
 
@@ -259,6 +573,89 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             mapInstanceRef.current = map;
 
+            try {
+              const clusterer = new window.kakao.maps.MarkerClusterer({
+                map,
+                averageCenter: true,
+                minLevel: 4,
+                disableClickZoom: true,
+                minClusterSize: 3,
+                gridSize: 60,
+                calculator: [10, 30, 50, 100, 200],
+                styles: [
+                  {
+                    width: '40px',
+                    height: '40px',
+                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                    borderRadius: '50%',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    lineHeight: '40px',
+                    boxShadow: '0 2px 6px rgba(255, 105, 180, 0.3)',
+                    opacity: '0.9',
+                  },
+                  {
+                    width: '50px',
+                    height: '50px',
+                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                    borderRadius: '50%',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    lineHeight: '50px',
+                    boxShadow: '0 3px 8px rgba(255, 105, 180, 0.4)',
+                    opacity: '0.9',
+                  },
+                  {
+                    width: '60px',
+                    height: '60px',
+                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                    borderRadius: '50%',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '18px',
+                    lineHeight: '60px',
+                    boxShadow: '0 4px 10px rgba(255, 105, 180, 0.5)',
+                    opacity: '0.9',
+                  },
+                  {
+                    width: '70px',
+                    height: '70px',
+                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                    borderRadius: '50%',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '20px',
+                    lineHeight: '70px',
+                    boxShadow: '0 5px 12px rgba(255, 105, 180, 0.6)',
+                    opacity: '0.9',
+                  },
+                  {
+                    width: '80px',
+                    height: '80px',
+                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                    borderRadius: '50%',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '22px',
+                    lineHeight: '80px',
+                    boxShadow: '0 6px 14px rgba(255, 105, 180, 0.7)',
+                    opacity: '0.9',
+                  },
+                ],
+              });
+              clustererRef.current = clusterer;
+            } catch (error) {
+              console.error('클러스터러 초기화 실패:', error);
+              clustererRef.current = null;
+            }
+
             const staticCircle = new window.kakao.maps.Circle({
               center: new window.kakao.maps.LatLng(37.544581, 127.055961),
               radius: 800,
@@ -274,12 +671,33 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             showCurrentLocation();
 
+            // 로드뷰 초기화
+            initializeRoadview();
+
             window.kakao.maps.event.addListener(map, 'idle', () => {
-              // idle 이벤트가 발생했지만 중심 이동 중이면 무시
               if (!isSettingCenterRef.current) {
                 renderMarkers();
               }
             });
+
+            // 지도 레벨 변경 이벤트 리스너 추가
+            window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
+              renderMarkers();
+            });
+
+            // 로드뷰 모드일 때 지도 클릭 이벤트 추가
+            window.kakao.maps.event.addListener(
+              map,
+              'click',
+              (mouseEvent?: { latLng?: KakaoLatLng }) => {
+                console.log('지도 클릭됨, 로드뷰 모드:', isLoadviewActiveRef.current);
+                if (isLoadviewActiveRef.current && mouseEvent?.latLng) {
+                  const position = mouseEvent.latLng;
+                  console.log('클릭한 위치:', position.getLat(), position.getLng());
+                  openLoadview(position.getLat(), position.getLng());
+                }
+              }
+            );
 
             renderMarkers();
           });
@@ -290,6 +708,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         document.head.removeChild(script);
         if (staticCircleRef.current) {
           staticCircleRef.current.setMap(null);
+        }
+        if (clustererRef.current && markerInstancesRef.current.length > 0) {
+          clustererRef.current.removeMarkers(markerInstancesRef.current);
+        }
+        if (overlayRef.current) {
+          overlayRef.current.setMap(null);
         }
       };
     }, [kakaoMapKey]);
