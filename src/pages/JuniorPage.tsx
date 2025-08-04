@@ -85,7 +85,10 @@ const JuniorPage = () => {
     return (
       <>
         <Header title="이번주니어" />
-        <div className="p-10 text-center">이벤트 정보를 불러오는 중입니다...</div>
+        {/* === 반응형 적용을 위해 컨테이너 추가 === */}
+        <div className="w-full max-w-[600px] mx-auto">
+          <div className="p-10 text-center">이벤트 정보를 불러오는 중입니다...</div>
+        </div>
       </>
     );
   }
@@ -94,7 +97,10 @@ const JuniorPage = () => {
     return (
       <>
         <Header title="이번주니어" />
-        <div className="p-10 text-center text-red-500">{error}</div>
+        {/* === 반응형 적용을 위해 컨테이너 추가 === */}
+        <div className="w-full max-w-[600px] mx-auto">
+          <div className="p-10 text-center text-red-500">{error}</div>
+        </div>
       </>
     );
   }
@@ -102,7 +108,8 @@ const JuniorPage = () => {
   return (
     <>
       <Header title="이번주니어" />
-      <div className="flex flex-col items-center">
+      {/* === 반응형 적용을 위해 최상위 컨테이너 수정 === */}
+      <div className="w-full max-w-[600px] mx-auto flex flex-col items-center">
         <EventBanner />
         <div className="flex flex-col gap-3 items-center w-full">
           <StampRouletteCard

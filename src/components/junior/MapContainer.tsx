@@ -1,8 +1,6 @@
-// src/components/junior/MapContainer.tsx (수정된 코드)
-
 import { useEffect, useRef, useState } from 'react';
 import ReactDOM, { type Root } from 'react-dom/client';
-import type { KakaoMap, KakaoCustomOverlay } from '@/types/kakao';
+import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
 import type { Place } from '@/types/map';
 import { getPlaces } from '@/apis/getPlaces';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
@@ -14,6 +12,8 @@ const MapContainer = () => {
   const [map, setMap] = useState<KakaoMap | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
 
+  // [수정] Circle 객체를 저장하기 위한 ref 추가
+  const circleRef = useRef<KakaoCircle | null>(null);
   const markerOverlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const markerRootsRef = useRef<Root[]>([]);
 
@@ -27,17 +27,16 @@ const MapContainer = () => {
       const container = mapRef.current;
       if (!container) return;
 
-      // [수정] 지도 생성 시 옵션에서는 draggable과 zoomable을 제거합니다.
       const mapInstance = new window.kakao.maps.Map(container, {
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         level: 6,
       });
 
-      // [수정] 지도 인스턴스가 생성된 후, setDraggable과 setZoomable 메소드를 호출하여 기능을 비활성화합니다.
       mapInstance.setDraggable(false);
       mapInstance.setZoomable(false);
 
-      const circle = new window.kakao.maps.Circle({
+      // [수정] 생성된 circle 인스턴스를 ref에 저장
+      circleRef.current = new window.kakao.maps.Circle({
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         radius: 800,
         strokeWeight: 5,
@@ -47,8 +46,9 @@ const MapContainer = () => {
         fillColor: '#F316B0',
         fillOpacity: 0.08,
       });
-      circle.setMap(mapInstance);
-      const bounds = circle.getBounds();
+
+      circleRef.current.setMap(mapInstance);
+      const bounds = circleRef.current.getBounds();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mapInstance as any).setBounds(bounds);
       setMap(mapInstance);
@@ -63,6 +63,25 @@ const MapContainer = () => {
       script.onload = () => window.kakao.maps.load(initializeMap);
     }
   }, [kakaoMapKey]);
+
+  // [수정] 화면 리사이즈 시 지도 경계를 다시 설정하는 Hook 추가
+  useEffect(() => {
+    if (!map) return;
+
+    const handleResize = () => {
+      if (circleRef.current) {
+        const bounds = circleRef.current.getBounds();
+        map.setBounds(bounds);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]); // map 객체가 생성된 후에 이 effect가 실행됩니다.
 
   // 2. 지도 초기화 후 장소 데이터 한 번만 불러오는 Hook
   useEffect(() => {

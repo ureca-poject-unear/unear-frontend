@@ -83,10 +83,12 @@ const StampRouletteCard: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full max-w-[600px] h-[210px] mx-auto bg-white p-5">
+    <div className="relative w-full h-[210px] bg-white p-5">
       <h2 className="absolute left-5 top-3 text-lm font-bold text-black">스탬프</h2>
-      <div className="w-[353px] h-36 rounded-xl bg-zinc-100 absolute left-[19.5px] top-[50px] flex flex-col justify-between p-4">
-        <div className="flex justify-between items-start">
+      {/* [수정] w-[600px]와 absolute를 제거하고 w-full과 flex 레이아웃으로 변경하여 반응형으로 만듭니다. */}
+      <div className="w-full h-36 rounded-xl bg-zinc-100 mt-10 flex flex-col justify-between p-4">
+        {/* [수정] justify-around를 사용하여 화면 크기에 따라 유연하게 간격 조정 */}
+        <div className="flex justify-around items-start">
           {displayStamps.map((stamp, idx) => {
             const isFirst = idx === 0;
             return (

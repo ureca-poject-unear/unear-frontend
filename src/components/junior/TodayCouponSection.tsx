@@ -147,14 +147,14 @@ const TodayCouponSection: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="w-[393px] h-[153px] flex justify-center items-center bg-white">
+      <div className="w-full h-[153px] flex justify-center items-center bg-white">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="w-[393px] h-auto p-4 bg-white">
+    <div className="w-full h-auto p-4 bg-white">
       <div className="m-2 mb-4">
         <p className="text-lm font-bold text-black">오늘의 선착순 쿠폰! (12시 초기화)</p>
       </div>
