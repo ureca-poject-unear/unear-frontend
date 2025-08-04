@@ -14,7 +14,7 @@ const BottomSheet = ({ isOpen, onClose, children, disablePadding }: BottomSheetP
       {isOpen && (
         <div className="fixed inset-0 z-30 flex justify-center">
           {/* 배경 어두움 */}
-          <div className="relative w-full max-w-[393px]">
+          <div className="relative w-full max-w-[600px]">
             <div
               className="absolute inset-0 bottom-[65px] bg-black bg-opacity-40"
               onClick={onClose}

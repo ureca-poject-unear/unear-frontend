@@ -318,7 +318,7 @@ const MapPage = () => {
 
       {/* 상단 검색바 - 로드뷰 화면이 열렸을 때만 숨김 */}
       {!isRoadviewOpen && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[600px] px-2.5">
           <SearchBar onSearch={handleSearch} />
         </div>
       )}

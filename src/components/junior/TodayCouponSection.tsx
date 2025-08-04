@@ -156,43 +156,45 @@ const TodayCouponSection: React.FC = () => {
 
   if (isLoading || !coupon) {
     return (
-      <div className="w-[393px] h-[153px] flex justify-center items-center">
+      <div className="w-full max-w-[600px] mx-auto h-[153px] flex justify-center items-center">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="w-[393px] h-auto p-4 bg-white">
-      <div className="m-2 mb-4">
+    <div className="w-full max-w-[600px] mx-auto bg-white">
+      <div className="px-5 py-4">
         <p className="text-lm font-bold text-black">오늘의 선착순 쿠폰! (12시 초기화!)</p>
       </div>
 
-      <div className="w-full h-[65px] rounded-[15px] bg-[#e6007e] flex items-center justify-between px-5">
-        <p className="text-base font-bold text-white">{coupon.title}</p>
+      <div className="px-5 pb-4">
+        <div className="w-full h-[65px] rounded-[15px] bg-[#e6007e] flex items-center justify-between px-5">
+          <p className="text-base font-bold text-white">{coupon.title}</p>
 
-        <div className="w-10 h-10 flex items-center justify-center">
-          {coupon.isSoldOut ? (
-            <p className="text-white font-bold text-sm">마감</p>
-          ) : coupon.isDownloaded ? (
-            <CheckCircle2 className="w-6 h-6 text-white" />
-          ) : (
-            <button
-              onClick={() => handleCouponDownload(coupon.id)}
-              disabled={isDownloading}
-              className="w-full h-full flex items-center justify-center"
-            >
-              {isDownloading ? (
-                <Loader2 className="w-5 h-5 animate-spin text-white" />
-              ) : (
-                <DownloadIcon className="w-5 h-5 text-white" />
-              )}
-            </button>
-          )}
+          <div className="w-10 h-10 flex items-center justify-center">
+            {coupon.isSoldOut ? (
+              <p className="text-white font-bold text-sm">마감</p>
+            ) : coupon.isDownloaded ? (
+              <CheckCircle2 className="w-6 h-6 text-white" />
+            ) : (
+              <button
+                onClick={() => handleCouponDownload(coupon.id)}
+                disabled={isDownloading}
+                className="w-full h-full flex items-center justify-center"
+              >
+                {isDownloading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-white" />
+                ) : (
+                  <DownloadIcon className="w-5 h-5 text-white" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
+        {/* 사용자에게 피드백 메시지를 보여주는 부분 */}
+        {message && <p className="mt-2 text-sm text-center text-red-500">{message}</p>}
       </div>
-      {/* 사용자에게 피드백 메시지를 보여주는 부분 */}
-      {message && <p className="mt-2 text-sm text-center text-red-500">{message}</p>}
     </div>
   );
 };

@@ -52,12 +52,16 @@ const MembershipBenefitSection = ({
 
       {/* 쿠폰/즐겨찾기 버튼 영역 */}
       <div className="px-5 py-5">
-        <div className="flex gap-[21px]">
+        <div className="flex gap-5">
           {/* 쿠폰 버튼 */}
-          <CouponButton label={`쿠폰 ${couponCount}개`} onClick={handleCouponClick} />
+          <div className="flex-1">
+            <CouponButton label={`쿠폰 ${couponCount}개`} onClick={handleCouponClick} />
+          </div>
 
           {/* 즐겨찾기 버튼 */}
-          <BookmarkButton label="즐겨찾기" onClick={handleBookmarkClick} />
+          <div className="flex-1">
+            <BookmarkButton label="즐겨찾기" onClick={handleBookmarkClick} />
+          </div>
         </div>
       </div>
     </div>

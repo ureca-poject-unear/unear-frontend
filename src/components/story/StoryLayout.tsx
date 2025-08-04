@@ -44,7 +44,7 @@ export default function StoryLayout({
       />
 
       {/* 컨텐츠 */}
-      <div className="relative z-10 mx-5 flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+      <div className="relative z-10 mx-5 sm:mx-8 md:mx-12 flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
         {children}
       </div>
     </div>
