@@ -57,6 +57,22 @@ export interface KakaoEvent {
 export interface KakaoCircle {
   setMap(map: KakaoMap | null): void;
   getBounds(): KakaoMapBounds;
+  setRadius(radius: number): void;
+  setOptions(options: {
+    strokeWeight?: number;
+    strokeColor?: string;
+    strokeOpacity?: number;
+    strokeStyle?:
+      | 'solid'
+      | 'shortdash'
+      | 'shortdot'
+      | 'shortdashdot'
+      | 'longdash'
+      | 'longdot'
+      | 'longdashdot';
+    fillColor?: string;
+    fillOpacity?: number;
+  }): void;
 }
 
 export interface KakaoMarkerClusterer {

@@ -14,6 +14,7 @@ import type {
 import CurrentLocationMarker from '@/components/map/CurrentLocationMarker';
 import MapMarkerIcon from '../common/MapMarkerIcon';
 import PlaceNameLabel from './PlaceNameLabel';
+import EventAreaCircle from './EventAreaCircle';
 import { getPlaces } from '@/apis/getPlaces';
 
 export interface MapContainerRef {
@@ -61,7 +62,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const currentLocationRef = useRef<{ lat: number; lng: number } | null>(null);
     const [isLocationShown, setIsLocationShown] = useState(false);
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
-    const staticCircleRef = useRef<KakaoCircle | null>(null);
+    const [mapInstance, setMapInstance] = useState<KakaoMap | null>(null);
     const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
     const selectedPlaceIdRef = useRef<number | null>(null);
     const isSettingCenterRef = useRef(false);
@@ -661,18 +662,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               clustererRef.current = null;
             }
 
-            const staticCircle = new window.kakao.maps.Circle({
-              center: new window.kakao.maps.LatLng(37.544581, 127.055961),
-              radius: 800,
-              strokeWeight: 5,
-              strokeColor: '#DFA2A2',
-              strokeOpacity: 1,
-              strokeStyle: 'shortdash',
-              fillColor: '#F316B0',
-              fillOpacity: 0.08,
-            });
-            staticCircle.setMap(map);
-            staticCircleRef.current = staticCircle;
+            setMapInstance(map);
 
             showCurrentLocation();
 
@@ -711,9 +701,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
       return () => {
         document.head.removeChild(script);
-        if (staticCircleRef.current) {
-          staticCircleRef.current.setMap(null);
-        }
         if (clustererRef.current && markerInstancesRef.current.length > 0) {
           clustererRef.current.removeMarkers(markerInstancesRef.current);
         }
@@ -736,7 +723,17 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       }
     }, [shouldRestoreLocation]);
 
-    return <div ref={mapRef} className="w-full h-full absolute top-0 left-0 z-0" />;
+    return (
+      <div ref={mapRef} className="w-full h-full absolute top-0 left-0 z-0">
+        {mapInstance && (
+          <EventAreaCircle
+            center={{ lat: 37.544581, lng: 127.055961 }}
+            radius={800}
+            map={mapInstance}
+          />
+        )}
+      </div>
+    );
   }
 );
 
