@@ -28,6 +28,8 @@ const BottomSheet = ({ isOpen, onClose, children, disablePadding }: BottomSheetP
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
+              dragMomentum={false}
+              dragElastic={0.1}
               onDragEnd={(_, info) => {
                 if (info.offset.y > 100) {
                   onClose();
