@@ -69,7 +69,7 @@ const CouponPage = () => {
               ? `${selectedCoupon.discountPercent}%`
               : selectedCoupon.fixedDiscount
                 ? `${selectedCoupon.fixedDiscount.toLocaleString()}원`
-                : '할인 정보 없음'
+                : null
           }
           expireDate={selectedCoupon.couponEnd}
           barcodeValue={selectedCoupon.barcodeNumber}

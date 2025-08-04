@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import HomeIcon from '@/assets/common/home.svg?react';
@@ -19,10 +19,22 @@ const BottomNavigator = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const currentTab = tabs.find((tab) => tab.path === location.pathname)?.id ?? 'home';
-  const [activeTab, setActiveTab] = useState(currentTab);
+  // 현재 경로에 따른 현재 탭 계산
+  const getCurrentTab = () => {
+    const foundTab = tabs.find((tab) => tab.path === location.pathname);
+    return foundTab?.id ?? 'home';
+  };
+
+  const [activeTab, setActiveTab] = useState(getCurrentTab());
+
+  // 경로가 변경될 때마다 activeTab 업데이트
+  useEffect(() => {
+    const currentTab = getCurrentTab();
+    setActiveTab(currentTab);
+  }, [location.pathname]);
 
   const handleClick = (id: string, path: string) => {
+    // 상태를 먼저 업데이트하여 즉시 시각적 피드백 제공
     setActiveTab(id);
     navigate(path);
   };

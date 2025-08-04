@@ -5,7 +5,7 @@ import BarcodeIcon from '@/assets/common/barcode.svg?react';
 import InformationIcon from '@/assets/common/information.svg?react';
 import MainNubiImage from '@/assets/main/mainnubi.png';
 import EventBannerImage from '@/assets/main/eventbanner.png';
-import StoryBackgroundImage from '@/assets/main/storyBackground.png';
+import StoryBackgroundImage from '@/assets/story/starBackground.png';
 import StoryNubiImage from '@/assets/main/storynubi.png';
 import Grade from '@/components/common/Grade';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
@@ -103,10 +103,7 @@ const MainPage = () => {
       {/* 메인 컨텐츠 영역 */}
       <main className="px-5 pb-3">
         {/* 사용자 카드 */}
-        <div
-          className="w-full bg-white rounded-[20px] mt-3 pl-6 pt-3 pb-3 flex items-center justify-between"
-          style={{ boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}
-        >
+        <div className="w-full bg-white rounded-[20px] mt-3 pl-6 pt-3 pb-3 flex items-center justify-between">
           <div className="flex flex-col gap-3">
             {/* 사용자 인사말 - 동적으로 사용자 이름 표시 */}
             <h2 className="text-black font-semibold text-lm leading-[18px]">
@@ -144,13 +141,12 @@ const MainPage = () => {
         {/* 스토리 배너 */}
         <button
           onClick={handleStoryClick}
-          className="w-full mt-1 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
+          className="w-full mt-3 pl-6 pt-3 pb-3 rounded-[20px] overflow-hidden flex items-center justify-between"
           style={{
             backgroundImage: `url(${StoryBackgroundImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
           }}
         >
           <div className="flex-col gap-2">
