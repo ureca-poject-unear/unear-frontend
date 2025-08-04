@@ -5,7 +5,7 @@ import { formatDateToKorean } from '@/utils/formatDate';
 interface CouponModalProps {
   brand: string;
   title: string;
-  discountRate: string;
+  discountRate: string | null; // null 허용
   expireDate: string;
   barcodeValue: string;
   usageCondition: string;
@@ -47,7 +47,9 @@ const CouponModal = ({
             <div className="bg-gray-100 rounded-t-[12px] pt-6 pb-4 text-[#333]">
               <p className="text-sm font-regular px-6">{brand}</p>
               <h2 className="text-lm font-semibold mt-1 px-6">{title}</h2>
-              <p className="text-lg font-bold mt-2 text-center">{discountRate}</p>
+              <p className="text-lg font-bold mt-2 text-center">
+                {discountRate ? `${discountRate} 할인` : '할인 정보 없음'}
+              </p>
               <p className="text-lm font-regular text-gray-400 mt-1 text-center">
                 {formatDateToKorean(expireDate)}까지
               </p>

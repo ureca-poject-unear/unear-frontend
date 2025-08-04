@@ -19,6 +19,9 @@ const StatisticsSection = ({
     }
   };
 
+  // 누적 할인액이 0원인지 확인
+  const isZeroAccumulated = accumulatedSavings === '0원';
+
   return (
     <div className="w-full bg-white mt-3 h-[284px]">
       <div className="px-5 py-5">
@@ -31,9 +34,13 @@ const StatisticsSection = ({
               <BackIcon className="w-5 h-5 mb-0.5 text-black transform rotate-180" />
             </button>
           </div>
-          <p className="text-m font-semibold text-gray-500">
-            이번달 누적 할인액 {accumulatedSavings}
-          </p>
+          {isZeroAccumulated ? (
+            <p className="text-m font-semibold text-gray-500">아직 절약 내역이 없어요</p>
+          ) : (
+            <p className="text-m font-semibold text-gray-500">
+              이번달 누적 할인액 {accumulatedSavings}
+            </p>
+          )}
         </div>
 
         {/* 바 차트 */}

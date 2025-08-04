@@ -147,27 +147,40 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
       return { display: 'none' };
     };
 
+    // 할인 금액이 0원인지 확인
+    const isZeroDiscount = totalDiscountAmount === 0;
+
     return (
       <div className="bg-white" ref={containerRef} onClick={(e) => e.stopPropagation()}>
         <div className="px-5 pt-4 pb-1">
-          {/* 멤버십 혜택으로 타이틀 */}
-          <div className="flex items-center justify-center mb-2">
-            <div className="flex items-center gap-2">
-              <GrowUpIcon className="w-6 h-6" />
-              <span className="text-m font-regular text-gray-500">멤버십 혜택으로</span>
+          {isZeroDiscount ? (
+            // 0원일 때: 아이콘과 "멤버십 혜택으로" 텍스트 숨김
+            <div className="text-center mb-6">
+              <p className="text-lm font-semibold text-gray-600">아직 절약 내역이 없어요</p>
             </div>
-          </div>
+          ) : (
+            // 0원이 아닐 때: 기존 스타일 유지
+            <>
+              {/* 멤버십 혜택으로 타이틀 */}
+              <div className="flex items-center justify-center mb-2">
+                <div className="flex items-center gap-2">
+                  <GrowUpIcon className="w-6 h-6" />
+                  <span className="text-m font-regular text-gray-500">멤버십 혜택으로</span>
+                </div>
+              </div>
 
-          {/* 메인 타이틀 */}
-          <div className="text-center mb-2">
-            <p className="text-lm font-semibold text-black">
-              이번달{' '}
-              <span className="text-lg font-semibold text-primary">
-                {formatCurrency(totalDiscountAmount)}
-              </span>
-              을 절약했어요!
-            </p>
-          </div>
+              {/* 메인 타이틀 */}
+              <div className="text-center mb-2">
+                <p className="text-lm font-semibold text-black">
+                  이번달{' '}
+                  <span className="text-lg font-semibold text-primary">
+                    {formatCurrency(totalDiscountAmount)}
+                  </span>
+                  을 절약했어요!
+                </p>
+              </div>
+            </>
+          )}
 
           {/* 월 네비게이션 */}
           <div className="flex items-center justify-center mb-4">
