@@ -75,7 +75,7 @@ const TodayCouponSection: React.FC = () => {
       setCoupons([
         {
           id: 326,
-          title: '(필수 매장) 20% 할인 쿠폰 (10명 한정)',
+          title: '(필수 매장) 20% 할인 쿠폰 (100명 한정)',
           isDownloaded: locallyDownloadedIds.includes(326),
           isSoldOut: false,
         },
@@ -155,7 +155,7 @@ const TodayCouponSection: React.FC = () => {
 
   return (
     <div className="w-[393px] h-auto p-4 bg-white">
-      <div>
+      <div className="m-2 mb-4">
         <p className="text-lm font-bold text-black">오늘의 선착순 쿠폰! (12시 초기화)</p>
       </div>
 

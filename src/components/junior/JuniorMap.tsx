@@ -10,7 +10,7 @@ import MapContainer from '@/components/junior/MapContainer';
 // [수정] 컴포넌트가 더 이상 props를 받지 않으므로 인자를 비워둡니다.
 const JuniorMap = () => {
   return (
-    <div className="px-5 bg-white">
+    <div className="w-[393px] p-4  bg-white">
       {/* 지도 위쪽 텍스트 */}
       <div className="m-2 mb-4 ">
         <p className="text-lm font-bold text-black">이번주니어 지역</p>
