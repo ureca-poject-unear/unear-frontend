@@ -270,7 +270,7 @@ const LoginPage = () => {
               type="button"
               onClick={togglePasswordVisibility}
               disabled={isLoading}
-              className="absolute right-0 top-2 disabled:opacity-50 hover:opacity-70 transition-opacity"
+              className="absolute right-0 top-[14px] disabled:opacity-50 hover:opacity-70 transition-opacity"
               aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
             >
               {showPassword ? (
