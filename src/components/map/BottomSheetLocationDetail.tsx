@@ -126,6 +126,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
 
     if (isDifferent) {
       mapRef.current?.setCenter(targetLat, targetLng);
+      mapRef.current?.setLevel(1);
     }
   };
 
@@ -135,7 +136,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding>
-      <div className="relative w-full bg-white rounded-t-[20px] p-[19px] pb-5 flex flex-col">
+      <div className="relative w-full bg-white rounded-t-[20px] p-[19px] pb-1 flex flex-col">
         {store.eventTypeCode !== 'NONE' && (
           <div className="text-pink-600 font-bold text-sm mb-1">이벤트 매장</div>
         )}

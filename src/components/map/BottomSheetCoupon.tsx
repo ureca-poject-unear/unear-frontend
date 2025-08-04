@@ -323,8 +323,11 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
                           }}
                           onLocationClick={(lat, lng) => {
                             if (!mapRef.current) return;
-                            mapRef.current.setCenter(lat, lng);
+
                             mapRef.current.setSelectedMarker(Number(store.placeId));
+
+                            mapRef.current.setCenter(lat, lng);
+                            mapRef.current.setLevel(1);
                             onClose();
                             onMarkerClick(Number(store.placeId), String(lat), String(lng));
                           }}

@@ -52,11 +52,32 @@ export interface KakaoEvent {
     type: string,
     handler: (event?: { latLng?: KakaoLatLng }) => void
   ): void;
+  addListener(
+    target: KakaoMarkerClusterer,
+    type: 'clusterclick',
+    handler: (cluster: KakaoMarkerClusterer) => void
+  ): void;
 }
 
 export interface KakaoCircle {
   setMap(map: KakaoMap | null): void;
   getBounds(): KakaoMapBounds;
+  setRadius(radius: number): void;
+  setOptions(options: {
+    strokeWeight?: number;
+    strokeColor?: string;
+    strokeOpacity?: number;
+    strokeStyle?:
+      | 'solid'
+      | 'shortdash'
+      | 'shortdot'
+      | 'shortdashdot'
+      | 'longdash'
+      | 'longdot'
+      | 'longdashdot';
+    fillColor?: string;
+    fillOpacity?: number;
+  }): void;
 }
 
 export interface KakaoMarkerClusterer {
@@ -65,6 +86,7 @@ export interface KakaoMarkerClusterer {
   clear(): void;
   getMarkers(): KakaoMarker[];
   setMap(map: KakaoMap | null): void;
+  getCenter(): KakaoLatLng;
 }
 
 declare global {
