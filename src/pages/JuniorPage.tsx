@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// src/pages/JuniorPage.tsx (수정된 코드)
+
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
 
 import EventBanner from '@/components/junior/EventBanner';
@@ -18,13 +20,12 @@ type Stamp = {
 
 const JuniorPage = () => {
   const [stamps, setStamps] = useState<Stamp[]>([]);
-  // [수정] 변수명을 백엔드와 일치시켜 혼동을 방지합니다.
   const [isRouletteAvailable, setIsRouletteAvailable] = useState(false);
   const [initialIsSpun, setInitialIsSpun] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const currentEventId = 2; // 현재 이벤트 ID
+  const currentEventId = 2;
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -36,13 +37,11 @@ const JuniorPage = () => {
       }
       try {
         setIsLoading(true);
-
         const [userInfo, stampStatus] = await Promise.all([
           getUserInfo(),
           getStampsStatus(currentEventId),
         ]);
 
-        // [수정] 올바른 속성 이름으로 접근하여 콘솔에 찍어봅니다.
         console.log('API 응답 원본 (stampStatus):', stampStatus);
         console.log('-> rouletteAvailable 값:', stampStatus.rouletteAvailable);
 
@@ -51,8 +50,6 @@ const JuniorPage = () => {
             (result) => result.event.unearEventId === currentEventId && result.participated
           ) || false;
         setInitialIsSpun(hasParticipated);
-
-        // [수정] API로부터 받은 올바른 속성 값을 state에 저장합니다.
         setIsRouletteAvailable(stampStatus.rouletteAvailable);
 
         const newStamps: Stamp[] = stampStatus.stamps.map((slot: StampSlot) => ({
@@ -111,14 +108,17 @@ const JuniorPage = () => {
       <div className="flex flex-col items-center">
         <EventBanner />
         <div className="flex flex-col gap-3 items-center w-full">
-          {/* [수정] props 이름도 명확하게 변경합니다. */}
           <StampRouletteCard
             stamps={stamps}
             eventId={currentEventId}
             initialIsSpun={initialIsSpun}
             isRouletteEnabledByServer={isRouletteAvailable}
           />
-          <JuniorMap stores={[]} onBookmarkToggle={() => {}} />
+          {/*
+            [수정] JuniorMap 컴포넌트에 불필요한 props(stores, onBookmarkToggle) 전달 코드를 제거합니다.
+            [이유] JuniorMap 컴포넌트는 더 이상 props를 받지 않도록 수정되었기 때문입니다.
+          */}
+          <JuniorMap />
           <TodayCouponSection />
           <JuniorMarket />
         </div>

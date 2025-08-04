@@ -28,17 +28,13 @@ const StampRouletteCard: React.FC<Props> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // localStorage에서 값을 읽어와 초기 상태를 설정합니다.
   const [isRouletteSpun, setIsRouletteSpun] = useState(() => {
     const hasSpun = localStorage.getItem('rouletteHasSpun');
-    // initialIsSpun은 서버에서 내려주는 초기값으로 우선 고려하고,
-    // localStorage 값으로 덮어씁니다.
     return initialIsSpun || hasSpun === 'true';
   });
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    // initialIsSpun prop이 변경될 때도 localStorage 값을 함께 고려하여 상태를 업데이트합니다.
     const hasSpun = localStorage.getItem('rouletteHasSpun');
     setIsRouletteSpun(initialIsSpun || hasSpun === 'true');
   }, [initialIsSpun]);
@@ -75,8 +71,7 @@ const StampRouletteCard: React.FC<Props> = ({
     try {
       await sendRouletteResult(eventId, prize.prizeName);
 
-      // API 호출 성공 시 localStorage에 상태를 저장하고, React 상태를 업데이트합니다.
-      localStorage.setItem('rouletteHasSpun', 'true'); // [핵심] 로컬 스토리지에 기록
+      localStorage.setItem('rouletteHasSpun', 'true');
       setIsRouletteSpun(true);
 
       alert(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨되셨습니다!`);
@@ -205,7 +200,8 @@ const StampRouletteCard: React.FC<Props> = ({
             );
           })}
         </div>
-        <div className="flex justify-center mt-0">
+        {/* --- [수정] 버튼 위쪽 여백 추가 --- */}
+        <div className="flex justify-center mt-2">
           <MiniButton text={buttonText} onClick={handleRouletteClick} isActive={isButtonActive} />
         </div>
       </div>

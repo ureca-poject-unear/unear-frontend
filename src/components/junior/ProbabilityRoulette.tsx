@@ -17,7 +17,7 @@ interface Props {
 // Tailwind 클래스명 → 실제 색상값 매핑
 const tailwindColors: { [key: string]: string } = {
   'bg-white': '#FFFFFF',
-  'bg-pink-100': '#FCE7F3',
+  'bg-pink-100': '#FFFFFF',
 };
 
 // prizeData에 Prize[] 타입을 명시합니다.
@@ -26,8 +26,7 @@ const prizeData: Prize[] = [
   { id: 2, prizeName: '베스킨라빈스\n파인트', probability: 0.75 },
   { id: 3, prizeName: 'LG\ngram', probability: 0.15 },
   { id: 4, prizeName: '아이패드', probability: 0.04 },
-  { id: 5, prizeName: '테슬라', probability: 0.01 },
-  { id: 6, prizeName: 'CGV\n영화관람권', probability: 5 },
+  { id: 5, prizeName: 'CGV\n영화관람권', probability: 5 },
 ];
 
 const sectionAngle = 360 / prizeData.length;

@@ -193,9 +193,9 @@ const JuniorMarket = () => {
   }
 
   return (
-    <div className="relative bg-white px-5 pb-5">
+    <div className="px-5 bg-white">
       <div className="m-2 mb-4">
-        <p className="text-lm font-bold text-black">이번주니어 매장</p>
+        <p className="ml-3 text-lm font-bold text-black">이번주니어 매장</p>
       </div>
       <div className="flex flex-col items-start gap-4">
         {stores.length > 0 ? (

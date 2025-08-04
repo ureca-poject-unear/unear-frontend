@@ -2,35 +2,23 @@
 
 import React from 'react';
 import MapContainer from '@/components/junior/MapContainer';
-import type { StoreType } from '@/types/Junior';
+// 'StoreType'이 이 파일에서 더 이상 사용되지 않으므로 import 문을 제거해도 됩니다.
+// import type { StoreType } from '@/types/Junior';
 
-// 부모로부터 받을 props 타입 정의
-interface JuniorMapProps {
-  stores: StoreType[]; // 이 프롭은 이제 MapContainer에 전달되지 않지만,
-  // JuniorMap의 다른 부분(예: 지도 아래 목록)에서 사용될 수 있으므로 남겨둡니다.
-  onBookmarkToggle: (storeId: string) => void;
-}
+// [수정] 컴포넌트가 받는 props가 없으므로 인터페이스를 비워두거나 제거할 수 있습니다.
 
-const JuniorMap = ({ onBookmarkToggle }: JuniorMapProps) => {
-  // MapContainer가 number 타입의 ID로 호출할 때,
-  // 이를 string으로 변환하여 부모 컴포넌트의 onBookmarkToggle 함수를 호출하는 어댑터 함수
-  const handleBookmarkToggleAdapter = (placeId: number) => {
-    onBookmarkToggle(placeId.toString());
-  };
-
+// [수정] 컴포넌트가 더 이상 props를 받지 않으므로 인자를 비워둡니다.
+const JuniorMap = () => {
   return (
     <div className="px-5 bg-white">
       {/* 지도 위쪽 텍스트 */}
-      <div className="m-4">
+      <div className="m-2 mb-4 ">
         <p className="text-lm font-bold text-black">이번주니어 지역</p>
       </div>
 
       {/* 지도 */}
       <div className="relative h-[280px] w-[352px] mb-4">
-        {/*
-          [수정] MapContainer는 자체적으로 데이터를 로드하므로 stores 프롭을 전달하지 않습니다.
-        */}
-        <MapContainer onBookmarkToggle={handleBookmarkToggleAdapter} />
+        <MapContainer />
       </div>
     </div>
   );
