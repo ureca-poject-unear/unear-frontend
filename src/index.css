@@ -2,85 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LG EI Headline: iOS Safari 최적화 버전 */
+/* LG EI Headline: 굵기별로 family 분리 */
 @font-face {
   font-family: 'LGEIHeadline-Thin';
-  src:
-    url('/font/LG-EI-Headline-woff2/LGEIHeadline-Thin.woff2') format('woff2'),
-    url('/font/LG-EI-Headline-otf/LGEIHeadline-Thin.otf') format('opentype');
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Thin.otf') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-  /* iOS Safari 렌더링 힌트 */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
-
 @font-face {
   font-family: 'LGEIHeadline-Light';
-  src:
-    url('/font/LG-EI-Headline-woff2/LGEIHeadline-Light.woff2') format('woff2'),
-    url('/font/LG-EI-Headline-otf/LGEIHeadline-Light.otf') format('opentype');
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Light.otf') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
-
 @font-face {
   font-family: 'LGEIHeadline-Regular';
-  src:
-    url('/font/LG-EI-Headline-woff2/LGEIHeadline-Regular.woff2') format('woff2'),
-    url('/font/LG-EI-Headline-otf/LGEIHeadline-Regular.otf') format('opentype');
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Regular.otf') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
-
 @font-face {
   font-family: 'LGEIHeadline-Semibold';
-  src:
-    url('/font/LG-EI-Headline-woff2/LGEIHeadline-Semibold.woff2') format('woff2'),
-    url('/font/LG-EI-Headline-otf/LGEIHeadline-Semibold.otf') format('opentype');
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Semibold.otf') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
-
 @font-face {
   font-family: 'LGEIHeadline-Bold';
-  src:
-    url('/font/LG-EI-Headline-woff2/LGEIHeadline-Bold.woff2') format('woff2'),
-    url('/font/LG-EI-Headline-otf/LGEIHeadline-Bold.otf') format('opentype');
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Bold.otf') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
-  font-family:
-    'LGEIHeadline-Regular',
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+  font-family: 'LGEIHeadline-Regular', sans-serif;
+}
+
+html {
+  font-family: 'LGEIHeadline-Regular', sans-serif;
   /* 스크롤바로 인한 레이아웃 시프트 방지 */
   overflow-y: scroll;
   scrollbar-gutter: stable;
-}
-
-/* 전체 요소에 iOS Safari 폰트 렌더링 최적화 적용 */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* iOS Safari에서 폰트 weight 인식 개선 */
-  -webkit-text-stroke: 0.01em transparent;
 }
 
 /* 스크롤바 숨기기 */
