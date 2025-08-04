@@ -61,9 +61,7 @@ const MonthlyDiscountChart = ({
               <span className="text-m font-semibold text-black mt-[3px]">이전 월</span>
             </div>
             <div className="flex items-center">
-              <span className="text-m font-semibold text-black mt-[3px]">
-                평균: {averageAmount}
-              </span>
+              <span className="text-m font-semibold text-black mt-[3px]">평균:{averageAmount}</span>
             </div>
           </div>
         </div>

@@ -34,9 +34,9 @@ const MembershipBenefitSection = ({
     <div className="w-full bg-white">
       {/* 멤버십 혜택 영역 */}
       <div className="mx-5 bg-gray-100 rounded-xl">
-        <div className="px-5 py-5">
+        <div className="px-5 py-4">
           {/* 멤버십 혜택 헤더 */}
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-1">
             <GrowUpIcon className="w-6 h-6" />
             <span className="text-m font-regular text-gray-700">멤버십혜택으로</span>
           </div>
@@ -51,7 +51,7 @@ const MembershipBenefitSection = ({
       </div>
 
       {/* 쿠폰/즐겨찾기 버튼 영역 */}
-      <div className="px-5 py-5">
+      <div className="px-5 py-4">
         <div className="flex gap-5">
           {/* 쿠폰 버튼 */}
           <div className="flex-1">

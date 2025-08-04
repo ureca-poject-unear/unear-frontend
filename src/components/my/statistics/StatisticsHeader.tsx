@@ -184,14 +184,6 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
             </button>
           </div>
 
-          {/* 할인받은 금액 */}
-          <div className="text-center mb-4">
-            <p className="text-sm font-semibold text-gray-500 mb-1">할인받은 금액</p>
-            <p className="text-xl font-semibold text-primary">
-              {formatCurrency(totalDiscountAmount)}
-            </p>
-          </div>
-
           {/* 클릭 가능한 진행률 바 + 툴팁 */}
           <div className="mb-2 relative">
             {progressBars.length > 0 ? (
