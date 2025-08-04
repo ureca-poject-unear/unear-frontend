@@ -23,12 +23,8 @@ const MembershipBenefitModal = ({ isOpen, onClose }: MembershipBenefitModalProps
         <div className="bg-gray-100 rounded-lg p-4 mb-3">
           <h4 className="font-semibold text-black mb-2">VVIP</h4>
           <ul className="space-y-1 font-regular text-sm text-black">
-            <li>
-              <span className="text-primary text-lm">•</span> 월별 요금제 95,000원 이상
-            </li>
-            <li>
-              <span className="text-primary text-lm">•</span> 또는 연간 납부액 200만원 이상
-            </li>
+            <li> - 월별 요금제 95,000원 이상</li>
+            <li> - 또는 연간 납부액 200만원 이상</li>
           </ul>
         </div>
 
@@ -36,12 +32,8 @@ const MembershipBenefitModal = ({ isOpen, onClose }: MembershipBenefitModalProps
         <div className="bg-gray-100 rounded-lg p-4 mb-4">
           <h4 className="font-semibold text-black mb-2">VIP</h4>
           <ul className="space-y-1 font-regular text-sm text-black">
-            <li>
-              <span className="text-primary text-lm">•</span> 월별 요금제 74,800원 이상
-            </li>
-            <li>
-              <span className="text-primary text-lm">•</span> 또는 연간 납부액 100만원 이상
-            </li>
+            <li>- 월별 요금제 74,800원 이상</li>
+            <li>- 또는 연간 납부액 100만원 이상</li>
           </ul>
         </div>
 
@@ -97,7 +89,7 @@ const MembershipBenefitModal = ({ isOpen, onClose }: MembershipBenefitModalProps
         <div className="space-y-2">
           <div className="bg-gray-100 rounded-lg p-3">
             <span className="text-sm text-black">
-              <span className="font-semibold">등급 산정:</span> 전전년도 11월 1일 ~ 전년도 10월 31일
+              <span className="font-regular">등급 산정:</span> 전전년도 11월 1일 ~ 전년도 10월 31일
               납부액 기준
             </span>
           </div>
@@ -113,7 +105,7 @@ const MembershipBenefitModal = ({ isOpen, onClose }: MembershipBenefitModalProps
           </div>
           <div className="bg-gray-100 rounded-lg p-3">
             <span className="font-regular text-sm text-black">
-              **월 1회 혜택 이용 시 다른 VIP콕 혜택 이용 불가**
+              월 1회 혜택 이용 시 다른 VIP콕 혜택 이용 불가
             </span>
           </div>
         </div>
