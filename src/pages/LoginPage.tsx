@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import ActionButton from '../components/common/ActionButton';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -190,10 +191,6 @@ const LoginPage = () => {
     navigate('/signup');
   };
 
-  const handleFindAccount = (): void => {
-    navigate('/find-account');
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter' && isLoginActive) {
       handleActionClick();
@@ -201,149 +198,182 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center font-['Inter']">
-      {/* 타이틀 */}
-      <p className="absolute top-[171px] left-1/2 transform -translate-x-1/2 text-[32px] font-bold text-center whitespace-nowrap">
-        <span className="text-primary">U:NEAR</span>
-        <span className="text-black"> 로그인</span>
-      </p>
+    <div className="w-full max-w-[600px] min-h-screen mx-auto flex flex-col bg-white">
+      {/* 전체 컴테이너 - 화면 중앙 정렬 */}
+      <div className="flex-1 flex flex-col justify-center px-5 py-8">
+        {/* 타이틀 영역 */}
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <motion.h1
+            className="text-xl font-bold mb-4"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+          >
+            <span className="text-primary">U:NEAR</span>
+            <span className="text-black"> 로그인</span>
+          </motion.h1>
+          <motion.p
+            className="text-m text-black"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
+          >
+            로그인하고 유니어의 서비스를 경험해보세요!
+          </motion.p>
+        </motion.div>
 
-      <p className="absolute top-[231px] left-1/2 transform -translate-x-1/2 w-[296px] text-m text-center text-black">
-        로그인하고 유니어의 서비스를 경험해보세요!
-      </p>
+        {/* 오류 메시지 */}
+        {errorMessage && (
+          <div className="mb-6">
+            <p className="text-red-500 text-center text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+              {errorMessage}
+            </p>
+          </div>
+        )}
 
-      {/* 오류 메시지 */}
-      {errorMessage && (
-        <div className="absolute top-[285px] left-5 right-5">
-          <p className="text-red-500 text-center text-sm bg-red-50 p-2 rounded border border-red-200">
-            {errorMessage}
-          </p>
-        </div>
-      )}
+        {/* 입력 필들 영역 */}
+        <motion.div
+          className="space-y-6 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
+        >
+          {/* 이메일 입력 */}
+          <div>
+            <input
+              type="email"
+              placeholder="이메일"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+              className="w-full h-10 border-b border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-primary bg-transparent font-regular text-m disabled:opacity-50 transition-colors"
+            />
+          </div>
 
-      {/* 입력 필드 영역 */}
-      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[340px]' : 'top-[303px]'}`}>
-        {/* 이메일 입력 */}
-        <input
-          type="email"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isLoading}
-          className="w-full h-10 border-b border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-primary bg-transparent font-regular text-m disabled:opacity-50 transition-colors"
-        />
+          {/* 비밀번호 입력 + 눈 아이콘 */}
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="비밀번호"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyPress}
+              disabled={isLoading}
+              className="w-full h-10 border-b border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-primary pr-10 bg-transparent font-regular text-m disabled:opacity-50 transition-colors"
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              disabled={isLoading}
+              className="absolute right-0 top-2 disabled:opacity-50 hover:opacity-70 transition-opacity"
+              aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+            >
+              {showPassword ? (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="#9CA3AF"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
+                    fill="#9CA3AF"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+        </motion.div>
 
-        {/* 비밀번호 입력 + 눈 아이콘 */}
-        <div className="relative mt-6">
-          <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="비밀번호"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={handleKeyPress}
-            disabled={isLoading}
-            className="w-full h-10 border-b border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-primary pr-10 bg-transparent font-regular text-m disabled:opacity-50 transition-colors"
+        {/* 로그인 버튼 */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+        >
+          <ActionButton
+            text={isLoading ? '로그인 중...' : '로그인'}
+            onClick={handleActionClick}
+            isActive={isLoginActive}
+            isLoading={isLoading}
           />
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            disabled={isLoading}
-            className="absolute right-0 top-2 disabled:opacity-50 hover:opacity-70 transition-opacity"
-            aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
-          >
-            {showPassword ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  fill="#9CA3AF"
-                />
-              </svg>
-            ) : (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  fill="#9CA3AF"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* 로그인 버튼 */}
-      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[475px]' : 'top-[438px]'}`}>
-        <ActionButton
-          text={isLoading ? '로그인 중...' : '로그인'}
-          onClick={handleActionClick}
-          isActive={isLoginActive}
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* 아이디/비밀번호 찾기 및 회원가입 */}
-      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[538px]' : 'top-[501px]'}`}>
-        <div className="flex justify-center gap-8">
-          <button
-            onClick={handleFindAccount}
-            disabled={isLoading}
-            className="text-sm text-gray-600 whitespace-nowrap hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            아이디 / 비밀번호 찾기
-          </button>
+        {/* 회원가입 */}
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.0, ease: 'easeOut' }}
+        >
           <button
             onClick={handleSignUp}
             disabled={isLoading}
-            className="text-sm text-gray-600 whitespace-nowrap hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-sm text-gray-600 hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             회원가입
           </button>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* 간편 로그인 텍스트 */}
-      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[605px]' : 'top-[568px]'}`}>
-        <p className="text-sm font-light text-center text-zinc-400">간편 로그인</p>
-      </div>
+        {/* 간편 로그인 텍스트 */}
+        <motion.div
+          className="text-center mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2, ease: 'easeOut' }}
+        >
+          <p className="text-sm font-light text-zinc-400">간편 로그인</p>
+        </motion.div>
 
-      {/* 소셜 로그인 버튼들 */}
-      <div
-        className={`absolute left-5 right-5 ${errorMessage ? 'top-[633.5px]' : 'top-[596.5px]'}`}
-      >
-        <div className="flex justify-center gap-10">
+        {/* 소셜 로그인 버튼들 */}
+        <motion.div
+          className="flex justify-center gap-10"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+        >
           <a href={NAVER_AUTH_URL} aria-label="네이버 로그인">
             <img
               src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Naver.png"
-              className="w-12 h-12 object-cover rounded-full"
+              className="w-12 h-12 object-cover rounded-full hover:scale-110 transition-transform"
               alt="네이버 로그인"
             />
           </a>
           <a href={KAKAO_AUTH_URL} aria-label="카카오 로그인">
             <img
               src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Kakao.png"
-              className="w-12 h-12 object-cover rounded-full"
+              className="w-12 h-12 object-cover rounded-full hover:scale-110 transition-transform"
               alt="카카오 로그인"
             />
           </a>
           <a href={GOOGLE_AUTH_URL} aria-label="구글 로그인">
             <img
               src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Google.png"
-              className="w-12 h-12 object-cover rounded-full"
+              className="w-12 h-12 object-cover rounded-full hover:scale-110 transition-transform"
               alt="구글 로그인"
             />
           </a>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
