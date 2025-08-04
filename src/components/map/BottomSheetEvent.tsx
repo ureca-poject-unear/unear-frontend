@@ -3,6 +3,7 @@ import CoffeeIcon from '@/assets/map/IconExampleCoffee.svg?react';
 import BigCloud from '@/assets/map/bigCloud.svg?react';
 import SmallCloud from '@/assets/map/smallCloud.svg?react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 interface BottomSheetEventProps {
   isOpen: boolean;
@@ -15,8 +16,67 @@ const BottomSheetEvent = ({ isOpen, onClose, onMoveToJuniorLocation }: BottomShe
     <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding={true}>
       <div className="relative w-full h-[531px] bg-white rounded-t-[20px] overflow-hidden">
         {/* 구름 */}
-        <BigCloud className="absolute left-[7.63%] top-[6.97%] w-[127px] h-[72px]" />
-        <SmallCloud className="absolute left-[70.99%] top-[26.93%] w-[82px] h-[46px]" />
+        <motion.div
+          className="absolute left-[7.63%] top-[6.97%] w-[127px] h-[72px]"
+          animate={{
+            y: [0, -10, 0],
+            x: [0, 5, 0],
+            rotate: [0, 1, 0, -1, 0],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            y: {
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            },
+            x: {
+              duration: 8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            },
+            rotate: {
+              duration: 10,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            },
+          }}
+        >
+          <BigCloud className="w-full h-full" />
+        </motion.div>
+
+        <motion.div
+          className="absolute left-[70.99%] top-[26.93%] w-[82px] h-[46px]"
+          animate={{
+            y: [0, 8, 0],
+            x: [0, -3, 0],
+            rotate: [0, -0.5, 0, 0.5, 0],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            y: {
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            },
+            x: {
+              duration: 6,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            },
+            rotate: {
+              duration: 8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            },
+          }}
+        >
+          <SmallCloud className="w-full h-full" />
+        </motion.div>
 
         {/* 메인 타이틀 */}
         <h1 className="absolute left-1/2 -translate-x-1/2 top-[40px] font-bold text-[40px] leading-[54px] text-[#333333] text-center w-[148px] z-10">
