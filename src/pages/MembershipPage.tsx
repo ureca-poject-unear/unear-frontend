@@ -85,20 +85,21 @@ export default function MembershipPage() {
       {/* SearchBar */}
       <div className="mt-4 px-5">
         <SearchBar
+          value={searchKeyword}
           onSearch={handleSearch}
           onChange={handleSearchChange}
           placeholder="브랜드명이나 혜택 키워드를 검색하세요"
         />
       </div>
       {/* 필터 + 결과 + 카드 리스트 묶음 */}
-      <div className="bg-white mt-4">
+      <div className="bg-white px-5 mt-4">
         {/* Category Filter */}
         <CategoryFilter
           selectedCategory={selectedCategory}
           onSelectCategory={(category) => setSelectedCategory(category)}
         />
         {/* 결과 개수 */}
-        <div className="text-sm text-black font-semibold px-5 my-2.5">
+        <div className="text-sm text-black font-semibold my-2.5">
           총 <span className="text-primary font-semibold">{filteredList.length}개</span>
         </div>
         {/* 카드 리스트 */}
