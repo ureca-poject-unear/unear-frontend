@@ -4,12 +4,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // font-[지정명] - iOS Safari 호환성 개선
+        // iOS 호환성을 위한 폰트 패밀리 설정 개선
         thin: [
           'LGEIHeadline',
           'LGEIHeadline-Thin',
           '-apple-system',
           'BlinkMacSystemFont',
+          'system-ui',
           'sans-serif',
         ],
         light: [
@@ -17,6 +18,7 @@ export default {
           'LGEIHeadline-Light',
           '-apple-system',
           'BlinkMacSystemFont',
+          'system-ui',
           'sans-serif',
         ],
         regular: [
@@ -24,6 +26,7 @@ export default {
           'LGEIHeadline-Regular',
           '-apple-system',
           'BlinkMacSystemFont',
+          'system-ui',
           'sans-serif',
         ],
         semibold: [
@@ -31,6 +34,7 @@ export default {
           'LGEIHeadline-Semibold',
           '-apple-system',
           'BlinkMacSystemFont',
+          'system-ui',
           'sans-serif',
         ],
         bold: [
@@ -38,20 +42,19 @@ export default {
           'LGEIHeadline-Bold',
           '-apple-system',
           'BlinkMacSystemFont',
+          'system-ui',
           'sans-serif',
         ],
-        // 기본 sans-serif도 업데이트
+        // 기본 sans 폰트도 개선
         sans: [
           'LGEIHeadline',
-          'LGEIHeadline-Regular',
           '-apple-system',
           'BlinkMacSystemFont',
-          'Apple SD Gothic Neo',
-          'Pretendard Variable',
-          'Pretendard',
-          'Noto Sans KR',
-          'Malgun Gothic',
-          '맑은 고딕',
+          'system-ui',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
           'sans-serif',
         ],
       },
