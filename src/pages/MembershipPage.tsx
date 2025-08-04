@@ -42,15 +42,21 @@ export default function MembershipPage() {
     };
     return franchiseList.filter((item) => categoryMap[item.categoryCode] === category);
   };
-  // 검색 기능 추가
+  // 검색 기능 개선 - 실시간 검색 및 빈 값 처리
   const handleSearch = async (keyword: string) => {
     setSearchKeyword(keyword);
+
     if (!keyword.trim()) {
       // 검색어가 없으면 전체 리스트 다시 불러오기
-      const res = await getFranchiseBenefits({ page: 0, size: 100 });
-      setFranchiseList(res.content);
+      try {
+        const res = await getFranchiseBenefits({ page: 0, size: 100 });
+        setFranchiseList(res.content);
+      } catch (error) {
+        console.error('전체 목록 로드 실패:', error);
+      }
       return;
     }
+
     try {
       const res = await getFranchiseBenefits({
         page: 0,
@@ -62,13 +68,23 @@ export default function MembershipPage() {
       console.error('검색 실패:', error);
     }
   };
+
+  // 검색어 변경 시 실시간 처리
+  const handleSearchChange = (keyword: string) => {
+    setSearchKeyword(keyword);
+
+    // 검색어가 비어있으면 즉시 전체 목록으로 복원
+    if (!keyword.trim()) {
+      handleSearch('');
+    }
+  };
   const filteredList = filterByCategory(selectedCategory);
   return (
-    <div className="w-full max-w-[393px] bg-background">
+    <div className="w-full max-w-[600px] bg-background mx-auto">
       <Header title="혜택 안내" />
       {/* SearchBar */}
       <div className="mt-4 px-5">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={handleSearch} onChange={handleSearchChange} />
       </div>
       {/* 필터 + 결과 + 카드 리스트 묶음 */}
       <div className="bg-white mt-4">
@@ -118,10 +134,19 @@ export default function MembershipPage() {
               );
             })
           ) : (
-            // 검색어가 있고 결과가 없을 때 안내 메시지
-            searchKeyword.trim() !== '' && (
-              <div className="text-center text-gray-500 py-4">
-                "{searchKeyword}" 검색 결과가 없습니다.
+            // 검색 결과가 없을 때 안내 메시지
+            filteredList.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                {searchKeyword.trim() !== '' ? (
+                  <div>
+                    <p className="text-m font-semibold mb-2">
+                      "{searchKeyword}" 검색 결과가 없습니다.
+                    </p>
+                    <p className="text-sm text-gray-400">다른 검색어로 시도해보세요.</p>
+                  </div>
+                ) : (
+                  <p className="text-m">등록된 혜택이 없습니다.</p>
+                )}
               </div>
             )
           )}

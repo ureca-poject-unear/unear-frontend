@@ -26,7 +26,7 @@ export default function CategoryFilter({
   onSelectCategory,
 }: CategoryFilterProps) {
   return (
-    <div className="w-full max-w-[393px] mx-auto px-5 overflow-hidden border-b border-gray-200">
+    <div className="w-full max-w-[600px] mx-auto px-5 overflow-hidden border-b border-gray-200">
       <Swiper
         modules={[Mousewheel]}
         slidesPerView="auto"

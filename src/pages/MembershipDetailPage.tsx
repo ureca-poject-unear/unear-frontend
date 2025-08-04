@@ -81,7 +81,7 @@ export default function MembershipDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-[393px] bg-background">
+      <div className="w-full max-w-[600px] bg-background mx-auto">
         <LoadingScreen message="혜택 정보를 불러오는 중..." />
       </div>
     );
@@ -89,7 +89,7 @@ export default function MembershipDetailPage() {
 
   if (isError || !benefitData) {
     return (
-      <div className="w-full max-w-[393px] bg-background">
+      <div className="w-full max-w-[600px] bg-background mx-auto">
         <Header title="혜택 상세" />
         <div className="text-center mt-10 text-m text-red-500 px-5">
           데이터를 불러올 수 없습니다.
@@ -104,7 +104,7 @@ export default function MembershipDetailPage() {
   const tableRows = hasPolicies ? convertToTableRows(benefitData.membershipPolicies) : [];
 
   return (
-    <div className="w-full max-w-[393px] bg-background">
+    <div className="w-full max-w-[600px] bg-background mx-auto">
       <Header title="혜택 상세" />
 
       <div className="bg-white px-5 pt-6">
@@ -113,17 +113,20 @@ export default function MembershipDetailPage() {
           <div className="relative w-[64px] h-[64px] flex items-center justify-center">
             {/* SVG 배경 원형 + 테두리 */}
             <svg
-              width={65}
-              height={63}
-              viewBox="0 0 65 63"
+              width={64}
+              height={64}
+              viewBox="0 0 64 64"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="absolute left-0 top-0"
               preserveAspectRatio="none"
             >
-              <path
-                d="M32.3928 0.5C49.9279 0.5 64.1233 14.39 64.1233 31.5C64.1233 48.61 49.9279 62.5 32.3928 62.5C14.8577 62.5 0.662354 48.61 0.662354 31.5C0.662354 14.39 14.8577 0.5 32.3928 0.5Z"
+              <circle
+                cx="32"
+                cy="32"
+                r="31.5"
                 className="fill-white stroke-gray-300"
+                strokeWidth="0.5"
               />
             </svg>
 
@@ -131,7 +134,7 @@ export default function MembershipDetailPage() {
             <img
               src={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${benefitData.imageUrl}`}
               alt={benefitData.franchiseName}
-              className="w-[37px] h-[37px] object-contain relative z-10"
+              className="w-[37px] h-[37px] object-contain relative z-10 mx-auto"
             />
           </div>
         </div>
