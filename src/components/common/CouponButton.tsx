@@ -8,7 +8,7 @@ const CouponButton: React.FC<CouponButtonProps> = ({ label = '쿠폰 5개', onCl
     <button
       type="button"
       onClick={onClick}
-      className="relative w-[166px] h-[100px] rounded-xl border border-zinc-400 bg-white hover:bg-zinc-100 transition-colors duration-200" // Added transition for hover effect
+      className="relative w-full h-[100px] rounded-xl border border-zinc-400 bg-white hover:bg-zinc-100 transition-colors duration-200" // Added transition for hover effect
     >
       {/* Absolute positioning for perfect centering */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-2">

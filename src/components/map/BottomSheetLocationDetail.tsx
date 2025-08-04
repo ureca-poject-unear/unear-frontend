@@ -135,7 +135,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} disablePadding>
-      <div className="relative w-full bg-white rounded-t-[20px] p-[19px] pb-[72px]">
+      <div className="relative w-full bg-white rounded-t-[20px] p-[19px] pb-5 flex flex-col">
         {store.eventTypeCode !== 'NONE' && (
           <div className="text-pink-600 font-bold text-sm mb-1">이벤트 매장</div>
         )}
@@ -149,7 +149,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
         </div>
 
         <div className="mt-1">
-          <p className="font-regular text-sm text-gray-400 leading-[19px] max-w-[330px]">
+          <p className="font-regular text-sm text-gray-400 leading-[19px] max-w-[580px]">
             {store.address}
           </p>
         </div>
@@ -204,7 +204,7 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
                   onClick={() => {
                     if (isClickable) handleCouponClick(userCouponId);
                   }}
-                  className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-[355px] h-[46px] ${
+                  className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-full h-[46px] ${
                     coupon.userCouponId
                       ? 'cursor-pointer hover:bg-gray-50 transition-colors'
                       : 'cursor-default'
@@ -245,9 +245,14 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
           </div>
         )}
 
-        <div className="absolute left-[20px] right-[20px] bottom-[15px] flex justify-between gap-2">
-          <LocationButton onClick={handleLocationClick} width={169} />
-          <CallButton onClick={handlePhoneClick} width={169} />
+        {/* 하단 버튼들 */}
+        <div className="mt-3 flex gap-5">
+          <div className="flex-1">
+            <LocationButton onClick={handleLocationClick} width="w-full" />
+          </div>
+          <div className="flex-1">
+            <CallButton onClick={handlePhoneClick} width="w-full" />
+          </div>
         </div>
       </div>
       {selectedCoupon && (

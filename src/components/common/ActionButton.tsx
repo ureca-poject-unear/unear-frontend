@@ -18,7 +18,7 @@ export default function ActionButton({
 
   return (
     <button
-      className={`w-[353px] h-[50px] rounded-xl flex items-center justify-center text-base font-semibold text-white transition-colors duration-200 ${backgroundColorClass}`}
+      className={`w-full h-[50px] rounded-xl flex items-center justify-center text-base font-semibold text-white transition-colors duration-200 ${backgroundColorClass}`}
       onClick={() => {
         if (isActive && !isLoading) {
           onClick();

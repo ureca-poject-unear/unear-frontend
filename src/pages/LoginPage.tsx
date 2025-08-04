@@ -214,7 +214,7 @@ const LoginPage = () => {
 
       {/* 오류 메시지 */}
       {errorMessage && (
-        <div className="absolute top-[285px] left-1/2 transform -translate-x-1/2 w-[351px]">
+        <div className="absolute top-[285px] left-5 right-5">
           <p className="text-red-500 text-center text-sm bg-red-50 p-2 rounded border border-red-200">
             {errorMessage}
           </p>
@@ -222,11 +222,7 @@ const LoginPage = () => {
       )}
 
       {/* 입력 필드 영역 */}
-      <div
-        className={`absolute left-1/2 transform -translate-x-1/2 w-[351px] ${
-          errorMessage ? 'top-[340px]' : 'top-[303px]'
-        }`}
-      >
+      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[340px]' : 'top-[303px]'}`}>
         {/* 이메일 입력 */}
         <input
           type="email"
@@ -287,11 +283,7 @@ const LoginPage = () => {
       </div>
 
       {/* 로그인 버튼 */}
-      <div
-        className={`absolute left-1/2 transform -translate-x-1/2 ${
-          errorMessage ? 'top-[475px]' : 'top-[438px]'
-        }`}
-      >
+      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[475px]' : 'top-[438px]'}`}>
         <ActionButton
           text={isLoading ? '로그인 중...' : '로그인'}
           onClick={handleActionClick}
@@ -301,63 +293,57 @@ const LoginPage = () => {
       </div>
 
       {/* 아이디/비밀번호 찾기 및 회원가입 */}
-      <div
-        className={`absolute left-0 right-0 w-full flex justify-center gap-8 ${
-          errorMessage ? 'top-[538px]' : 'top-[501px]'
-        }`}
-      >
-        <button
-          onClick={handleFindAccount}
-          disabled={isLoading}
-          className="text-sm text-gray-600 whitespace-nowrap hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          아이디 / 비밀번호 찾기
-        </button>
-        <button
-          onClick={handleSignUp}
-          disabled={isLoading}
-          className="text-sm text-gray-600 whitespace-nowrap hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          회원가입
-        </button>
+      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[538px]' : 'top-[501px]'}`}>
+        <div className="flex justify-center gap-8">
+          <button
+            onClick={handleFindAccount}
+            disabled={isLoading}
+            className="text-sm text-gray-600 whitespace-nowrap hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            아이디 / 비밀번호 찾기
+          </button>
+          <button
+            onClick={handleSignUp}
+            disabled={isLoading}
+            className="text-sm text-gray-600 whitespace-nowrap hover:text-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            회원가입
+          </button>
+        </div>
       </div>
 
       {/* 간편 로그인 텍스트 */}
-      <div
-        className={`absolute left-1/2 transform -translate-x-1/2 w-[340px] ${
-          errorMessage ? 'top-[605px]' : 'top-[568px]'
-        }`}
-      >
+      <div className={`absolute left-5 right-5 ${errorMessage ? 'top-[605px]' : 'top-[568px]'}`}>
         <p className="text-sm font-light text-center text-zinc-400">간편 로그인</p>
       </div>
 
       {/* 소셜 로그인 버튼들 */}
       <div
-        className={`absolute left-1/2 transform -translate-x-1/2 flex justify-center gap-10 ${
-          errorMessage ? 'top-[633.5px]' : 'top-[596.5px]'
-        }`}
+        className={`absolute left-5 right-5 ${errorMessage ? 'top-[633.5px]' : 'top-[596.5px]'}`}
       >
-        <a href={NAVER_AUTH_URL} aria-label="네이버 로그인">
-          <img
-            src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Naver.png"
-            className="w-20 h-25 object-cover rounded-full"
-            alt="네이버 로그인"
-          />
-        </a>
-        <a href={KAKAO_AUTH_URL} aria-label="카카오 로그인">
-          <img
-            src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Kakao.png"
-            className="w-20 h-25 object-cover rounded-full"
-            alt="카카오 로그인"
-          />
-        </a>
-        <a href={GOOGLE_AUTH_URL} aria-label="구글 로그인">
-          <img
-            src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Google.png"
-            className="w-20 h-25 object-cover rounded-full"
-            alt="구글 로그인"
-          />
-        </a>
+        <div className="flex justify-center gap-10">
+          <a href={NAVER_AUTH_URL} aria-label="네이버 로그인">
+            <img
+              src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Naver.png"
+              className="w-12 h-12 object-cover rounded-full"
+              alt="네이버 로그인"
+            />
+          </a>
+          <a href={KAKAO_AUTH_URL} aria-label="카카오 로그인">
+            <img
+              src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Kakao.png"
+              className="w-12 h-12 object-cover rounded-full"
+              alt="카카오 로그인"
+            />
+          </a>
+          <a href={GOOGLE_AUTH_URL} aria-label="구글 로그인">
+            <img
+              src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Google.png"
+              className="w-12 h-12 object-cover rounded-full"
+              alt="구글 로그인"
+            />
+          </a>
+        </div>
       </div>
     </div>
   );

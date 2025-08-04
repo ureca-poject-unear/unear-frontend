@@ -52,6 +52,14 @@ const MapPage = () => {
   const [isSearchOpen, setSearchOpen] = useState(false);
   const [currentLat, setCurrentLat] = useState<number | null>(null);
   const [currentLng, setCurrentLng] = useState<number | null>(null);
+  const [isLoadviewActive, setIsLoadviewActive] = useState(false);
+  const [isRoadviewOpen, setIsRoadviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (isRoadviewOpen) {
+      // 로드뷰가 열렸을 때
+    }
+  }, [isRoadviewOpen]);
 
   const ALL_CATEGORY_CODES = [
     'FOOD',
@@ -144,6 +152,11 @@ const MapPage = () => {
     mapRef.current?.showCurrentLocation();
   };
 
+  const handleMoveToJuniorLocation = () => {
+    mapRef.current?.setCenter(37.544581, 127.055961);
+    mapRef.current?.setLevel(6);
+  };
+
   const handleSearch = async (keyword: string) => {
     // ... 기존 검색 로직
   };
@@ -200,6 +213,12 @@ const MapPage = () => {
         shouldRestoreLocation={!location.state?.focusStore}
         onMarkerClick={handleMarkerClick}
         onMarkerDeselect={() => {}}
+        onLoadviewStateChange={(isActive) => {
+          setIsLoadviewActive(isActive);
+        }}
+        onRoadviewStateChange={(isOpen) => {
+          setIsRoadviewOpen(isOpen);
+        }}
       />
       {/* 나머지 JSX 코드는 이전과 동일 */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-full max-w-[393px] px-2.5">
@@ -218,7 +237,6 @@ const MapPage = () => {
         categoryCodes={categoryCodes}
         benefitCategories={benefitCategories}
       />
-      <BottomSheetEvent isOpen={isEventOpen} onClose={() => setIsEventOpen(false)} />
       <BottomSheetCoupon
         isOpen={isCouponOpen}
         onClose={() => setIsCouponOpen(false)}

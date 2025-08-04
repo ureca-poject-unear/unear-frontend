@@ -14,6 +14,7 @@ const LocationButton: React.FC<LocationButtonProps> = ({ onClick, width }) => {
 
   if (width === 169) buttonWidthClass = 'w-[169px]';
   else if (width === 180) buttonWidthClass = 'w-[180px]';
+  else if (width === 'w-full') buttonWidthClass = 'w-full';
   else if (typeof width === 'string') buttonWidthClass = width;
 
   return (

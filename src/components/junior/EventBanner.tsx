@@ -15,22 +15,22 @@ const EventBanner = () => {
   };
 
   return (
-    <div className="w-[393px] h-[142px] relative overflow-hidden bg-[linear-gradient(142.88deg,#e6007e_-1.96%,rgba(230,0,126,0.85)_50%,#be185d_101.96%)]">
-      <div className="w-[373px] h-[109px]">
-        <div className="flex flex-col justify-start items-start w-[345px] absolute left-5 top-[30px]">
+    <div className="w-full max-w-[600px] mx-auto h-[142px] relative overflow-hidden bg-[linear-gradient(142.88deg,#e6007e_-1.96%,rgba(230,0,126,0.85)_50%,#be185d_101.96%)]">
+      <div className="w-full h-[109px] relative">
+        <div className="flex flex-col justify-start items-start absolute left-5 top-[30px] max-w-[calc(100%-130px)]">
           <p className="flex-grow-0 flex-shrink-0 text-xl font-bold text-left text-white">
             이번주니어 성수편
           </p>
         </div>
-        <div className="flex flex-col justify-start items-start w-[400px] absolute left-5 top-20 opacity-90">
+        <div className="flex flex-col justify-start items-start absolute left-5 top-20 opacity-90 max-w-[calc(100%-130px)]">
           <p className="flex-grow-0 flex-shrink-0 text-m text-left text-white">
-            혜택을 통해 성수에서 즐기는 특별한 하루!
+            성수에서 즐기는 특별한 헤택!
           </p>
         </div>
         <img
           src={Banner}
           alt="이벤트 이미지"
-          className="w-[109px] h-[109px] absolute left-[283.5px] top-[5.5px] object-cover"
+          className="w-[109px] h-[109px] absolute right-[5px] top-[5.5px] object-cover"
         />
       </div>
 

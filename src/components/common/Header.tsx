@@ -28,10 +28,10 @@ const Header = ({
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 w-full max-w-[393px] h-[40px] mx-auto z-50 ${bgColor}`}
+      className={`fixed top-0 inset-x-0 w-full max-w-[600px] h-[40px] mx-auto z-50 ${bgColor}`}
     >
       <div
-        className="w-full max-w-[393px] mx-auto px-3 h-full flex items-center"
+        className="w-full max-w-[600px] mx-auto px-3 h-full flex items-center"
         style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.15)' }}
       >
         <button

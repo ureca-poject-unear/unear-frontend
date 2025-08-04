@@ -23,7 +23,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
-      <div className="relative w-full max-w-[393px]">
+      <div className="relative w-full max-w-[600px]">
         <div
           className="absolute inset-0 bottom-[65px] bg-black bg-opacity-40"
           onClick={handleBackdropClick}
@@ -34,7 +34,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
           <div
             className={`
               w-full 
-              max-w-[353px] 
+              max-w-[560px] 
               bg-white 
               rounded-[16px] 
               overflow-hidden 

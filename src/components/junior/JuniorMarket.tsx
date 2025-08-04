@@ -177,11 +177,15 @@ const JuniorMarket = (props: JuniorMarketProps) => {
   };
 
   if (isLoading) {
-    return <div className="p-5 text-center text-gray-500">매장 목록을 불러오는 중...</div>;
+    return (
+      <div className="w-full max-w-[600px] mx-auto p-5 text-center text-gray-500">
+        매장 목록을 불러오는 중...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-5 text-center text-red-500">{error}</div>;
+    return <div className="w-full max-w-[600px] mx-auto p-5 text-center text-red-500">{error}</div>;
   }
 
   return (
