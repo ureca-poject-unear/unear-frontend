@@ -4,59 +4,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // iOS 호환성을 위한 폰트 패밀리 설정 개선
-        thin: [
-          'LGEIHeadline',
-          'LGEIHeadline-Thin',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'sans-serif',
-        ],
-        light: [
-          'LGEIHeadline',
-          'LGEIHeadline-Light',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'sans-serif',
-        ],
-        regular: [
-          'LGEIHeadline',
-          'LGEIHeadline-Regular',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'sans-serif',
-        ],
-        semibold: [
-          'LGEIHeadline',
-          'LGEIHeadline-Semibold',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'sans-serif',
-        ],
-        bold: [
-          'LGEIHeadline',
-          'LGEIHeadline-Bold',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'sans-serif',
-        ],
-        // 기본 sans 폰트도 개선
-        sans: [
-          'LGEIHeadline',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'Segoe UI',
-          'Roboto',
-          'Helvetica Neue',
-          'Arial',
-          'sans-serif',
-        ],
+        // font-[지정명]
+        thin: ['LGEIHeadline-Thin', 'sans-serif'],
+        light: ['LGEIHeadline-Light', 'sans-serif'],
+        regular: ['LGEIHeadline-Regular', 'sans-serif'],
+        semibold: ['LGEIHeadline-Semibold', 'sans-serif'],
+        bold: ['LGEIHeadline-Bold', 'sans-serif'],
       },
       colors: {
         // bg-[지정명]
