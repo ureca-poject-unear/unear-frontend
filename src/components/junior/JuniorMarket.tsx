@@ -32,9 +32,7 @@ interface StoreData {
   coupons: CouponInfo[];
 }
 
-interface JuniorMarketProps {}
-
-const JuniorMarket = (props: JuniorMarketProps) => {
+const JuniorMarket = () => {
   const navigate = useNavigate();
   const [stores, setStores] = useState<StoreInfo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);

@@ -1,11 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import ReactDOM, { type Root } from 'react-dom/client';
 import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
 import type { Place } from '@/types/map';
 import { getPlaces } from '@/apis/getPlaces';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
 
-const MapContainer = () => {
+// MapActions 타입 정의 및 export
+export interface MapActions {
+  focusLocation: (lat: number, lng: number) => void;
+  resetView: () => void;
+  refreshPlaces: () => void;
+  getMapBounds: () => { sw: { lat: number; lng: number }; ne: { lat: number; lng: number } } | null;
+}
+
+const MapContainer = forwardRef<MapActions>((props, ref) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
 
@@ -16,6 +24,60 @@ const MapContainer = () => {
   const circleRef = useRef<KakaoCircle | null>(null);
   const markerOverlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const markerRootsRef = useRef<Root[]>([]);
+
+  // 장소 데이터를 가져오는 함수 분리
+  const fetchPlaces = async (mapInstance: KakaoMap) => {
+    const bounds = mapInstance.getBounds();
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+    try {
+      const fetchedPlaces = await getPlaces({
+        swLat: sw.getLat(),
+        swLng: sw.getLng(),
+        neLat: ne.getLat(),
+        neLng: ne.getLng(),
+      });
+      const eventPlaces = fetchedPlaces.filter((p) => p.eventCode !== 'NONE');
+      setPlaces(eventPlaces);
+    } catch (error) {
+      console.error('지도 영역 내 장소 가져오기 실패:', error);
+    }
+  };
+
+  // useImperativeHandle을 사용하여 부모 컴포넌트에서 호출할 수 있는 메서드들 정의
+  useImperativeHandle(
+    ref,
+    () => ({
+      focusLocation: (lat: number, lng: number) => {
+        if (map) {
+          const moveLatLng = new window.kakao.maps.LatLng(lat, lng);
+          map.setCenter(moveLatLng);
+        }
+      },
+      resetView: () => {
+        if (map && circleRef.current) {
+          const bounds = circleRef.current.getBounds();
+          map.setBounds(bounds);
+        }
+      },
+      refreshPlaces: () => {
+        if (map) {
+          fetchPlaces(map);
+        }
+      },
+      getMapBounds: () => {
+        if (!map) return null;
+        const bounds = map.getBounds();
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        return {
+          sw: { lat: sw.getLat(), lng: sw.getLng() },
+          ne: { lat: ne.getLat(), lng: ne.getLng() },
+        };
+      },
+    }),
+    [map]
+  );
 
   // 1. 지도 초기화 Hook
   useEffect(() => {
@@ -69,9 +131,10 @@ const MapContainer = () => {
     if (!map) return;
 
     const handleResize = () => {
-      if (circleRef.current) {
+      if (circleRef.current && map) {
         const bounds = circleRef.current.getBounds();
-        map.setBounds(bounds);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (map as any).setBounds(bounds);
       }
     };
 
@@ -86,24 +149,7 @@ const MapContainer = () => {
   // 2. 지도 초기화 후 장소 데이터 한 번만 불러오는 Hook
   useEffect(() => {
     if (!map) return;
-    const fetchInitialPlaces = async () => {
-      const bounds = map.getBounds();
-      const sw = bounds.getSouthWest();
-      const ne = bounds.getNorthEast();
-      try {
-        const fetchedPlaces = await getPlaces({
-          swLat: sw.getLat(),
-          swLng: sw.getLng(),
-          neLat: ne.getLat(),
-          neLng: ne.getLng(),
-        });
-        const eventPlaces = fetchedPlaces.filter((p) => p.eventCode !== 'NONE');
-        setPlaces(eventPlaces);
-      } catch (error) {
-        console.error('지도 영역 내 장소 가져오기 실패:', error);
-      }
-    };
-    fetchInitialPlaces();
+    fetchPlaces(map);
   }, [map]);
 
   // 3. 장소 데이터에 따라 마커를 렌더링하는 Hook
@@ -138,6 +184,8 @@ const MapContainer = () => {
   }, [map, places]);
 
   return <div ref={mapRef} className="w-full h-full absolute top-0 left-0 z-0" />;
-};
+});
+
+MapContainer.displayName = 'MapContainer';
 
 export default MapContainer;

@@ -17,6 +17,7 @@ export interface KakaoMap {
   //       TypeScript에 알려주어, MapContainer.tsx에서의 타입 오류를 해결합니다.
   setDraggable(draggable: boolean): void;
   setZoomable(zoomable: boolean): void;
+  setBounds(bounds: KakaoMapBounds): void;
 }
 
 export interface KakaoMapBounds {
