@@ -84,7 +84,11 @@ export default function MembershipPage() {
       <Header title="혜택 안내" />
       {/* SearchBar */}
       <div className="mt-4 px-5">
-        <SearchBar onSearch={handleSearch} onChange={handleSearchChange} />
+        <SearchBar
+          onSearch={handleSearch}
+          onChange={handleSearchChange}
+          placeholder="브랜드명이나 혜택 키워드를 검색하세요"
+        />
       </div>
       {/* 필터 + 결과 + 카드 리스트 묶음 */}
       <div className="bg-white mt-4">
