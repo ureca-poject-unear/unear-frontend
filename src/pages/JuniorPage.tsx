@@ -42,9 +42,6 @@ const JuniorPage = () => {
           getStampsStatus(currentEventId),
         ]);
 
-        console.log('API 응답 원본 (stampStatus):', stampStatus);
-        console.log('-> rouletteAvailable 값:', stampStatus.rouletteAvailable);
-
         const hasParticipated =
           userInfo.rouletteResults?.some(
             (result) => result.event.unearEventId === currentEventId && result.participated
@@ -114,10 +111,6 @@ const JuniorPage = () => {
             initialIsSpun={initialIsSpun}
             isRouletteEnabledByServer={isRouletteAvailable}
           />
-          {/*
-            [수정] JuniorMap 컴포넌트에 불필요한 props(stores, onBookmarkToggle) 전달 코드를 제거합니다.
-            [이유] JuniorMap 컴포넌트는 더 이상 props를 받지 않도록 수정되었기 때문입니다.
-          */}
           <JuniorMap />
           <TodayCouponSection />
           <JuniorMarket />

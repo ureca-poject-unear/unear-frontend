@@ -1,9 +1,10 @@
-'use client';
+// src/components/junior/JuniorMarket.tsx (수정된 코드)
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import BookmarkCard from '@/components/common/BookmarkCard';
-import type { StoreInfo, CouponInfo } from '@/components/common/BookmarkCard';
+import BookmarkCard from '@/components/junior/BookmarkCard';
+import type { StoreInfo, CouponInfo } from '@/components/junior/BookmarkCard';
 import { getPlaces } from '@/apis/getPlaces';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
 import { postDownloadCoupon } from '@/apis/postDownloadCoupon';
@@ -19,7 +20,6 @@ interface StoreData {
   name: string;
   address: string;
   hours: string;
-  // 오류 해결: distance 타입을 API 실제 반환 타입인 string으로 수정
   distance: string;
   latitude: number;
   longitude: number;
@@ -32,7 +32,10 @@ interface StoreData {
   coupons: CouponInfo[];
 }
 
-const JuniorMarket = () => {
+interface JuniorMarketProps {}
+
+const JuniorMarket = (props: JuniorMarketProps) => {
+  const navigate = useNavigate();
   const [stores, setStores] = useState<StoreInfo[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +60,6 @@ const JuniorMarket = () => {
         const centerLatStr = '37.544581';
         const centerLngStr = '127.055961';
 
-        // 이제 StoreData 타입이 일치하므로 타입 단언이 정상적으로 동작합니다.
         const detailResults = await Promise.allSettled(
           eventPlaces.map(
             (place) =>
@@ -79,6 +81,8 @@ const JuniorMarket = () => {
             name: detail.name,
             address: detail.address,
             hours: detail.hours,
+            latitude: detail.latitude,
+            longitude: detail.longitude,
             isBookmarked: detail.isBookmarked,
             category: detail.category,
             event: detail.eventTypeCode,
@@ -86,6 +90,7 @@ const JuniorMarket = () => {
             status: detail.status,
             benefitDesc: detail.benefitDesc,
             coupons: detail.coupons,
+            phoneNumber: detail.tel,
           };
         });
 
@@ -106,6 +111,20 @@ const JuniorMarket = () => {
 
     fetchSeoulEventStores();
   }, []);
+
+  const handleLocationClick = (store: StoreInfo) => {
+    // MapPage가 사용하는 `focusStore` 객체 형태로 state를 전달하여 페이지 이동
+    navigate('/map', {
+      state: {
+        focusStore: {
+          latitude: store.latitude,
+          longitude: store.longitude,
+          placeId: Number(store.id),
+          placeName: store.name,
+        },
+      },
+    });
+  };
 
   const handleBookmarkToggle = async (storeId: string) => {
     const store = stores.find((s) => s.id === storeId);
@@ -184,6 +203,7 @@ const JuniorMarket = () => {
               }
               downloadingCoupons={downloadingCoupons}
               downloadedCoupons={downloadedCoupons}
+              onLocationClick={() => handleLocationClick(store)}
             />
           ))
         ) : (
