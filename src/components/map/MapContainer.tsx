@@ -370,7 +370,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       setLevel: (level) => {
         const map = mapInstanceRef.current;
         if (map) {
+          isSettingCenterRef.current = true;
           map.setLevel(level);
+          setTimeout(() => {
+            isSettingCenterRef.current = false;
+            renderMarkers();
+          }, 500);
         }
       },
       fetchPlaces: () => {
@@ -445,7 +450,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               category={place.categoryCode}
               storeClass={place.markerCode}
               event={place.eventCode}
-              isSelected={selectedPlaceId === place.placeId}
+              isSelected={selectedPlaceIdRef.current === place.placeId}
             />
           );
 
