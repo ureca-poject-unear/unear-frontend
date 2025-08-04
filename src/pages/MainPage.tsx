@@ -5,7 +5,7 @@ import BarcodeIcon from '@/assets/common/barcode.svg?react';
 import InformationIcon from '@/assets/common/information.svg?react';
 import MainNubiImage from '@/assets/main/mainnubi.png';
 import EventBannerImage from '@/assets/main/eventbanner.png';
-import StoryBackgroundImage from '@/assets/main/storyBackground.png';
+import StoryBackgroundImage from '@/assets/story/starBackground.png';
 import StoryNubiImage from '@/assets/main/storynubi.png';
 import Grade from '@/components/common/Grade';
 import BottomSheetBarcode from '@/components/common/BottomSheetBarcode';
