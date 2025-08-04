@@ -40,15 +40,14 @@ const UserProfileSection = ({
 
   return (
     <div className="w-full bg-white">
-      <div className="px-5 py-6">
+      <div className="px-5 py-3">
         <div className="flex">
           {/* 캐릭터와 사용자 정보 */}
           <div className="flex gap-4 w-full">
             {/* 마이페이지 누비 캐릭터 */}
             <img src={MyPageNubiImage} alt="마이페이지 누비" className="w-[89px] h-[89px]" />
-
             {/* 사용자 정보 */}
-            <div className="flex flex-col gap-2 mt-4 w-full">
+            <div className="flex flex-col gap-1 mt-4 w-full">
               {/* 이름, 등급, 로그아웃 한 줄 */}
               <div className="flex justify-between w-full">
                 <div className="flex gap-2">

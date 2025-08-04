@@ -23,7 +23,9 @@ const BottomSheetBarcode = ({
           {/* 사용자 정보 섹션 */}
           <div className="flex items-center gap-3">
             <span className="text-lm font-semibold text-black pt-1">{userName}님</span>
-            <Grade grade={userGrade} />
+            <div className="pt-[2px]">
+              <Grade grade={userGrade} />
+            </div>
           </div>
           {/* 바코드 섹션 */}
           <div className="w-full">

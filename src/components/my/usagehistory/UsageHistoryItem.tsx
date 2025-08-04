@@ -30,9 +30,7 @@ const UsageHistoryItem = ({
 
       {/* 오른쪽: 가격 정보 */}
       <div className="flex-shrink-0 flex flex-col items-end justify-center">
-        <span className="text-sm font-regular text-gray-500 line-through">
-          {formatPrice(originalPrice)}
-        </span>
+        <span className="text-sm font-regular text-gray-500">{formatPrice(originalPrice)}</span>
         <span className="text-m font-semibold text-black">-{formatPrice(discountPrice)}</span>
       </div>
     </div>
