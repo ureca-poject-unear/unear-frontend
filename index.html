@@ -3,38 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- iOS Safari 폰트 렌더링 개선 -->
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-touch-fullscreen" content="yes" />
-
-    <!-- 폰트 preload로 로딩 성능 개선 -->
+    <!-- iOS Safari 폰트 로딩 최적화 -->
+    <link rel="preconnect" href="/font/LG-EI-Headline-otf/" crossorigin />
     <link
       rel="preload"
       href="/font/LG-EI-Headline-otf/LGEIHeadline-Regular.otf"
       as="font"
       type="font/otf"
-      crossorigin="anonymous"
+      crossorigin
     />
     <link
       rel="preload"
       href="/font/LG-EI-Headline-otf/LGEIHeadline-Semibold.otf"
       as="font"
       type="font/otf"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/font/LG-EI-Headline-otf/LGEIHeadline-Bold.otf"
-      as="font"
-      type="font/otf"
-      crossorigin="anonymous"
+      crossorigin
     />
 
-    <title>U:Near</title>
+    <!-- iOS 호환성을 위한 메타 태그 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>Unear</title>
   </head>
   <body>
     <div id="root"></div>
