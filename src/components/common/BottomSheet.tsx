@@ -36,7 +36,11 @@ const BottomSheet = ({ isOpen, onClose, children, disablePadding }: BottomSheetP
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              transition={{
+                type: 'tween',
+                duration: 0.4,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               dragMomentum={false}
