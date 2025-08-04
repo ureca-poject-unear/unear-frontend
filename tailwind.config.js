@@ -4,12 +4,56 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // font-[지정명]
-        thin: ['LGEIHeadline-Thin', 'sans-serif'],
-        light: ['LGEIHeadline-Light', 'sans-serif'],
-        regular: ['LGEIHeadline-Regular', 'sans-serif'],
-        semibold: ['LGEIHeadline-Semibold', 'sans-serif'],
-        bold: ['LGEIHeadline-Bold', 'sans-serif'],
+        // font-[지정명] - iOS Safari 호환성 개선
+        thin: [
+          'LGEIHeadline',
+          'LGEIHeadline-Thin',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif',
+        ],
+        light: [
+          'LGEIHeadline',
+          'LGEIHeadline-Light',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif',
+        ],
+        regular: [
+          'LGEIHeadline',
+          'LGEIHeadline-Regular',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif',
+        ],
+        semibold: [
+          'LGEIHeadline',
+          'LGEIHeadline-Semibold',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif',
+        ],
+        bold: [
+          'LGEIHeadline',
+          'LGEIHeadline-Bold',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif',
+        ],
+        // 기본 sans-serif도 업데이트
+        sans: [
+          'LGEIHeadline',
+          'LGEIHeadline-Regular',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Apple SD Gothic Neo',
+          'Pretendard Variable',
+          'Pretendard',
+          'Noto Sans KR',
+          'Malgun Gothic',
+          '맑은 고딕',
+          'sans-serif',
+        ],
       },
       colors: {
         // bg-[지정명]

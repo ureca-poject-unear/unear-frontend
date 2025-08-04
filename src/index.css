@@ -2,52 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LG EI Headline: 굵기별로 family 분리 */
+/* LG EI Headline: iOS Safari 호환성을 위한 개선된 폰트 선언 */
 @font-face {
   font-family: 'LGEIHeadline-Thin';
-  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Thin.otf') format('woff2');
-  font-weight: normal;
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Thin.otf') format('opentype');
+  font-weight: 100;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0020-007E, U+AC00-D7A3; /* 라틴 문자 + 한글 */
 }
+
 @font-face {
   font-family: 'LGEIHeadline-Light';
-  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Light.otf') format('woff2');
-  font-weight: normal;
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Light.otf') format('opentype');
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0020-007E, U+AC00-D7A3;
 }
+
 @font-face {
   font-family: 'LGEIHeadline-Regular';
-  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Regular.otf') format('woff2');
-  font-weight: normal;
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Regular.otf') format('opentype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0020-007E, U+AC00-D7A3;
 }
+
 @font-face {
   font-family: 'LGEIHeadline-Semibold';
-  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Semibold.otf') format('woff2');
-  font-weight: normal;
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Semibold.otf') format('opentype');
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0020-007E, U+AC00-D7A3;
 }
+
 @font-face {
   font-family: 'LGEIHeadline-Bold';
-  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Bold.otf') format('woff2');
-  font-weight: normal;
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+AC00-D7A3;
+}
+
+/* iOS Safari 호환성을 위한 통합 폰트 패밀리 선언 */
+@font-face {
+  font-family: 'LGEIHeadline';
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Thin.otf') format('opentype');
+  font-weight: 100;
   font-style: normal;
   font-display: swap;
 }
 
-html {
-  font-family: 'LGEIHeadline-Regular', sans-serif;
+@font-face {
+  font-family: 'LGEIHeadline';
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
+@font-face {
+  font-family: 'LGEIHeadline';
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LGEIHeadline';
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LGEIHeadline';
+  src: url('/font/LG-EI-Headline-otf/LGEIHeadline-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* iOS Safari 호환 기본 폰트 설정 */
 html {
-  font-family: 'LGEIHeadline-Regular', sans-serif;
+  font-family:
+    'LGEIHeadline',
+    'LGEIHeadline-Regular',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Apple SD Gothic Neo',
+    'Pretendard Variable',
+    'Pretendard',
+    'Noto Sans KR',
+    'Malgun Gothic',
+    '맑은 고딕',
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    sans-serif;
   /* 스크롤바로 인한 레이아웃 시프트 방지 */
   overflow-y: scroll;
   scrollbar-gutter: stable;
+  /* iOS Safari 텍스트 크기 조정 방지 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* iOS Safari 폰트 렌더링 개선 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 스크롤바 숨기기 */
@@ -60,4 +127,35 @@ html {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* iOS Safari 폰트 렌더링 개선을 위한 추가 스타일 */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari 전용 스타일 */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* iOS에서 폰트가 로드되지 않을 때 대비 */
+  .font-thin {
+    font-weight: 100 !important;
+  }
+
+  .font-light {
+    font-weight: 300 !important;
+  }
+
+  .font-regular {
+    font-weight: 400 !important;
+  }
+
+  .font-semibold {
+    font-weight: 600 !important;
+  }
+
+  .font-bold {
+    font-weight: 700 !important;
+  }
 }
