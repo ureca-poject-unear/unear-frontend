@@ -52,6 +52,11 @@ export interface KakaoEvent {
     type: string,
     handler: (event?: { latLng?: KakaoLatLng }) => void
   ): void;
+  addListener(
+    target: KakaoMarkerClusterer,
+    type: 'clusterclick',
+    handler: (cluster: KakaoMarkerClusterer) => void
+  ): void;
 }
 
 export interface KakaoCircle {
@@ -81,6 +86,7 @@ export interface KakaoMarkerClusterer {
   clear(): void;
   getMarkers(): KakaoMarker[];
   setMap(map: KakaoMap | null): void;
+  getCenter(): KakaoLatLng;
 }
 
 declare global {

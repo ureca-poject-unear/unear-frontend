@@ -657,6 +657,21 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                 ],
               });
               clustererRef.current = clusterer;
+
+              // 클러스터 클릭 이벤트 리스너 추가
+              window.kakao.maps.event.addListener(
+                clusterer,
+                'clusterclick',
+                (cluster: KakaoMarkerClusterer) => {
+                  const currentLevel = map.getLevel();
+                  const newLevel = Math.max(1, currentLevel - 2);
+
+                  // 클러스터 중심으로 이동
+                  const center = cluster.getCenter();
+                  map.setCenter(center);
+                  map.setLevel(newLevel);
+                }
+              );
             } catch (error) {
               console.error('클러스터러 초기화 실패:', error);
               clustererRef.current = null;
