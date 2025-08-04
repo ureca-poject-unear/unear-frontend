@@ -26,7 +26,7 @@ export default function MembershipCard({
   };
   return (
     <div
-      className="relative w-[353px] h-[85px] cursor-pointer"
+      className="relative w-full max-w-[560px] h-[85px] cursor-pointer"
       role="button"
       tabIndex={0}
       onClick={handleClick}
@@ -43,15 +43,18 @@ export default function MembershipCard({
           <svg
             width={64}
             height={64}
-            viewBox="0 0 64 64"
+            viewBox="0 0 65 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="absolute left-0 top-0"
             preserveAspectRatio="none"
           >
-            <path
-              d="M32.3928 0.5C49.9279 0.5 64.1233 14.39 64.1233 31.5C64.1233 48.61 49.9279 62.5 32.3928 62.5C14.8577 62.5 0.662354 48.61 0.662354 31.5C0.662354 14.39 14.8577 0.5 32.3928 0.5Z"
+            <circle
+              cx="32"
+              cy="32"
+              r="31.5"
               className="fill-white stroke-gray-300"
+              strokeWidth="0.5"
             />
           </svg>
           <img
@@ -60,7 +63,7 @@ export default function MembershipCard({
             onError={(e) => {
               e.currentTarget.src = '/images/default-franchise.png'; // fallback 이미지
             }}
-            className="absolute left-[13.5px] top-[12.5px] w-[37px] h-[37px] object-contain"
+            className="absolute inset-0 flex items-center justify-center w-[37px] h-[37px] object-contain m-auto"
           />
         </div>
         {/* 텍스트 정보 */}
