@@ -27,7 +27,9 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   className = '',
   isDarkMode = false,
 }) => {
+  const [isPhoneHovered, setIsPhoneHovered] = useState(false); // 상태 추가
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+
   const handleBookmarkToggle = () => {
     onBookmarkToggle?.(store.id);
   };
@@ -111,7 +113,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
           <MiniLocationButton onClick={handleLocationClick} />
         </div>
 
-        {/* 전화 버튼 - 2 비율 (간단한 div + className 사용) */}
+        {/* 전화 버튼 - 2 비율 */}
         <div className="flex-[2]">
           <button
             onClick={handlePhoneClick}
@@ -138,12 +140,3 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
 };
 
 export default BookmarkCard;
-
-/*
-- 사용법
-  <BookmarkCard
-    store={{ ...sampleStore, isBookmarked }} // phoneNumber는 store 데이터에 포함
-    onBookmarkToggle={handleBookmarkToggle}
-    isDarkMode={false} // true 혹은 isDarkMode 생략시 라이트 모드
-  />
-*/
