@@ -43,7 +43,15 @@ const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
     hours: `${data.startTime}:00 - ${data.endTime}:00`,
     tel: data.tel,
     isBookmarked: data.favorite,
-    status: data.endTime < new Date().getHours() ? '영업종료' : '영업중',
+    status: (() => {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const openHour = data.startTime;
+      const closeHour = data.endTime;
+
+      const isOpen = currentHour >= openHour && currentHour < closeHour;
+      return isOpen ? '영업중' : '영업종료';
+    })(),
     benefitDesc: data.benefitDesc,
     eventTypeCode: data.eventTypeCode,
     coupons: data.coupons.map((c) => ({

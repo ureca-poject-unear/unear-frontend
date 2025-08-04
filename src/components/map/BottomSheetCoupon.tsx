@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import CouponCard from '@/components/common/CouponCard';
 import StoreCouponCard from '@/components/common/StoreCouponCard';
+import EmptyState from '@/components/common/EmptyState';
 import ClockIcon from '@/assets/map/mapCouponWatchIcon.svg?react';
 import MarkerIcon from '@/assets/map/mapCouponLocationIcon.svg?react';
 import MapCouponIcon from '@/assets/map/mapCouponSheetIcon.svg?react';
@@ -36,6 +37,7 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
   const [shouldRefreshNearby, setShouldRefreshNearby] = useState(false);
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
   const [isLoadingNearbyStores, setIsLoadingNearbyStores] = useState(false);
+  const [locationError, setLocationError] = useState(false);
 
   const handleCardClick = async (couponId: number) => {
     try {
@@ -91,6 +93,7 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
       setShouldRefreshNearby(true);
     }
     setActiveTab(tab);
+    setLocationError(false);
   };
 
   const handleCloseModal = () => {
@@ -115,10 +118,12 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
     const fetchNearbyStores = async () => {
       try {
         if (!navigator.geolocation) {
-          alert('위치 정보를 사용할 수 없습니다.');
+          setLocationError(true);
+          setIsLoadingNearbyStores(false);
           return;
         }
         setIsLoadingNearbyStores(true);
+        setLocationError(false);
 
         navigator.geolocation.getCurrentPosition(
           async ({ coords }) => {
@@ -129,12 +134,13 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
           },
           (err) => {
             console.error('위치 정보 실패:', err);
-            alert('위치 정보를 가져올 수 없습니다.');
+            setLocationError(true);
             setIsLoadingNearbyStores(false);
           }
         );
       } catch (e) {
         console.error('근처 매장 불러오기 실패:', e);
+        setLocationError(true);
         setIsLoadingNearbyStores(false);
       }
     };
@@ -234,19 +240,25 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
                       </div>
                     </div>
 
-                    <div className="space-y-[14px]">
-                      {coupons.map((coupon) => (
-                        <CouponCard
-                          key={`all-${coupon.userCouponId}`}
-                          brand={coupon.name}
-                          title={coupon.couponName}
-                          validUntil={coupon.couponEnd}
-                          category={coupon.categoryCode}
-                          storeClass={coupon.markerCode}
-                          onClick={() => handleCardClick(coupon.userCouponId)}
-                        />
-                      ))}
-                    </div>
+                    {coupons.length === 0 ? (
+                      <div className="flex justify-center items-center py-8">
+                        <EmptyState message="사용할 수 있는 쿠폰이 없어요" />
+                      </div>
+                    ) : (
+                      <div className="space-y-[14px]">
+                        {coupons.map((coupon) => (
+                          <CouponCard
+                            key={`all-${coupon.userCouponId}`}
+                            brand={coupon.name}
+                            title={coupon.couponName}
+                            validUntil={coupon.couponEnd}
+                            category={coupon.categoryCode}
+                            storeClass={coupon.markerCode}
+                            onClick={() => handleCardClick(coupon.userCouponId)}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -255,6 +267,10 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
               (isLoadingNearbyStores ? (
                 <div className="flex justify-center items-center h-full">
                   <LoadingSpinner size="lg" />
+                </div>
+              ) : locationError ? (
+                <div className="flex justify-center items-center h-full">
+                  <EmptyState message={`불러올 매장이 없어요.\n위치정보를 확인해주세요!`} />
                 </div>
               ) : (
                 <div className="mt-4 ml-5 mr-5 pb-[10px]">
