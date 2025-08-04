@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue } from 'framer-motion';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -9,6 +9,17 @@ interface BottomSheetProps {
 }
 
 const BottomSheet = ({ isOpen, onClose, children, disablePadding }: BottomSheetProps) => {
+  const y = useMotionValue(0);
+
+  const handleDrag = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: { offset: { y: number } }
+  ) => {
+    if (info.offset.y < 0) {
+      y.set(0);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -29,7 +40,9 @@ const BottomSheet = ({ isOpen, onClose, children, disablePadding }: BottomSheetP
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               dragMomentum={false}
-              dragElastic={0.1}
+              dragElastic={0.2}
+              style={{ y }}
+              onDrag={handleDrag}
               onDragEnd={(_, info) => {
                 if (info.offset.y > 100) {
                   onClose();
