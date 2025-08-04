@@ -17,7 +17,7 @@ const Default = () => {
 
   return (
     <div
-      className={`w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative ${
+      className={`w-full max-w-[600px] min-h-screen mx-auto flex flex-col relative ${
         isAuthPage ? 'bg-white' : 'bg-background'
       }`}
     >
@@ -25,7 +25,7 @@ const Default = () => {
         <Outlet />
       </main>
 
-      {pathname !== '/login' && <BottomNavigator />}
+      {!isAuthPage && <BottomNavigator />}
     </div>
   );
 };

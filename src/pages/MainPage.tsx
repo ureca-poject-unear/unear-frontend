@@ -66,7 +66,7 @@ const MainPage = () => {
   // 사용자 데이터가 로딩 중이면 로딩 화면 표시
   if (isUserDataLoading) {
     return (
-      <div className="w-full max-w-[393px] min-h-screen mx-auto flex flex-col relative bg-background">
+      <div className="w-full max-w-[600px] min-h-screen mx-auto flex flex-col relative bg-background">
         <LoadingScreen message="메인페이지를 준비하고 있습니다..." />
       </div>
     );
@@ -84,7 +84,7 @@ const MainPage = () => {
     <>
       {/* 메인페이지 헤더 */}
       <header className="absolute top-0 left-0 w-full h-[40px] bg-background">
-        <div className="w-full max-w-[393px] pt-1 mx-auto px-5 h-full flex items-center justify-between">
+        <div className="w-full max-w-[600px] pt-1 mx-auto px-5 h-full flex items-center justify-between">
           {/* U:NEAR 로고 */}
           <h1 className="text-primary font-bold text-lg leading-[40px]">U:NEAR</h1>
 

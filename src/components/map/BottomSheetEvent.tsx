@@ -44,51 +44,57 @@ const BottomSheetEvent = ({ isOpen, onClose }: BottomSheetEventProps) => {
         {/* 원 모양 배경 */}
         <div className="absolute left-1/2 -translate-x-1/2 top-[322px] w-[500px] h-[500px] bg-[#E4E4E7] rounded-full z-0" />
 
-        {/* 아이콘들 */}
-        <div className="absolute left-[63px] top-[369px] flex gap-[40px] z-10">
-          {/* 프랜차이즈 매장 아이콘 */}
-          <div className="w-[34px] h-[34px] rounded-full bg-[#FF860D] flex items-center justify-center">
-            <CoffeeIcon className="w-5 h-5 text-white" />
-          </div>
+        {/* 아이콘들과 제목들 - 반응형 중앙 정렬 */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-[369px] z-10">
+          <div className="flex justify-center items-start gap-[25px]">
+            {/* 프랜차이즈 매장 */}
+            <div className="flex flex-col items-center">
+              <div className="w-[34px] h-[34px] rounded-full bg-[#FF860D] flex items-center justify-center mb-[11px]">
+                <CoffeeIcon className="w-5 h-5 text-white" />
+              </div>
+              <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px]">
+                프랜차이즈
+                <br />
+                매장
+              </p>
+            </div>
 
-          {/* 소상공인 매장 아이콘 */}
-          <div className="w-[34px] h-[34px] rounded-full bg-[#3B82F6] flex items-center justify-center">
-            <CoffeeIcon className="w-5 h-5 text-white" />
-          </div>
+            {/* 소상공인 매장 */}
+            <div className="flex flex-col items-center">
+              <div className="w-[34px] h-[34px] rounded-full bg-[#3B82F6] flex items-center justify-center mb-[11px]">
+                <CoffeeIcon className="w-5 h-5 text-white" />
+              </div>
+              <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[45px]">
+                소상공인
+                <br />
+                매장
+              </p>
+            </div>
 
-          {/* 이번주니어 매장 아이콘 */}
-          <div className="w-[34px] h-[34px] rounded-full bg-primary flex items-center justify-center">
-            <CoffeeIcon className="w-5 h-5 text-white" />
-          </div>
+            {/* 이번주니어 매장 */}
+            <div className="flex flex-col items-center">
+              <div className="w-[34px] h-[34px] rounded-full bg-primary flex items-center justify-center mb-[11px]">
+                <CoffeeIcon className="w-5 h-5 text-white" />
+              </div>
+              <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px]">
+                이번주니어
+                <br />
+                매장
+              </p>
+            </div>
 
-          {/* 이번주니어 필수매장 아이콘 */}
-          <div className="w-[35px] h-[35px] rounded-full bg-[#F472B6] flex items-center justify-center">
-            <CoffeeIcon className="w-5 h-5 text-white" />
+            {/* 이번주니어 필수매장 */}
+            <div className="flex flex-col items-center">
+              <div className="w-[35px] h-[35px] rounded-full bg-[#F472B6] flex items-center justify-center mb-[11px]">
+                <CoffeeIcon className="w-5 h-5 text-white" />
+              </div>
+              <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px]">
+                이번주니어
+                <br />
+                필수매장
+              </p>
+            </div>
           </div>
-        </div>
-
-        {/* 각 아이콘의 제목 */}
-        <div className="absolute left-[52px] top-[414px] flex z-10">
-          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px]">
-            프랜차이즈
-            <br />
-            매장
-          </p>
-          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[45px] ml-[23px]">
-            소상공인
-            <br />
-            매장
-          </p>
-          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px] ml-[24px]">
-            이번주니어
-            <br />
-            매장
-          </p>
-          <p className="font-semibold text-[12px] leading-[16px] text-[#333333] text-center w-[56px] ml-[20px]">
-            이번주니어
-            <br />
-            필수매장
-          </p>
         </div>
 
         {/* 이번주니어 이동 링크 영역 */}

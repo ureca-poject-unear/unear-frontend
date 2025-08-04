@@ -10,44 +10,25 @@ const PhoneButton: React.FC<PhoneButtonProps> = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="w-[58px] h-[31.6px] p-0 m-0 bg-transparent border-none flex items-center justify-center"
+      className={`w-full h-[31.6px] p-0 m-0 bg-storecard border rounded flex items-center justify-center ${
+        isHovered ? 'border-gray-500 bg-gray-100' : 'border-gray-200'
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       aria-label="Phone Button"
     >
+      {/* 전화 아이콘만 중앙에 고정 크기로 */}
       <svg
-        width={58}
-        height={32}
-        viewBox="0 0 58 32"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-[58px] h-[31.6px]"
-        preserveAspectRatio="none"
+        className="w-5 h-5"
       >
-        <rect
-          x="0.5"
-          y="0.5"
-          width={57}
-          height="30.5962"
-          rx="3.5"
-          className={`
-            ${isHovered ? 'fill-gray-100 stroke-gray-500' : 'fill-storecard stroke-gray-200'}
-          `}
-        />
-        <rect
-          width="21.7845"
-          height="21.7845"
-          transform="translate(18.9128 4.90588)"
-          className={isHovered ? 'fill-none' : 'fill-storecard'}
-        />
         <path
-          d="M38.1019 20.8188C37.4262 20.138 35.7898 19.1445 34.9959 18.7441C33.962 18.2234 33.8769 18.1808 33.0642 18.7846C32.5221 19.1875 32.1618 19.5475 31.5274 19.4121C30.893 19.2768 29.5144 18.514 28.3074 17.3107C27.1003 16.1075 26.2931 14.6889 26.1574 14.0566C26.0217 13.4244 26.3876 13.0683 26.7867 12.5249C27.3492 11.7591 27.3066 11.6314 26.8258 10.5975C26.451 9.79335 25.4286 8.17227 24.7452 7.50002C24.0143 6.77798 24.0143 6.90562 23.5433 7.10134C23.1598 7.26265 22.7919 7.45876 22.4443 7.68723C21.7635 8.13951 21.3857 8.51521 21.1214 9.07982C20.8572 9.64443 20.7385 10.9681 22.103 13.4469C23.4675 15.9258 24.4249 17.1933 26.4063 19.1692C28.3878 21.1451 29.9114 22.2075 32.1388 23.4568C34.8942 25 35.9511 24.6992 36.5174 24.4354C37.0837 24.1716 37.4611 23.7971 37.9142 23.1164C38.1433 22.7693 38.3398 22.4018 38.5014 22.0186C38.6975 21.5493 38.8252 21.5493 38.1019 20.8188Z"
-          className={`
-            ${isHovered ? 'fill-gray-500 stroke-gray-500' : 'fill-gray-200 stroke-gray-200'}
-          `}
-          strokeWidth={1.5}
-          strokeMiterlimit={10}
-          strokeLinejoin="round"
+          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+          className={`${isHovered ? 'fill-gray-300' : 'fill-gray-200'}`}
         />
       </svg>
     </button>

@@ -274,7 +274,7 @@ const ChangePasswordPage = () => {
               <button
                 onClick={handleSubmit}
                 disabled={!isFormValid || isLoading}
-                className={`w-[353px] h-[50px] rounded-xl font-semibold text-white transition-colors ${
+                className={`w-[560px] h-[50px] rounded-xl font-semibold text-white transition-colors ${
                   isFormValid && !isLoading
                     ? 'bg-[#e6007e] hover:bg-[#d1006b]'
                     : 'bg-zinc-300 cursor-not-allowed'

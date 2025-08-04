@@ -117,12 +117,12 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
     <div
       className={`
         relative
-        w-[353px]
+        w-full
         bg-white
         rounded-[8px]
         shadow-[0px_2px_10px_rgba(0,0,0,0.25)]
         transition-all duration-300
-        pl-[19px] pr-[15px] pt-[19px] pb-[72px]
+        p-[19px] pb-[72px]
         ${className}
       `}
     >
@@ -137,14 +137,14 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
       </div>
 
       {/* 매장명 */}
-      <div className="absolute left-[85px] top-[19px]">
-        <h3 className="font-semibold text-lm text-black">{store.name}</h3>
+      <div className="absolute left-[85px] top-[19px] w-[50%]">
+        <h3 className="font-semibold text-lm text-black truncate">{store.name}</h3>
       </div>
 
       {/* 주소 */}
-      <div className="absolute left-[85px] top-[46px]">
-        <p className="font-regular text-sm text-gray-400 leading-[19px]">
-          {store.address.length > 20 ? `${store.address.slice(0, 20)}...` : store.address}
+      <div className="absolute left-[85px] top-[46px] w-[65%]">
+        <p className="font-regular text-sm text-gray-400 leading-[19px] truncate">
+          {store.address}
         </p>
       </div>
 
@@ -164,7 +164,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
       </div>
 
       {/* 쿠폰 섹션 */}
-      <div className="mt-[94px] flex items-center justify-between w-full">
+      <div className="mt-[94px] flex items-center justify-between w-full ">
         <div className="flex items-center gap-2">
           <div className="w-[10px] h-[10px] bg-green-400 rounded-full" />
           <span className="font-semibold text-sm text-black leading-none relative top-[1px]">
@@ -188,7 +188,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
           {store.coupons.map((coupon) => (
             <div
               key={coupon.id}
-              className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-[318px] h-[46px] ${
+              className={`relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-full h-[46px] ${
                 coupon.userCouponId
                   ? 'cursor-pointer hover:bg-gray-50 transition-colors'
                   : 'cursor-default'
@@ -223,8 +223,12 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
       )}
       {/* 하단 버튼(위치보기, 전화) */}
       <div className="absolute left-[19px] right-[15px] bottom-[20px] flex gap-2">
-        <MiniLocationButton onClick={handleLocationClick} />
-        <PhoneButton onClick={handlePhoneClick} />
+        <div className="flex-[8]">
+          <MiniLocationButton onClick={handleLocationClick} />
+        </div>
+        <div className="flex-[2]">
+          <PhoneButton onClick={handlePhoneClick} />
+        </div>
       </div>
     </div>
   );
