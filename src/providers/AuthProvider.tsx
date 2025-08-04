@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/auth';
 import axiosInstance from '@/apis/axiosInstance';
 import { getUserInfo } from '@/apis/userInfo';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { showToast } from '@/utils/toast';
+import { showToast, showSuccessToast } from '@/utils/toast';
 
 interface UserInfo {
   userId: number;
@@ -194,6 +194,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     await loadUserInfo();
+    
+    // 사용자 정보 로드 후 환영 메시지 표시
+    const { getUserDisplayName } = useAuthStore.getState();
+    const userName = getUserDisplayName();
+    showSuccessToast(`${userName}님 환영합니다!`);
   };
 
   // 로그아웃
