@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import ActionButton from '../components/common/ActionButton';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -201,13 +202,30 @@ const LoginPage = () => {
       {/* 전체 컴테이너 - 화면 중앙 정렬 */}
       <div className="flex-1 flex flex-col justify-center px-5 py-8">
         {/* 타이틀 영역 */}
-        <div className="text-center mb-8">
-          <h1 className="text-xl font-bold mb-4">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <motion.h1
+            className="text-xl font-bold mb-4"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+          >
             <span className="text-primary">U:NEAR</span>
             <span className="text-black"> 로그인</span>
-          </h1>
-          <p className="text-m text-black">로그인하고 유니어의 서비스를 경험해보세요!</p>
-        </div>
+          </motion.h1>
+          <motion.p
+            className="text-m text-black"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
+          >
+            로그인하고 유니어의 서비스를 경험해보세요!
+          </motion.p>
+        </motion.div>
 
         {/* 오류 메시지 */}
         {errorMessage && (
@@ -219,7 +237,12 @@ const LoginPage = () => {
         )}
 
         {/* 입력 필들 영역 */}
-        <div className="space-y-6 mb-8">
+        <motion.div
+          className="space-y-6 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
+        >
           {/* 이메일 입력 */}
           <div>
             <input
@@ -279,20 +302,30 @@ const LoginPage = () => {
               )}
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* 로그인 버튼 */}
-        <div className="mb-6">
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+        >
           <ActionButton
             text={isLoading ? '로그인 중...' : '로그인'}
             onClick={handleActionClick}
             isActive={isLoginActive}
             isLoading={isLoading}
           />
-        </div>
+        </motion.div>
 
         {/* 회원가입 */}
-        <div className="text-center mb-8">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.0, ease: 'easeOut' }}
+        >
           <button
             onClick={handleSignUp}
             disabled={isLoading}
@@ -300,15 +333,25 @@ const LoginPage = () => {
           >
             회원가입
           </button>
-        </div>
+        </motion.div>
 
         {/* 간편 로그인 텍스트 */}
-        <div className="text-center mb-4">
+        <motion.div
+          className="text-center mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2, ease: 'easeOut' }}
+        >
           <p className="text-sm font-light text-zinc-400">간편 로그인</p>
-        </div>
+        </motion.div>
 
         {/* 소셜 로그인 버튼들 */}
-        <div className="flex justify-center gap-10">
+        <motion.div
+          className="flex justify-center gap-10"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+        >
           <a href={NAVER_AUTH_URL} aria-label="네이버 로그인">
             <img
               src="https://test.codemshop.com/wp-content/plugins/mshop-mcommerce-premium-s2/lib/mshop-members-s2/assets/images/social/icon_1/Naver.png"
@@ -330,7 +373,7 @@ const LoginPage = () => {
               alt="구글 로그인"
             />
           </a>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
