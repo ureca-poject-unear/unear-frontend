@@ -469,8 +469,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           // 마커를 컨테이너에 추가
           containerElement.appendChild(markerElement);
 
-          // 지도 레벨 6 이하에서 장소명 텍스트 추가
-          if (currentLevel <= 6) {
+          // 지도 레벨 4 이하에서 장소명 텍스트 추가
+          if (currentLevel <= 4) {
             const textHTML = ReactDOMServer.renderToString(
               <PlaceNameLabel
                 placeName={place.placeName}
