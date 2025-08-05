@@ -684,9 +684,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             initializeRoadview();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
-              if (!isSettingCenterRef.current) {
-                renderMarkers();
-              }
+              fetchPlacesInViewportRef.current(); // 항상 최신 함수를 호출
             });
 
             // 지도 레벨 변경 이벤트 리스너 추가
