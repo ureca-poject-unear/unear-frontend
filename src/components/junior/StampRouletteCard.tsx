@@ -6,7 +6,7 @@ import type { Prize } from '@/components/junior/ProbabilityRoulette';
 import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette';
 import { sendRouletteResult } from '@/apis/roulette';
 // 'showToast' 유틸리티의 경로에 맞게 수정해주세요.
-import { showSuccessToast, showErrorToast, showWarningToast, showInfoToast } from '@/utils/toast'; // 경로 예시입니다.
+import { showSuccessToast, showErrorToast, showWarningToast } from '@/utils/toast'; // 경로 예시입니다.
 
 type Stamp = {
   name: string;
