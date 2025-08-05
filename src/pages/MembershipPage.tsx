@@ -6,6 +6,7 @@ import CategoryFilter from '@/components/membership/CategoryFilter';
 import MembershipCard from '@/components/common/MembershipCard';
 import type { FranchiseBenefitItem, GradeType } from '@/types/franchise';
 import { getFranchiseBenefits } from '@/apis/getFranchiseBenefits';
+
 export default function MembershipPage() {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [franchiseList, setFranchiseList] = useState<FranchiseBenefitItem[]>([]);
@@ -88,73 +89,75 @@ export default function MembershipPage() {
           value={searchKeyword}
           onSearch={handleSearch}
           onChange={handleSearchChange}
-          placeholder="브랜드명이나 혜택 키워드를 검색하세요"
+          placeholder="브랜드명을 입력하세요"
         />
       </div>
       {/* 필터 + 결과 + 카드 리스트 묶음 */}
-      <div className="bg-white px-5 mt-4">
+      <div className="bg-white mt-4">
         {/* Category Filter */}
         <CategoryFilter
           selectedCategory={selectedCategory}
           onSelectCategory={(category) => setSelectedCategory(category)}
         />
         {/* 결과 개수 */}
-        <div className="text-sm text-black font-semibold my-2.5">
-          총 <span className="text-primary font-semibold">{filteredList.length}개</span>
-        </div>
-        {/* 카드 리스트 */}
-        <div className="flex flex-col gap-3 items-center pb-5">
-          {loading ? (
-            <div className="text-black text-sm">로딩 중...</div>
-          ) : filteredList.length > 0 ? (
-            filteredList.map((card) => {
-              // 타입 에러 방지용 as const 적용
-              const gradeList: GradeType[] = [
-                ...(card.hasVvip ? (['VVIP'] as const) : []),
-                ...(card.hasVip ? (['VIP'] as const) : []),
-                ...(card.hasBasic ? (['우수'] as const) : []),
-              ];
-              return (
-                <MembershipCard
-                  key={card.franchiseId}
-                  name={card.franchiseName}
-                  description={card.description}
-                  grade={gradeList}
-                  imageUrl={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${card.franchiseImageUrl}`}
-                  onClick={() =>
-                    navigate(`/membership/detail/${card.franchiseId}`, {
-                      state: {
-                        franchiseId: card.franchiseId,
-                        franchiseName: card.franchiseName,
-                        franchiseImageUrl: card.franchiseImageUrl,
-                        description: card.franchiseName,
-                        categoryCode: card.categoryCode,
-                        hasVvip: card.hasVvip,
-                        hasVip: card.hasVip,
-                        hasBasic: card.hasBasic,
-                      },
-                    })
-                  }
-                />
-              );
-            })
-          ) : (
-            // 검색 결과가 없을 때 안내 메시지
-            filteredList.length === 0 && (
-              <div className="text-center text-gray-500 py-8">
-                {searchKeyword.trim() !== '' ? (
-                  <div>
-                    <p className="text-m font-semibold mb-2">
-                      "{searchKeyword}" 검색 결과가 없습니다.
-                    </p>
-                    <p className="text-sm text-gray-400">다른 검색어로 시도해보세요.</p>
-                  </div>
-                ) : (
-                  <p className="text-m">등록된 혜택이 없습니다.</p>
-                )}
-              </div>
-            )
-          )}
+        <div className="px-5">
+          <div className="text-sm text-black font-semibold my-2.5">
+            총 <span className="text-primary font-semibold">{filteredList.length}개</span>
+          </div>
+          {/* 카드 리스트 */}
+          <div className="flex flex-col gap-3 items-center pb-5">
+            {loading ? (
+              <div className="text-black text-sm">로딩 중...</div>
+            ) : filteredList.length > 0 ? (
+              filteredList.map((card) => {
+                // 타입 에러 방지용 as const 적용
+                const gradeList: GradeType[] = [
+                  ...(card.hasVvip ? (['VVIP'] as const) : []),
+                  ...(card.hasVip ? (['VIP'] as const) : []),
+                  ...(card.hasBasic ? (['우수'] as const) : []),
+                ];
+                return (
+                  <MembershipCard
+                    key={card.franchiseId}
+                    name={card.franchiseName}
+                    description={card.description}
+                    grade={gradeList}
+                    imageUrl={`https://unear-uploads.s3.ap-southeast-2.amazonaws.com/${card.franchiseImageUrl}`}
+                    onClick={() =>
+                      navigate(`/membership/detail/${card.franchiseId}`, {
+                        state: {
+                          franchiseId: card.franchiseId,
+                          franchiseName: card.franchiseName,
+                          franchiseImageUrl: card.franchiseImageUrl,
+                          description: card.franchiseName,
+                          categoryCode: card.categoryCode,
+                          hasVvip: card.hasVvip,
+                          hasVip: card.hasVip,
+                          hasBasic: card.hasBasic,
+                        },
+                      })
+                    }
+                  />
+                );
+              })
+            ) : (
+              // 검색 결과가 없을 때 안내 메시지
+              filteredList.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  {searchKeyword.trim() !== '' ? (
+                    <div>
+                      <p className="text-m font-semibold mb-2">
+                        "{searchKeyword}" 검색 결과가 없습니다.
+                      </p>
+                      <p className="text-sm text-gray-400">다른 검색어로 시도해보세요.</p>
+                    </div>
+                  ) : (
+                    <p className="text-m">등록된 혜택이 없습니다.</p>
+                  )}
+                </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>
