@@ -21,6 +21,8 @@ interface AuthState {
   refreshToken: string | null;
   userInfo: UserInfo | null;
   isAuthenticated: boolean;
+  isAuthInitialized: boolean;
+  setAuthInitialized: (value: boolean) => void;
 
   // 기본 액션
   setAccessToken: (token: string | null) => void;
@@ -51,6 +53,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   refreshToken: null,
   userInfo: null,
   isAuthenticated: false,
+  isAuthInitialized: false,
+  setAuthInitialized: (value) => set({ isAuthInitialized: value }),
 
   // 기본 액션
   setAccessToken: (token) => set({ accessToken: token }),
