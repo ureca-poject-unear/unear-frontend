@@ -115,7 +115,7 @@ const JuniorPage = () => {
           <StampRouletteCard
             stamps={stamps}
             eventId={currentEventId}
-            initialIsSpun={initialIsSpun}
+            hasExistingResult={initialIsSpun}
             isRouletteEnabledByServer={isRouletteAvailable}
           />
           <JuniorMap />

@@ -271,7 +271,7 @@ const MapPage = () => {
 
       console.log('🔍 검색 결과:', results);
       if (results.length === 0) {
-        showInfoToast('검색 결과가 없습니다.');
+        showInfoToast(`주변에 '${keyword}' 에 대한 검색 결과가 없습니다.`);
         return;
       }
 

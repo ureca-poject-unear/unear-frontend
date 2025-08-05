@@ -8,16 +8,22 @@ import StoryButton from '@/components/common/StoryButton';
 import SparkleImage from '@/assets/story/sparkle.svg';
 import { useAuthStore } from '@/store/auth';
 
+interface DiagnosisData {
+  category: string;
+  emoji: string;
+  label: string;
+  description: string[];
+}
+
 const StoryPage = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [diagnosisMap, setDiagnosisMap] = useState<Record<string, DiagnosisData>>({});
   const navigate = useNavigate();
 
-  // 사용자 이름 불러오기
   const { getUserDisplayName } = useAuthStore();
   const userName = getUserDisplayName();
 
-  // 사용자 이름이 반영된 loading 텍스트
   const loadingTexts = useMemo(
     () => [
       '나의 결제 기록을 모아 AI가\n나만의 스토리를 제작중이에요.',
@@ -30,9 +36,29 @@ const StoryPage = () => {
   useEffect(() => {
     if (!isStarted) return;
 
+    const fetchDiagnosisMap = async () => {
+      try {
+        const res = await fetch('/data/diagnosisMap.json');
+        const data = await res.json();
+        setDiagnosisMap(data);
+      } catch (err) {
+        console.error('diagnosisMap 로딩 실패', err);
+      }
+    };
+
+    fetchDiagnosisMap();
+  }, [isStarted]);
+
+  useEffect(() => {
+    if (!isStarted) return;
+
     if (currentIndex >= loadingTexts.length - 1) {
       const timeout = setTimeout(() => {
-        navigate('/story/diagnosis');
+        navigate('/story/diagnosis', {
+          state: {
+            diagnosisMap,
+          },
+        });
       }, 2500);
       return () => clearTimeout(timeout);
     }
@@ -42,7 +68,7 @@ const StoryPage = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isStarted, currentIndex, navigate, loadingTexts.length]);
+  }, [isStarted, currentIndex, diagnosisMap, navigate, loadingTexts.length]);
 
   return (
     <StoryLayout bgColorClass={isStarted ? 'bg-storybackground2' : 'bg-storybackground1'}>

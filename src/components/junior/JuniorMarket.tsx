@@ -1,5 +1,3 @@
-// src/components/junior/JuniorMarket.tsx (수정된 코드)
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,7 +7,7 @@ import { getPlaces } from '@/apis/getPlaces';
 import { getPlaceDetail } from '@/apis/getPlaceDetail';
 import { postDownloadCoupon } from '@/apis/postDownloadCoupon';
 import { toggleFavorite } from '@/apis/postFavorite';
-
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { Place } from '@/types/map';
 import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
@@ -111,7 +109,6 @@ const JuniorMarket = () => {
   }, []);
 
   const handleLocationClick = (store: StoreInfo) => {
-    // MapPage가 사용하는 `focusStore` 객체 형태로 state를 전달하여 페이지 이동
     navigate('/map', {
       state: {
         focusStore: {
@@ -176,14 +173,27 @@ const JuniorMarket = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-[600px] mx-auto p-5 text-center text-gray-500">
-        매장 목록을 불러오는 중...
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-sm font-regular text-gray-600">매장 정보를 불러오는 중...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
-    return <div className="w-full max-w-[600px] mx-auto p-5 text-center text-red-500">{error}</div>;
+    return (
+      <div className="bg-background">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-105px)]">
+          <p className="text-sm font-regular text-gray-600 text-center px-5">
+            데이터를 불러오는 중 오류가 발생했습니다.
+            <br />
+            잠시 후 다시 시도해주세요.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
