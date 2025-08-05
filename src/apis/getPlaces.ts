@@ -11,6 +11,28 @@ interface GetPlacesParams {
   benefitCategories?: string[];
 }
 
+interface GetPlacesForSearchParams {
+  keyword: string;
+  southWestLatitude: number;
+  southWestLongitude: number;
+  northEastLatitude: number;
+  northEastLongitude: number;
+  categoryCodes?: string[];
+  benefitCategories?: string[];
+  isFavorite?: boolean;
+}
+
+// ✅ 중복 제거 유틸 함수: 동일한 placeName 하나만 유지
+const removeDuplicatePlacesByName = (places: Place[]): Place[] => {
+  const seen = new Set<string>();
+  return places.filter((place) => {
+    if (seen.has(place.placeName)) return false;
+    seen.add(place.placeName);
+    return true;
+  });
+};
+
+// ✅ 장소 가져오기 API
 export const getPlaces = async ({
   swLat,
   swLng,
@@ -32,12 +54,12 @@ export const getPlaces = async ({
         benefitCategory: benefitCategories,
       },
     });
-    const places = res.data?.data || [];
 
-    // 데이터 콘솔 출력
-    console.log('[getPlaces] 가져온 장소 데이터:', places);
+    const rawPlaces: Place[] = res.data?.data || [];
+    const uniquePlaces = removeDuplicatePlacesByName(rawPlaces);
 
-    return res.data?.data || [];
+    console.log('[getPlaces] 중복 제거된 장소 데이터:', uniquePlaces);
+    return uniquePlaces;
   } catch (error) {
     console.error('장소 가져오기 실패:', error);
     console.log('[getPlaces] categoryCodes:', categoryCodes);
@@ -46,18 +68,7 @@ export const getPlaces = async ({
   }
 };
 
-//검색
-interface GetPlacesForSearchParams {
-  keyword: string;
-  southWestLatitude: number;
-  southWestLongitude: number;
-  northEastLatitude: number;
-  northEastLongitude: number;
-  categoryCodes?: string[];
-  benefitCategories?: string[];
-  isFavorite?: boolean;
-}
-
+// ✅ 검색용 장소 가져오기 API
 export const getPlacesForSearch = async ({
   keyword,
   southWestLatitude,
@@ -82,7 +93,11 @@ export const getPlacesForSearch = async ({
       },
     });
 
-    return res.data?.data || [];
+    const rawPlaces: Place[] = res.data?.data || [];
+    const uniquePlaces = removeDuplicatePlacesByName(rawPlaces);
+
+    console.log('[getPlacesForSearch] 중복 제거된 검색 결과:', uniquePlaces);
+    return uniquePlaces;
   } catch (error) {
     console.error('🔍 검색 API 실패:', error);
     console.log('[getPlacesForSearch] keyword:', keyword);
