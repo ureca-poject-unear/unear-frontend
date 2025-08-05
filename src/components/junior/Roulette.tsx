@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/system';
-// 'clsx' import 라인을 삭제했습니다.
+
 import { FiArrowRight } from 'react-icons/fi';
 
 interface PrizeData {

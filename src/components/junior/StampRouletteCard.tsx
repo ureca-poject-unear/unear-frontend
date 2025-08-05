@@ -5,8 +5,7 @@ import CommonModal from '@/components/common/CommonModal';
 import type { Prize } from '@/components/junior/ProbabilityRoulette';
 import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette';
 import { sendRouletteResult } from '@/apis/roulette';
-// 'showToast' 유틸리티의 경로에 맞게 수정해주세요.
-import { showSuccessToast, showErrorToast, showWarningToast } from '@/utils/toast'; // 경로 예시입니다.
+import { showSuccessToast, showErrorToast, showWarningToast } from '@/utils/toast';
 
 type Stamp = {
   name: string;
@@ -17,7 +16,7 @@ type Stamp = {
 type Props = {
   stamps: Stamp[];
   eventId: number;
-  hasExistingResult: boolean;
+  hasExistingResult: boolean; // 부모로부터 받은, 서버에 저장된 룰렛 참여 결과
   isRouletteEnabledByServer: boolean;
 };
 
@@ -29,9 +28,11 @@ const StampRouletteCard: React.FC<Props> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+  // ✨ 컴포넌트 내부 상태를 부모로부터 받은 초기값(hasExistingResult)으로 설정
   const [isRouletteSpun, setIsRouletteSpun] = useState(hasExistingResult);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // 부모의 prop이 변경될 경우를 대비해 상태를 동기화
   useEffect(() => {
     setIsRouletteSpun(hasExistingResult);
   }, [hasExistingResult]);
@@ -41,42 +42,57 @@ const StampRouletteCard: React.FC<Props> = ({
     displayStamps.push({ name: '-', isStamped: false });
   }
 
-  const isButtonActive = isRouletteEnabledByServer && !isRouletteSpun && !isProcessing;
+  const hasAllStamps = stamps.filter((stamp) => stamp.isStamped).length >= 4;
 
+  // ✨ `hasExistingResult`가 true이면 `isRouletteCompleted`는 처음부터 true가 됨
+  const isRouletteCompleted = hasExistingResult || isRouletteSpun;
+
+  // ✨ `isRouletteCompleted`가 true이므로 `isButtonActive`는 false가 됨
+  const isButtonActive =
+    isRouletteEnabledByServer && !isRouletteCompleted && !isProcessing && hasAllStamps;
+
+  // ✨ `isRouletteCompleted`가 true이므로 `buttonText`는 '참여 완료'가 됨
   let buttonText = '룰렛 돌리기';
   if (isProcessing) {
     buttonText = '결과 저장 중...';
-  } else if (isRouletteSpun) {
+  } else if (isRouletteCompleted) {
     buttonText = '참여 완료';
   } else if (!isRouletteEnabledByServer) {
-    buttonText = '룰렛 비활성'; // 비활성 상태 텍스트를 명확하게 변경
+    buttonText = '룰렛이 비활성화되었습니다';
+  } else if (!hasAllStamps) {
+    buttonText = '스탬프를 모두 모아주세요';
   }
 
   const handleRouletteClick = () => {
-    if (!isButtonActive) return;
-    if (isRouletteSpun) {
-      // alert('이미 룰렛에 참여하셨습니다.'); // 변경
+    if (isRouletteCompleted) {
       showWarningToast('이미 룰렛에 참여하셨습니다.');
       return;
     }
-    if (isProcessing) return;
+    if (isProcessing) {
+      showWarningToast('처리 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
     if (!isRouletteEnabledByServer) {
-      // alert('룰렛이 아직 활성화되지 않았습니다.'); // 변경
       showWarningToast('룰렛이 아직 활성화되지 않았습니다.');
+      return;
+    }
+    if (!hasAllStamps) {
+      showWarningToast('스탬프 4개를 모두 모아야 룰렛에 참여할 수 있습니다.');
       return;
     }
     const token = sessionStorage.getItem('temp_access_token');
     if (!token) {
-      // alert('룰렛을 돌리려면 로그인이 필요합니다.'); // 변경
       showErrorToast('룰렛을 돌리려면 로그인이 필요합니다.');
       navigate('/login');
       return;
     }
-    setIsModalOpen(true);
+    if (isButtonActive) {
+      setIsModalOpen(true);
+    }
   };
 
   const handleRouletteFinish = async (prize: Prize) => {
-    if (isRouletteSpun || isProcessing) return;
+    if (isRouletteCompleted || isProcessing) return;
 
     setIsProcessing(true);
     setIsModalOpen(false);
@@ -84,7 +100,6 @@ const StampRouletteCard: React.FC<Props> = ({
     try {
       await sendRouletteResult(eventId, prize.prizeName);
       setIsRouletteSpun(true);
-      // alert(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨되셨습니다!`); // 변경
       showSuccessToast(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨!`);
     } catch (error) {
       console.error('룰렛 결과 저장 오류:', error);
@@ -93,10 +108,8 @@ const StampRouletteCard: React.FC<Props> = ({
 
       if (errorMessage.includes('이미') || errorMessage.includes('already')) {
         setIsRouletteSpun(true);
-        // alert('이미 룰렛에 참여하셨습니다.'); // 변경
         showWarningToast('이미 룰렛에 참여하셨습니다.');
       } else {
-        // alert(errorMessage); // 변경
         showErrorToast(errorMessage);
       }
     } finally {
@@ -111,14 +124,11 @@ const StampRouletteCard: React.FC<Props> = ({
   };
 
   return (
-    // ... JSX 부분은 동일 ...
     <div className="relative w-full h-[400px] bg-white p-5">
       <div className="m-2">
         <p className="text-lm font-bold text-black">스탬프</p>
       </div>
       <div className="rounded-lg p-4 space-y-3 border-2 border-zinc-100">
-        {' '}
-        {/* Added padding and spacing */}
         <div className="flex items-start">
           <svg
             width={21}
@@ -208,7 +218,6 @@ const StampRouletteCard: React.FC<Props> = ({
                         isFirst ? 'bg-pink-300' : 'bg-blue-300'
                       }`}
                     >
-                      {/* SVG: 당첨 스탬프 */}
                       <svg
                         width={48}
                         height={48}
@@ -246,7 +255,6 @@ const StampRouletteCard: React.FC<Props> = ({
                     </div>
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center opacity-33">
-                      {/* 비활성 스탬프 SVG (회색 처리됨) */}
                       <svg
                         width={48}
                         height={48}
@@ -273,10 +281,15 @@ const StampRouletteCard: React.FC<Props> = ({
           })}
         </div>
         <div className="flex justify-center mt-2">
+          {/* ✨ `isActive` prop에 `isButtonActive`를 전달하여 버튼의 활성/비활성 스타일을 제어 */}
           <MiniButton text={buttonText} onClick={handleRouletteClick} isActive={isButtonActive} />
         </div>
       </div>
-      <CommonModal isOpen={isModalOpen} onClose={handleModalClose} title="행운의 룰렛">
+      <CommonModal
+        isOpen={isModalOpen && !isRouletteCompleted}
+        onClose={handleModalClose}
+        title="행운의 룰렛"
+      >
         <ProbabilityRoulette onFinish={handleRouletteFinish} />
       </CommonModal>
     </div>

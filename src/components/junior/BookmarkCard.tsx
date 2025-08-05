@@ -47,7 +47,7 @@ export interface StoreInfo {
   isBookmarked: boolean;
   benefitDesc?: string;
   coupons?: CouponInfo[];
-  phoneNumber?: string; // 전화번호 추가
+  phoneNumber?: string;
 }
 
 // BookmarkCard의 props 타입 정의

@@ -15,9 +15,7 @@ const EventBanner = () => {
   };
 
   return (
-    // [수정] 고정 너비를 w-full로 변경하여 반응형으로 만듭니다.
     <div className="w-full h-[142px] relative overflow-hidden bg-[linear-gradient(142.88deg,#e6007e_-1.96%,rgba(230,0,126,0.85)_50%,#be185d_101.96%)]">
-      {/* [수정] 고정 너비를 w-full로 변경합니다. */}
       <div className="w-full h-[109px] relative">
         <div className="flex flex-col justify-start items-start absolute left-5 top-[30px] max-w-[calc(100%-130px)]">
           <p className="flex-grow-0 flex-shrink-0 text-xl font-bold text-left text-white">
