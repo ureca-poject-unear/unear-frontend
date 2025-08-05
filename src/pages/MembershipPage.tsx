@@ -33,13 +33,15 @@ export default function MembershipPage() {
     if (category === '전체') return franchiseList;
     // categoryCode -> 한글 매핑
     const categoryMap: Record<string, string> = {
-      CAFE: '카페',
       FOOD: '푸드',
-      LIFE: '생활/편의',
-      BEAUTY: '뷰티',
-      CULTURE: '문화/여가',
+      CAFE: '카페',
       BAKERY: '베이커리',
+      CULTURE: '문화/여가',
+      LIFE: '생활/편의',
       SHOPPING: '쇼핑',
+      ACTIVITY: '액티비티',
+      BEAUTY: '뷰티/건강',
+      EDUCATION: '교육',
     };
     return franchiseList.filter((item) => categoryMap[item.categoryCode] === category);
   };

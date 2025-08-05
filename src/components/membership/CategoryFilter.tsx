@@ -10,14 +10,14 @@ type CategoryFilterProps = {
 const categories = [
   '전체',
   '푸드',
-  '문화/여가',
+  '카페',
   '베이커리',
+  '문화/여가',
   '생활/편의',
   '쇼핑',
-  '카페',
   '액티비티',
-  '교육',
   '뷰티/건강',
+  '교육',
 ];
 
 export default function CategoryFilter({
