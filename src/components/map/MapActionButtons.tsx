@@ -43,7 +43,7 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
         }`}
       >
         {/* 이벤트 버튼 */}
-        <div className="relative">
+        <div className="relative w-[45px] h-[45px]">
           {/* 말풍선 */}
           {showTooltip && (
             <motion.div
