@@ -20,29 +20,23 @@ const TodayCouponSection: React.FC = () => {
   const [isExpanded] = useState(true);
   const navigate = useNavigate();
 
-  // [핵심 1] 로컬 스토리지에서 다운로드된 쿠폰 ID 목록을 가져오는 헬퍼 함수
-  const getDownloadedCouponsFromLocal = (): number[] => {
-    const localData = localStorage.getItem('downloadedCoupons');
-    return localData ? JSON.parse(localData) : [];
-  };
-
   const checkCouponStatus = async (couponTemplateId: number) => {
     setIsLoading(true);
     try {
       const token = sessionStorage.getItem('temp_access_token');
-      const couponTitle = '(필수 매장) 20% 할인 쿠폰 (10명 한정)';
-      const locallyDownloadedIds = getDownloadedCouponsFromLocal();
+      const couponTitle = '(필수 매장) 20% 할인 쿠폰 (100명 한정)';
 
+      // 비로그인 시 쿠폰 상태를 다운로드되지 않음으로 간주
       if (!token) {
         setCoupons([
           {
             id: couponTemplateId,
             title: couponTitle,
-            // [핵심 2] 로컬 스토리지 확인하여 다운로드 상태 결정
-            isDownloaded: locallyDownloadedIds.includes(couponTemplateId),
+            isDownloaded: false,
             isSoldOut: false,
           },
         ]);
+        setIsLoading(false);
         return;
       }
 
@@ -60,9 +54,8 @@ const TodayCouponSection: React.FC = () => {
           {
             id: couponTemplateId,
             title: couponTitle,
-            // [핵심 3] 서버 상태 또는 로컬 상태 둘 중 하나라도 true이면 다운로드된 것으로 간주
-            isDownloaded:
-              result.data?.isDownloaded || locallyDownloadedIds.includes(couponTemplateId),
+            // 서버 응답만으로 다운로드 및 매진 상태 결정
+            isDownloaded: result.data?.isDownloaded || false,
             isSoldOut: result.data?.isSoldOut || false,
           },
         ]);
@@ -71,12 +64,12 @@ const TodayCouponSection: React.FC = () => {
       }
     } catch (error) {
       console.error('쿠폰 상태 확인 중 오류 발생:', error);
-      const locallyDownloadedIds = getDownloadedCouponsFromLocal();
+      // 에러 발생 시의 기본 상태 설정
       setCoupons([
         {
           id: 326,
           title: '(필수 매장) 20% 할인 쿠폰 (100명 한정)',
-          isDownloaded: locallyDownloadedIds.includes(326),
+          isDownloaded: false,
           isSoldOut: false,
         },
       ]);
@@ -91,6 +84,26 @@ const TodayCouponSection: React.FC = () => {
   }, []);
 
   const handleCouponDownload = async (couponId: number) => {
+    // 현재 쿠폰 상태 확인
+    const currentCoupon = coupons.find((c) => c.id === couponId);
+
+    // 이미 다운로드된 쿠폰이면 함수 즉시 종료
+    if (currentCoupon?.isDownloaded) {
+      setMessage('이미 다운로드한 쿠폰입니다.');
+      return;
+    }
+
+    // 매진된 쿠폰이면 함수 즉시 종료
+    if (currentCoupon?.isSoldOut) {
+      setMessage('매진된 쿠폰입니다.');
+      return;
+    }
+
+    // 현재 다운로드 진행 중이면 함수 즉시 종료
+    if (downloadingCoupons.has(couponId)) {
+      return;
+    }
+
     setDownloadingCoupons((prev) => new Set(prev).add(couponId));
     setMessage('');
 
@@ -114,23 +127,24 @@ const TodayCouponSection: React.FC = () => {
 
       if (response.ok) {
         setMessage(result.message || '쿠폰이 성공적으로 다운로드되었습니다.');
-
-        // [핵심 4] 다운로드 성공 시 로컬 스토리지에 ID 저장
-        const downloadedIds = getDownloadedCouponsFromLocal();
-        if (!downloadedIds.includes(couponId)) {
-          downloadedIds.push(couponId);
-          localStorage.setItem('downloadedCoupons', JSON.stringify(downloadedIds));
-        }
-
+        // 다운로드 성공 시 상태 업데이트
         setCoupons((prevCoupons) =>
           prevCoupons.map((c) => (c.id === couponId ? { ...c, isDownloaded: true } : c))
         );
       } else {
-        setMessage(result.message || `에러: ${response.statusText}`);
-        if (result.message === '매진되었습니다.') {
+        // 서버에서 이미 다운로드되었다고 응답하는 경우 처리
+        if (result.message?.includes('이미') || result.message?.includes('already')) {
+          setMessage('이미 다운로드한 쿠폰입니다.');
+          setCoupons((prevCoupons) =>
+            prevCoupons.map((c) => (c.id === couponId ? { ...c, isDownloaded: true } : c))
+          );
+        } else if (result.message === '매진되었습니다.' || result.message?.includes('sold out')) {
+          setMessage('매진된 쿠폰입니다.');
           setCoupons((prevCoupons) =>
             prevCoupons.map((c) => (c.id === couponId ? { ...c, isSoldOut: true } : c))
           );
+        } else {
+          setMessage(result.message || `에러: ${response.statusText}`);
         }
       }
     } catch (error) {
@@ -164,7 +178,7 @@ const TodayCouponSection: React.FC = () => {
       </div>
 
       {isExpanded && (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3">
           {coupons.map((coupon) => (
             <div
               key={coupon.id}
@@ -180,12 +194,20 @@ const TodayCouponSection: React.FC = () => {
                 {coupon.isSoldOut ? (
                   <p className="text-gray-500 font-bold text-sm">마감</p>
                 ) : coupon.isDownloaded ? (
-                  <CheckCircle2 className="w-6 h-6 text-pink-500" />
+                  <div className="flex items-center justify-center cursor-not-allowed">
+                    <CheckCircle2 className="w-6 h-6 text-pink-500" />
+                  </div>
                 ) : (
                   <button
                     onClick={() => handleCouponDownload(coupon.id)}
-                    disabled={downloadingCoupons.has(coupon.id)}
-                    className="w-full h-full flex items-center justify-center"
+                    disabled={
+                      downloadingCoupons.has(coupon.id) || coupon.isDownloaded || coupon.isSoldOut
+                    }
+                    className={`w-full h-full flex items-center justify-center ${
+                      downloadingCoupons.has(coupon.id) || coupon.isDownloaded || coupon.isSoldOut
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'cursor-pointer hover:bg-gray-50 rounded-full'
+                    }`}
                   >
                     {downloadingCoupons.has(coupon.id) ? (
                       <Loader2 className="w-5 h-5 animate-spin text-black" />
@@ -200,7 +222,15 @@ const TodayCouponSection: React.FC = () => {
         </div>
       )}
 
-      {message && <p className="mt-4 text-sm text-center text-red-500">{message}</p>}
+      {message && (
+        <p
+          className={`mt-4 text-sm text-center ${
+            message.includes('성공') ? 'text-green-500' : 'text-red-500'
+          }`}
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
 };

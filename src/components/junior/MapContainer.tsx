@@ -20,7 +20,6 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
   const [map, setMap] = useState<KakaoMap | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
 
-  // [수정] Circle 객체를 저장하기 위한 ref 추가
   const circleRef = useRef<KakaoCircle | null>(null);
   const markerOverlaysRef = useRef<KakaoCustomOverlay[]>([]);
   const markerRootsRef = useRef<Root[]>([]);
@@ -89,15 +88,15 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
       const container = mapRef.current;
       if (!container) return;
 
+      // [수정] 지도 생성자 옵션에 확대/축소 관련 설정을 추가합니다.
       const mapInstance = new window.kakao.maps.Map(container, {
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         level: 6,
+        draggable: false, // 드래그 비활성화
+        scrollwheel: false, // 마우스 휠 확대/축소 비활성화
+        disableDoubleClickZoom: true, // 더블클릭 확대 비활성화
       });
 
-      mapInstance.setDraggable(false);
-      mapInstance.setZoomable(false);
-
-      // [수정] 생성된 circle 인스턴스를 ref에 저장
       circleRef.current = new window.kakao.maps.Circle({
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         radius: 800,
@@ -126,7 +125,7 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
     }
   }, [kakaoMapKey]);
 
-  // [수정] 화면 리사이즈 시 지도 경계를 다시 설정하는 Hook 추가
+  // 화면 리사이즈 시 지도 경계를 다시 설정하는 Hook
   useEffect(() => {
     if (!map) return;
 
@@ -144,7 +143,7 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [map]); // map 객체가 생성된 후에 이 effect가 실행됩니다.
+  }, [map]);
 
   // 2. 지도 초기화 후 장소 데이터 한 번만 불러오는 Hook
   useEffect(() => {
@@ -163,6 +162,10 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
     markerRootsRef.current = [];
     places.forEach((place) => {
       const contentNode = document.createElement('div');
+      // 마우스 포인터 및 클릭 이벤트 비활성화를 위한 스타일 적용
+      contentNode.style.cursor = 'default';
+      contentNode.style.pointerEvents = 'none';
+
       const root = ReactDOM.createRoot(contentNode);
       root.render(
         <MapMarkerIcon
@@ -176,6 +179,7 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
         position: new window.kakao.maps.LatLng(place.latitude, place.longitude),
         content: contentNode,
         yAnchor: 1,
+        clickable: false, // 마커 클릭 비활성화
       });
       customOverlay.setMap(map);
       markerOverlaysRef.current.push(customOverlay);
