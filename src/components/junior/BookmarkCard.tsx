@@ -1,6 +1,8 @@
-// src/components/common/BookmarkCard.tsx
+// src/components/junior/BookmarkCard.tsx (변경 없음)
 
 import type React from 'react';
+import { Loader2 } from 'lucide-react';
+
 import StoreTypeIcon, {
   type CategoryType,
   type StoreClassType,
@@ -11,34 +13,55 @@ import StoreStatus, { type StoreStatusType } from '@/components/common/StoreStat
 import MiniLocationButton from '@/components/common/MiniLocationButton';
 import PhoneButton from '@/components/common/PhoneButton';
 import PhoneButtonDark from '@/components/common/PhoneButtonDark';
+
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
+import GiftIcon from '@/assets/map/giftIcon.svg?react';
+import CouponIcon from '@/assets/common/couponIcon.svg?react';
+import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
+import ArrowUpIcon from '@/assets/common/arrowUpIcon.svg?react';
+import DownloadIcon from '@/assets/common/downloadIcon.svg?react';
 
+// 쿠폰 상세 정보를 위한 타입 정의
+export interface CouponInfo {
+  couponTemplateId: number;
+  userCouponId: number | null;
+  couponName: string;
+  discountInfo: string | null;
+  couponEnd: string;
+  downloaded: boolean;
+}
+
+// StoreInfo 타입에 위치 및 전화번호 정보를 포함하도록 업데이트
 export interface StoreInfo {
   id: string;
   name: string;
   address: string;
   hours: string;
+  latitude: number;
+  longitude: number;
   category: CategoryType;
   storeClass: StoreClassType;
   event: EventType;
   status: StoreStatusType;
   isBookmarked: boolean;
   benefitDesc?: string;
-  coupons?: {
-    couponTemplateId: number;
-    couponName: string;
-    discountInfo: string | null;
-    couponEnd: string;
-  }[];
+  coupons?: CouponInfo[];
+  phoneNumber?: string; // 전화번호 추가
 }
 
+// BookmarkCard의 props 타입 정의
 interface BookmarkCardProps {
   store: StoreInfo;
   onBookmarkToggle?: (storeId: string) => void;
   className?: string;
   isDarkMode?: boolean;
-  variant?: 'full' | 'compact';
+  isExpanded?: boolean;
+  onExpandToggle?: () => void;
+  onCouponDownload?: (couponTemplateId: string) => void;
+  downloadingCoupons?: Set<string>;
+  downloadedCoupons?: Set<string>;
+  onLocationClick?: (latitude: number, longitude: number) => void;
 }
 
 const BookmarkCard: React.FC<BookmarkCardProps> = ({
@@ -46,104 +69,163 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   onBookmarkToggle,
   className = '',
   isDarkMode = false,
-  variant = 'full',
+  isExpanded = false,
+  onExpandToggle,
+  onCouponDownload,
+  downloadingCoupons = new Set(),
+  downloadedCoupons = new Set(),
+  onLocationClick,
 }) => {
   const handleBookmarkClick = () => {
     onBookmarkToggle?.(store.id);
   };
 
   const handleLocationClick = () => {
-    console.log('위치보기버튼 클릭됨');
+    onLocationClick?.(store.latitude, store.longitude);
   };
 
   const handlePhoneClick = () => {
-    console.log('전화버튼클릭됨');
+    if (store.phoneNumber) {
+      window.location.href = `tel:${store.phoneNumber}`;
+    } else {
+      console.warn('전화번호가 없습니다.');
+    }
   };
 
-  if (variant === 'compact') {
-    // ... (compact variant remains the same)
-  }
+  const handleDownloadClick = (couponTemplateId: number) => {
+    onCouponDownload?.(String(couponTemplateId));
+  };
 
   const bgColor = isDarkMode ? 'bg-[#251A49]' : 'bg-white';
   const textColor = isDarkMode ? 'text-white' : 'text-black';
   const subTextColor = isDarkMode ? 'text-gray-300' : 'text-gray-400';
-  const borderColor = isDarkMode ? 'border-gray-600' : 'border-gray-200';
   const IconTime = isDarkMode ? TimeWhiteIcon : TimeIcon;
 
-  const hasBenefitsOrCoupons = store.benefitDesc || (store.coupons && store.coupons.length > 0);
-
   return (
-    <div
-      className={`relative w-[353px] rounded-[8px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] transition-all duration-300 p-4 flex flex-col gap-2 ${bgColor} ${className}`}
-    >
-      <div className="flex gap-4">
-        <div className="flex-shrink-0">
-          <StoreTypeIcon
-            category={store.category}
-            storeClass={store.storeClass}
-            event={store.event}
-            size={50}
-          />
-        </div>
-        <div className="flex-1 overflow-hidden pr-8">
-          <h3 className={`font-semibold text-lm ${textColor} break-words`}>{store.name}</h3>
-          <p
-            className={`font-regular text-sm ${subTextColor} leading-[19px] mt-1`}
-            style={{ wordBreak: 'break-all', whiteSpace: 'normal' }}
-          >
-            {store.address}
-          </p>
-        </div>
-        <div className="absolute right-[15px] top-[14px]">
-          <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-[6px]">
-          <IconTime />
-          <span className={`font-regular text-sm ${subTextColor} relative top-px`}>
-            {store.hours}
-          </span>
-        </div>
-        <StoreStatus status={store.status} />
-      </div>
-
-      {hasBenefitsOrCoupons && (
-        <div className={`mt-2 pt-3 border-t ${borderColor}`}>
-          <div className="flex flex-col gap-2">
-            {store.benefitDesc && (
-              <div className="p-2 rounded-md bg-sky-500/10">
-                <p className="font-bold text-sm text-sky-600">대표 혜택</p>
-                <p className="text-xs text-gray-500 mt-1">{store.benefitDesc}</p>
-              </div>
-            )}
-
-            {store.coupons?.map((coupon) => (
-              <div
-                key={coupon.couponTemplateId}
-                className="p-2 rounded-md bg-green-500/10 flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-bold text-sm text-green-600">{coupon.couponName}</p>
-                  <p className="text-xs text-gray-500">
-                    {coupon.discountInfo || `~ ${coupon.couponEnd.split('T')[0]}`}
-                  </p>
-                </div>
-              </div>
-            ))}
+    <div className={`w-full rounded-lg border border-gray-200 p-4 ${bgColor} ${className}`}>
+      {/* --- 기본 정보 섹션 --- */}
+      <div className="relative flex flex-col gap-2">
+        <div className="flex gap-4">
+          <div className="flex-shrink-0">
+            <StoreTypeIcon
+              category={store.category}
+              storeClass={store.storeClass}
+              event={store.event}
+              size={50}
+            />
           </div>
+          <div className="flex-1 overflow-hidden pr-8">
+            <h3 className={`font-semibold text-lm ${textColor} break-words`}>{store.name}</h3>
+            <p
+              className={`font-regular text-sm ${subTextColor} leading-[19px] mt-1`}
+              style={{ wordBreak: 'break-all', whiteSpace: 'normal' }}
+            >
+              {store.address}
+            </p>
+          </div>
+          <div className="absolute right-0 top-[-2px]">
+            <BookmarkStar isBookmarked={store.isBookmarked} onToggle={handleBookmarkClick} />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-[6px]">
+            <IconTime />
+            <span className={`font-regular text-sm ${subTextColor} relative top-px`}>
+              {store.hours}
+            </span>
+          </div>
+          <StoreStatus status={store.status} />
+        </div>
+
+        <div className="mt-auto pt-2 flex gap-2">
+          <MiniLocationButton onClick={handleLocationClick} />
+          {isDarkMode ? (
+            <PhoneButtonDark onClick={handlePhoneClick} />
+          ) : (
+            <PhoneButton onClick={handlePhoneClick} />
+          )}
+        </div>
+      </div>
+
+      {/* --- 혜택 및 쿠폰 섹션 --- */}
+      {store.benefitDesc && (
+        <div className="mt-4 px-4 py-3 bg-gray-100 rounded-[8px]">
+          <div className="flex items-center gap-2 mb-1">
+            <GiftIcon />
+            <span className="font-semibold text-sm mt-[3px] text-black">혜택 정보</span>
+          </div>
+          <p className="font-semibold text-sm text-gray-800 leading-[21px]">
+            · {store.benefitDesc}
+          </p>
         </div>
       )}
 
-      <div className="mt-auto pt-2 flex gap-2">
-        <MiniLocationButton onClick={handleLocationClick} />
-        {isDarkMode ? (
-          <PhoneButtonDark onClick={handlePhoneClick} />
-        ) : (
-          <PhoneButton onClick={handlePhoneClick} />
-        )}
-      </div>
+      {store.coupons && store.coupons.length > 0 && (
+        <>
+          <div className="mt-5 flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <div className="w-[10px] h-[10px] bg-green-400 rounded-full" />
+              <span className="font-semibold text-sm text-black leading-none relative top-[1px]">
+                사용 가능한 쿠폰 {store.coupons.length}개
+              </span>
+            </div>
+            <button onClick={onExpandToggle} className="p-1">
+              {isExpanded ? (
+                <ArrowUpIcon className="w-[18px] h-[10px] text-black" />
+              ) : (
+                <ArrowDownIcon className="w-[18px] h-[10px] text-black" />
+              )}
+            </button>
+          </div>
+
+          {isExpanded && (
+            <div className="mt-4 space-y-3">
+              {store.coupons.map((coupon) => {
+                const couponTemplateIdStr = String(coupon.couponTemplateId);
+                const isDownloading = downloadingCoupons.has(couponTemplateIdStr);
+                const isDownloaded = downloadedCoupons.has(couponTemplateIdStr);
+
+                return (
+                  <div
+                    key={coupon.couponTemplateId}
+                    className="relative bg-white border border-[#D4D4D8] rounded-[5px] p-3 w-full h-[46px]"
+                  >
+                    <div className="absolute left-3 top-3">
+                      <CouponIcon />
+                    </div>
+                    <div className="ml-8">
+                      <h4 className="font-bold text-s text-black leading-[12px]">
+                        {coupon.couponName}
+                      </h4>
+                      <p className="text-xs text-gray-400 mt-[2px]">
+                        {coupon.couponEnd?.split('T')[0]} 까지
+                      </p>
+                    </div>
+
+                    {!coupon.downloaded && !isDownloaded && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownloadClick(coupon.couponTemplateId);
+                        }}
+                        className="absolute right-3 top-[13px] w-5 h-5 flex items-center justify-center"
+                        disabled={isDownloading}
+                      >
+                        {isDownloading ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-black" />
+                        ) : (
+                          <DownloadIcon className="w-5 h-5 text-black" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

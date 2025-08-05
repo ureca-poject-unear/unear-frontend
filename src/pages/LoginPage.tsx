@@ -96,7 +96,7 @@ const LoginPage = () => {
           await login(data.data.accessToken, data.data.refreshToken);
 
           console.log('🎉 로그인 완료!');
-          //alert('로그인 성공!');
+          alert('로그인 성공!');
 
           // 이전 페이지가 있으면 그곳으로, 없으면 메인 페이지로
           const locationState = location.state as LocationState | null;

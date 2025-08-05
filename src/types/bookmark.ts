@@ -24,7 +24,6 @@ export interface FavoritePlace {
 // 기존 BookmarkStore 타입 (UI용)
 export interface BookmarkStore {
   id: string;
-  placeId: number;
   name: string;
   address: string;
   distance: string;
@@ -33,9 +32,7 @@ export interface BookmarkStore {
   storeClass: StoreClassType;
   event: EventType;
   isBookmarked: boolean;
-  phoneNumber?: string;
-  latitude?: number;
-  longitude?: number;
+  phoneNumber?: string; // 전화번호 추가
 }
 
 export interface BookmarkPageState {

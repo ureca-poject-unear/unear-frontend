@@ -1,3 +1,5 @@
+// src/apis/getPlaceDetail.ts (수정된 최종 코드)
+
 import axiosInstance from './axiosInstance';
 import type { StoreData } from '@/types/storeDetail';
 
@@ -43,15 +45,10 @@ const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
     hours: `${data.startTime}:00 - ${data.endTime}:00`,
     tel: data.tel,
     isBookmarked: data.favorite,
-    status: (() => {
-      const now = new Date();
-      const currentHour = now.getHours();
-      const openHour = data.startTime;
-      const closeHour = data.endTime;
-
-      const isOpen = currentHour >= openHour && currentHour < closeHour;
-      return isOpen ? '영업중' : '영업종료';
-    })(),
+    status:
+      new Date().getHours() >= data.startTime && new Date().getHours() < data.endTime
+        ? '영업중'
+        : '영업종료',
     benefitDesc: data.benefitDesc,
     eventTypeCode: data.eventTypeCode,
     coupons: data.coupons.map((c) => ({
@@ -71,10 +68,12 @@ const convertToStoreData = (data: PlaceDetailResponse): StoreData => {
 //  장소 상세 조회 API
 export const getPlaceDetail = async (
   placeId: number,
+  // [수정] 위도/경도는 항상 string으로 받음 (null 허용 안 함)
   latitude: string,
   longitude: string
 ): Promise<StoreData> => {
   const response = await axiosInstance.get(`/places/${placeId}`, {
+    // [수정] 파라미터를 항상 포함하여 요청
     params: { latitude, longitude },
   });
 

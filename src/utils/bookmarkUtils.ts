@@ -92,7 +92,6 @@ export const convertFavoritePlaceToBookmarkStore = (
 
   return {
     id: favoritePlace.placeId.toString(),
-    placeId: favoritePlace.placeId,
     name: favoritePlace.placeName,
     address: favoritePlace.address,
     distance: formatDistance(favoritePlace.distanceKm),
@@ -106,8 +105,6 @@ export const convertFavoritePlaceToBookmarkStore = (
     event: mapEventCode(favoritePlace.eventCode),
     isBookmarked: favoritePlace.favorite,
     phoneNumber: favoritePlace.tel,
-    latitude: favoritePlace.latitude,
-    longitude: favoritePlace.longitude,
   };
 };
 
