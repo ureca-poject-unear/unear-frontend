@@ -6,19 +6,25 @@ import Router from './router';
 
 const queryClient = new QueryClient();
 
-// 🚨 Service Worker 등록 비활성화 (캐시 문제 해결)
-// if ('serviceWorker' in navigator) {
-//   window.addEventListener('load', () => {
-//     navigator.serviceWorker
-//       .register('/sw.js')
-//       .then((registration) => {
-//         console.log('SW registered: ', registration);
-//       })
-//       .catch((registrationError) => {
-//         console.log('SW registration failed: ', registrationError);
-//       });
-//   });
-// }
+// 🔥 기존 서비스 워커 강제 제거
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      registration.unregister();
+      console.log('🗑️ Service Worker 제거됨:', registration.scope);
+    });
+  });
+
+  // 캐시도 모두 삭제
+  if ('caches' in window) {
+    caches.keys().then((cacheNames) => {
+      cacheNames.forEach((cacheName) => {
+        caches.delete(cacheName);
+        console.log('🗑️ 캐시 삭제됨:', cacheName);
+      });
+    });
+  }
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
