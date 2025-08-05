@@ -26,18 +26,17 @@ const StampCompletedModal = ({ isOpen, message, onClose }: StampCompletedModalPr
     }, 300); // 애니메이션 완료 후 닫기
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
-  if (!isOpen) return null;
-
   const handleRouletteClick = () => {
     handleClose();
     navigate('/junior'); // 이번주니어 페이지로 이동
   };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // 배경 클릭으로는 모달이 닫히지 않도록 함
+    e.stopPropagation();
+  };
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
@@ -61,44 +60,17 @@ const StampCompletedModal = ({ isOpen, message, onClose }: StampCompletedModalPr
             exit={{ scale: 0.7, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
-            {/* 축하 텍스트 */}
+            {/* 타이틀과 메시지 */}
             <div className="text-center mb-6">
-              <motion.div
-                className="text-3xl mb-3"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', damping: 15, stiffness: 300 }}
-              >
-                🎉
-              </motion.div>
-              <h2 className="text-lg font-bold text-black mb-3">모든 스탬프 적립 완료!</h2>
+              <h2 className="text-lg font-bold text-black mb-4">모든 스탬프 적립 완료!</h2>
               <p className="text-sm text-gray-600 leading-relaxed">{message}</p>
             </div>
-
-            {/* 스탬프 완료 이미지 영역 */}
-            <motion.div
-              className="flex justify-center mb-6"
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.1, type: 'spring', damping: 20, stiffness: 200 }}
-            >
-              <div className="w-24 h-24 bg-gradient-to-br from-primary to-pink-400 rounded-full flex items-center justify-center shadow-lg">
-                <motion.div
-                  className="text-white text-2xl font-bold"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  ✓
-                </motion.div>
-              </div>
-            </motion.div>
 
             {/* 룰렛 돌리기 버튼 */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.2 }}
             >
               <ActionButton text="룰렛 돌리기" onClick={handleRouletteClick} isActive={true} />
             </motion.div>
