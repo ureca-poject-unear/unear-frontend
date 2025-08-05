@@ -98,6 +98,14 @@ const MapPage = () => {
     }
   }, [benefitCategories]);
 
+  // 필터링 상태가 변경될 때마다 지도 마커를 다시 렌더링
+  useEffect(() => {
+    if (mapRef.current) {
+      // 즉시 마커를 다시 렌더링
+      mapRef.current?.fetchPlaces?.();
+    }
+  }, [categoryCodes, benefitCategories, isBookmarkOnly]);
+
   useEffect(() => {
     const focusStore = location.state?.focusStore;
     if (focusStore) {
@@ -339,7 +347,16 @@ const MapPage = () => {
       {!isRoadviewOpen && (
         <MapTopRightButtons
           onToggleFilter={() => setIsFilterOpen(true)}
-          onToggleBookmark={() => setIsBookmarkOnly((prev) => !prev)}
+          onToggleBookmark={() => {
+            const newValue = !isBookmarkOnly;
+            console.log('⭐ 즐겨찾기 토글:', { from: isBookmarkOnly, to: newValue });
+            setIsBookmarkOnly(newValue);
+
+            // 즉시 지도 마커를 다시 렌더링
+            setTimeout(() => {
+              mapRef.current?.fetchPlaces?.();
+            }, 0);
+          }}
           onToggleLoadview={(isActive) => {
             setIsLoadviewActive(isActive);
             mapRef.current?.toggleLoadview?.(isActive);
@@ -375,6 +392,11 @@ const MapPage = () => {
         onApply={(categories, benefits) => {
           setCategoryCodes(categories);
           setBenefitCategories(benefits);
+
+          // 상태 업데이트 후 즉시 지도 마커를 다시 렌더링
+          setTimeout(() => {
+            mapRef.current?.fetchPlaces?.();
+          }, 0);
         }}
         selectedCategoryCodes={categoryCodes}
         selectedBenefitCategories={benefitCategories}
