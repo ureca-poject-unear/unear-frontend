@@ -5,6 +5,8 @@ import CommonModal from '@/components/common/CommonModal';
 import type { Prize } from '@/components/junior/ProbabilityRoulette';
 import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette';
 import { sendRouletteResult } from '@/apis/roulette';
+// 'showToast' 유틸리티의 경로에 맞게 수정해주세요.
+import { showSuccessToast, showErrorToast, showWarningToast, showInfoToast } from '@/utils/toast'; // 경로 예시입니다.
 
 type Stamp = {
   name: string;
@@ -47,22 +49,26 @@ const StampRouletteCard: React.FC<Props> = ({
   } else if (isRouletteSpun) {
     buttonText = '참여 완료';
   } else if (!isRouletteEnabledByServer) {
+    buttonText = '룰렛 비활성'; // 비활성 상태 텍스트를 명확하게 변경
   }
 
   const handleRouletteClick = () => {
     if (!isButtonActive) return;
     if (isRouletteSpun) {
-      alert('이미 룰렛에 참여하셨습니다.');
+      // alert('이미 룰렛에 참여하셨습니다.'); // 변경
+      showWarningToast('이미 룰렛에 참여하셨습니다.');
       return;
     }
     if (isProcessing) return;
     if (!isRouletteEnabledByServer) {
-      alert('룰렛이 아직 활성화되지 않았습니다.');
+      // alert('룰렛이 아직 활성화되지 않았습니다.'); // 변경
+      showWarningToast('룰렛이 아직 활성화되지 않았습니다.');
       return;
     }
     const token = sessionStorage.getItem('temp_access_token');
     if (!token) {
-      alert('룰렛을 돌리려면 로그인이 필요합니다.');
+      // alert('룰렛을 돌리려면 로그인이 필요합니다.'); // 변경
+      showErrorToast('룰렛을 돌리려면 로그인이 필요합니다.');
       navigate('/login');
       return;
     }
@@ -78,7 +84,8 @@ const StampRouletteCard: React.FC<Props> = ({
     try {
       await sendRouletteResult(eventId, prize.prizeName);
       setIsRouletteSpun(true);
-      alert(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨되셨습니다!`);
+      // alert(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨되셨습니다!`); // 변경
+      showSuccessToast(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨!`);
     } catch (error) {
       console.error('룰렛 결과 저장 오류:', error);
       const errorMessage =
@@ -86,9 +93,11 @@ const StampRouletteCard: React.FC<Props> = ({
 
       if (errorMessage.includes('이미') || errorMessage.includes('already')) {
         setIsRouletteSpun(true);
-        alert('이미 룰렛에 참여하셨습니다.');
+        // alert('이미 룰렛에 참여하셨습니다.'); // 변경
+        showWarningToast('이미 룰렛에 참여하셨습니다.');
       } else {
-        alert(errorMessage);
+        // alert(errorMessage); // 변경
+        showErrorToast(errorMessage);
       }
     } finally {
       setIsProcessing(false);
@@ -102,6 +111,7 @@ const StampRouletteCard: React.FC<Props> = ({
   };
 
   return (
+    // ... JSX 부분은 동일 ...
     <div className="relative w-full h-[400px] bg-white p-5">
       <div className="m-2">
         <p className="text-lm font-bold text-black">스탬프</p>

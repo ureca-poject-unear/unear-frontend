@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
+import LoadingScreen from '@/components/common/LoadingScreen'; // --- [수정] LoadingScreen 컴포넌트 import 추가
 
 import EventBanner from '@/components/junior/EventBanner';
 import StampRouletteCard from '@/components/junior/StampRouletteCard';
@@ -87,7 +88,11 @@ const JuniorPage = () => {
         <Header title="이번주니어" />
         {/* === 반응형 적용을 위해 컨테이너 추가 === */}
         <div className="w-full max-w-[600px] mx-auto">
-          <div className="p-10 text-center">이벤트 정보를 불러오는 중입니다...</div>
+          <LoadingScreen
+            fullHeight={false}
+            message="이벤트 정보를 불러오는 중입니다..."
+            size="md"
+          />
         </div>
       </>
     );
