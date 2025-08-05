@@ -403,7 +403,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const renderMarkers = useCallback(async () => {
       const map = mapInstanceRef.current;
       const clusterer = clustererRef.current;
-      if (!map || !clusterer) return;
+      if (!map) return;
+
+      // clusterer가 없어도 마커 렌더링은 계속 진행
+      if (!clusterer) {
+        console.log('클러스터러가 없어서 개별 마커 모드로 동작합니다.');
+      }
 
       const bounds = map.getBounds();
       const sw = bounds.getSouthWest();
@@ -445,8 +450,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               m.setMap(null);
             }
           });
-          clusterer.removeMarkers(markerInstancesRef.current);
-          clusterer.clear();
+          if (clusterer) {
+            try {
+              clusterer.removeMarkers(markerInstancesRef.current);
+              clusterer.clear();
+            } catch (error) {
+              console.warn('클러스터러에서 마커 제거 중 오류:', error);
+            }
+          }
           markerInstancesRef.current = [];
         }
 
@@ -560,11 +571,26 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                 marker.setMap(map);
               }
             });
-          } else {
+          } else if (clusterer) {
+            // clusterer가 null이 아닐 때만 사용
             clusterer.addMarkers(newMarkers);
+          } else {
+            // clusterer가 null이면 개별 마커로 표시
+            console.warn('클러스터러가 없어서 개별 마커로 표시합니다.');
+            newMarkers.forEach((marker) => {
+              if (marker && marker.setMap) {
+                marker.setMap(map);
+              }
+            });
           }
         } catch (error) {
           console.error('마커 추가 중 오류:', error);
+          // 에러 발생 시 개별 마커로 fallback
+          newMarkers.forEach((marker) => {
+            if (marker && marker.setMap) {
+              marker.setMap(map);
+            }
+          });
         }
 
         if (!isLocationShown && currentLocationRef.current) {
@@ -616,14 +642,25 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         return;
       }
 
+      // 기존 스크립트가 있다면 제거
+      const existingScript = document.querySelector('script[src*="dapi.kakao.com"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+
       const script = document.createElement('script');
       script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&autoload=false&libraries=clusterer`;
       script.async = true;
+      script.defer = true;
       document.head.appendChild(script);
 
       script.onload = () => {
-        if (window.kakao && window.kakao.maps) {
+        console.log('카카오맵 스크립트 로딩 완료');
+
+        // 카카오맵 API가 완전히 로드되었는지 확인
+        if (window.kakao && window.kakao.maps && typeof window.kakao.maps.load === 'function') {
           window.kakao.maps.load(() => {
+            console.log('카카오맵 API 로딩 완료');
             const container = mapRef.current;
             if (!container) return;
 
@@ -634,103 +671,146 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             mapInstanceRef.current = map;
 
-            try {
-              const clusterer = new window.kakao.maps.MarkerClusterer({
-                map,
-                averageCenter: true,
-                minLevel: 4,
-                disableClickZoom: true,
-                minClusterSize: 3,
-                gridSize: 60,
-                calculator: [10, 30, 50, 100, 200],
-                styles: [
-                  {
-                    width: '40px',
-                    height: '40px',
-                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
-                    borderRadius: '50%',
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    lineHeight: '40px',
-                    boxShadow: '0 2px 6px rgba(255, 105, 180, 0.3)',
-                    opacity: '0.9',
-                  },
-                  {
-                    width: '50px',
-                    height: '50px',
-                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
-                    borderRadius: '50%',
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    lineHeight: '50px',
-                    boxShadow: '0 3px 8px rgba(255, 105, 180, 0.4)',
-                    opacity: '0.9',
-                  },
-                  {
-                    width: '60px',
-                    height: '60px',
-                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
-                    borderRadius: '50%',
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '18px',
-                    lineHeight: '60px',
-                    boxShadow: '0 4px 10px rgba(255, 105, 180, 0.5)',
-                    opacity: '0.9',
-                  },
-                  {
-                    width: '70px',
-                    height: '70px',
-                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
-                    borderRadius: '50%',
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '20px',
-                    lineHeight: '70px',
-                    boxShadow: '0 5px 12px rgba(255, 105, 180, 0.6)',
-                    opacity: '0.9',
-                  },
-                  {
-                    width: '80px',
-                    height: '80px',
-                    background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
-                    borderRadius: '50%',
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '22px',
-                    lineHeight: '80px',
-                    boxShadow: '0 6px 14px rgba(255, 105, 180, 0.7)',
-                    opacity: '0.9',
-                  },
-                ],
-              });
-              clustererRef.current = clusterer;
-
-              // 클러스터 클릭 이벤트 리스너 추가
-              window.kakao.maps.event.addListener(
-                clusterer,
-                'clusterclick',
-                (cluster: KakaoMarkerClusterer) => {
-                  const currentLevel = map.getLevel();
-                  const newLevel = Math.max(1, currentLevel - 2);
-
-                  // 클러스터 중심으로 이동
-                  const center = cluster.getCenter();
-                  map.setCenter(center);
-                  map.setLevel(newLevel);
+            // MarkerClusterer 초기화를 안전하게 처리
+            const initializeClusterer = (retryCount = 0) => {
+              try {
+                // MarkerClusterer가 사용 가능한지 확인
+                if (!window.kakao.maps.MarkerClusterer) {
+                  console.warn(
+                    'MarkerClusterer가 아직 로드되지 않았습니다. 재시도 중...',
+                    retryCount
+                  );
+                  if (retryCount < 5) {
+                    // 재시도 횟수를 5회로 증가
+                    setTimeout(() => initializeClusterer(retryCount + 1), 2000); // 대기 시간을 2초로 증가
+                    return;
+                  } else {
+                    console.error('MarkerClusterer 초기화 실패: 최대 재시도 횟수 초과');
+                    console.log('대안: 개별 마커 모드로 전환');
+                    clustererRef.current = null;
+                    return;
+                  }
                 }
-              );
-            } catch (error) {
-              console.error('클러스터러 초기화 실패:', error);
-              clustererRef.current = null;
-            }
+
+                // MarkerClusterer 생성자 확인
+                if (typeof window.kakao.maps.MarkerClusterer !== 'function') {
+                  console.error(
+                    'MarkerClusterer가 함수가 아닙니다:',
+                    typeof window.kakao.maps.MarkerClusterer
+                  );
+                  clustererRef.current = null;
+                  return;
+                }
+
+                const clusterer = new window.kakao.maps.MarkerClusterer({
+                  map,
+                  averageCenter: true,
+                  minLevel: 4,
+                  disableClickZoom: true,
+                  minClusterSize: 3,
+                  gridSize: 60,
+                  calculator: [10, 30, 50, 100, 200],
+                  styles: [
+                    {
+                      width: '40px',
+                      height: '40px',
+                      background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                      borderRadius: '50%',
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '14px',
+                      lineHeight: '40px',
+                      boxShadow: '0 2px 6px rgba(255, 105, 180, 0.3)',
+                      opacity: '0.9',
+                    },
+                    {
+                      width: '50px',
+                      height: '50px',
+                      background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                      borderRadius: '50%',
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '16px',
+                      lineHeight: '50px',
+                      boxShadow: '0 3px 8px rgba(255, 105, 180, 0.4)',
+                      opacity: '0.9',
+                    },
+                    {
+                      width: '60px',
+                      height: '60px',
+                      background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                      borderRadius: '50%',
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '18px',
+                      lineHeight: '60px',
+                      boxShadow: '0 4px 10px rgba(255, 105, 180, 0.5)',
+                      opacity: '0.9',
+                    },
+                    {
+                      width: '70px',
+                      height: '70px',
+                      background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                      borderRadius: '50%',
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '20px',
+                      lineHeight: '70px',
+                      boxShadow: '0 5px 12px rgba(255, 105, 180, 0.6)',
+                      opacity: '0.9',
+                    },
+                    {
+                      width: '80px',
+                      height: '80px',
+                      background: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                      borderRadius: '50%',
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '22px',
+                      lineHeight: '80px',
+                      boxShadow: '0 6px 14px rgba(255, 105, 180, 0.7)',
+                      opacity: '0.9',
+                    },
+                  ],
+                });
+                clustererRef.current = clusterer;
+
+                // 클러스터 클릭 이벤트 리스너 추가
+                window.kakao.maps.event.addListener(
+                  clusterer,
+                  'clusterclick',
+                  (cluster: KakaoMarkerClusterer) => {
+                    const currentLevel = map.getLevel();
+                    const newLevel = Math.max(1, currentLevel - 2);
+
+                    // 클러스터 중심으로 이동
+                    const center = cluster.getCenter();
+                    map.setCenter(center);
+                    map.setLevel(newLevel);
+                  }
+                );
+
+                console.log('MarkerClusterer 초기화 성공');
+              } catch (error) {
+                console.error('클러스터러 초기화 실패:', error);
+                if (retryCount < 5) {
+                  console.log(`클러스터러 재시도 중... (${retryCount + 1}/5)`);
+                  setTimeout(() => initializeClusterer(retryCount + 1), 2000);
+                } else {
+                  console.error('클러스터러 초기화 최종 실패');
+                  console.log('대안: 개별 마커 모드로 전환');
+                  clustererRef.current = null;
+                }
+              }
+            };
+
+            // MarkerClusterer 초기화 시작
+            initializeClusterer();
 
             setMapInstance(map);
 
@@ -768,11 +848,19 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             renderMarkers();
           });
+        } else {
+          console.error('카카오맵 API 로딩 실패');
         }
       };
 
+      script.onerror = () => {
+        console.error('카카오맵 스크립트 로딩 실패');
+      };
+
       return () => {
-        document.head.removeChild(script);
+        if (document.head.contains(script)) {
+          document.head.removeChild(script);
+        }
         if (clustererRef.current && markerInstancesRef.current.length > 0) {
           clustererRef.current.removeMarkers(markerInstancesRef.current);
         }
