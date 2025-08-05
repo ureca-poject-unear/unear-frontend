@@ -15,6 +15,10 @@ const UsageDiscountSummary = ({
   formatCurrency,
   formatGrowth,
 }: UsageDiscountSummaryProps) => {
+  // 할인 금액이 0원인지 확인
+  const isZeroDiscount = totalDiscountAmount === 0;
+  const isZeroUsage = calculatedSummary.usageAmount === 0;
+
   return (
     <div className="bg-white mt-3">
       <div className="px-5 py-5">
@@ -29,7 +33,11 @@ const UsageDiscountSummary = ({
             </div>
             <div className="flex flex-col items-center">
               <p className="text-s text-gray-500 text-center">사용금액</p>
-              <p className="text-lm font-semibold text-black text-center">
+              <p
+                className={`text-lm font-semibold text-center ${
+                  isZeroUsage ? 'text-gray-500' : 'text-black'
+                }`}
+              >
                 {formatCurrency(calculatedSummary.usageAmount)}
               </p>
               <p className="text-s text-gray-500 text-center">
@@ -54,7 +62,11 @@ const UsageDiscountSummary = ({
             </div>
             <div className="flex flex-col items-center">
               <p className="text-s text-gray-500 text-center">할인금액</p>
-              <p className="text-lm font-semibold text-black text-center">
+              <p
+                className={`text-lm font-semibold text-center ${
+                  isZeroDiscount ? 'text-gray-500' : 'text-black'
+                }`}
+              >
                 {formatCurrency(totalDiscountAmount)}
               </p>
               <p className="text-s text-gray-500 text-center">

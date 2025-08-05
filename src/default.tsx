@@ -13,6 +13,8 @@ const Default = () => {
   const isAuthPage =
     pathname === '/login' || pathname === '/signup' || pathname === '/complete-profile';
 
+  const isLoginPage = pathname === '/login';
+
   useScrollToTop();
 
   return (
@@ -21,7 +23,7 @@ const Default = () => {
         isAuthPage ? 'bg-white' : 'bg-background'
       }`}
     >
-      <main className={isMapPage ? '' : 'pt-[40px] pb-[65px]'}>
+      <main className={isMapPage || isLoginPage ? '' : 'pt-[40px] pb-[65px]'}>
         <Outlet />
       </main>
 

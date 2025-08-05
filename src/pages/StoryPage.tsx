@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import StoryLayout from '@/components/story/StoryLayout';
@@ -6,23 +6,31 @@ import BookNubiImage from '@/assets/story/bookNubi.png';
 import SearchNubiImage from '@/assets/story/searchNubi.png';
 import StoryButton from '@/components/common/StoryButton';
 import SparkleImage from '@/assets/story/sparkle.svg';
-
-const loadingTexts = [
-  '나의 결제 기록을 모아 AI가\n나만의 스토리를 제작중이에요.',
-  '유니어와 함께 했던 시간들을\n다시 살펴보고 있어요.',
-  '분석이 끝났어요!\nOOO님의 소비 스토리를 보여드릴게요!',
-];
+import { useAuthStore } from '@/store/auth';
 
 const StoryPage = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
 
+  // 사용자 이름 불러오기
+  const { getUserDisplayName } = useAuthStore();
+  const userName = getUserDisplayName();
+
+  // 사용자 이름이 반영된 loading 텍스트
+  const loadingTexts = useMemo(
+    () => [
+      '나의 결제 기록을 모아 AI가\n나만의 스토리를 제작중이에요.',
+      'U:NEAR와 함께 했던 시간들을\n다시 살펴보고 있어요.',
+      `분석이 끝났어요!\n${userName}님의 소비 스토리를 보여드릴게요!`,
+    ],
+    [userName]
+  );
+
   useEffect(() => {
     if (!isStarted) return;
 
     if (currentIndex >= loadingTexts.length - 1) {
-      // 마지막 텍스트 후 2.5초 뒤 다음 페이지 이동
       const timeout = setTimeout(() => {
         navigate('/story/diagnosis');
       }, 2500);
@@ -34,7 +42,7 @@ const StoryPage = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isStarted, currentIndex, navigate]);
+  }, [isStarted, currentIndex, navigate, loadingTexts.length]);
 
   return (
     <StoryLayout bgColorClass={isStarted ? 'bg-storybackground2' : 'bg-storybackground1'}>

@@ -20,13 +20,20 @@ const MonthlyDiscountChart = ({
   isLoading = false,
   error = null,
 }: MonthlyDiscountChartProps) => {
+  // 현재 월 할인액이 0원인지 확인
+  const isZeroCurrentMonth = currentMonthAmount === '0원';
+
   return (
     <div className="bg-white mt-3">
       <div className="px-5 py-5">
         <h3 className="text-lm font-semibold text-black">월별 누적 할인액</h3>
-        <p className="text-m font-semibold text-gray-500 mb-6">
-          이번달 누적 할인액 {currentMonthAmount}
-        </p>
+        {isZeroCurrentMonth ? (
+          <p className="text-m font-semibold text-gray-500 mb-6">아직 절약 내역이 없어요</p>
+        ) : (
+          <p className="text-m font-semibold text-gray-500 mb-6">
+            이번달 누적 할인액 {currentMonthAmount}
+          </p>
+        )}
 
         {/* 로딩 상태 */}
         {isLoading && (
@@ -61,9 +68,7 @@ const MonthlyDiscountChart = ({
               <span className="text-m font-semibold text-black mt-[3px]">이전 월</span>
             </div>
             <div className="flex items-center">
-              <span className="text-m font-semibold text-black mt-[3px]">
-                평균: {averageAmount}
-              </span>
+              <span className="text-m font-semibold text-black mt-[3px]">평균:{averageAmount}</span>
             </div>
           </div>
         </div>

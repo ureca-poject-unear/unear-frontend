@@ -4,7 +4,6 @@ import { showToast } from '@/utils/toast';
 import type {
   KakaoMap,
   KakaoCustomOverlay,
-  KakaoCircle,
   KakaoMarkerClusterer,
   KakaoMarker,
   KakaoLatLng,

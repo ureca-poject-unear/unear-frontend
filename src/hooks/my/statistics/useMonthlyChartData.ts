@@ -63,18 +63,23 @@ const useMonthlyChartData = (
     // 배열을 뒤집어서 최신 월이 맨 오른쪽에 오도록 함
     const reversedData = [...summaryData.recentMonthDiscounts].reverse();
 
+    // 실제 현재 월 계산 (오늘 날짜 기준)
+    const now = new Date();
+    const actualCurrentYear = now.getFullYear();
+    const actualCurrentMonth = now.getMonth() + 1; // 0부터 시작하므로 +1
+
     return reversedData.map((item) => {
       const [year, month] = item.month.split('-');
-      const isCurrentMonth =
-        parseInt(year, 10) === currentYear && parseInt(month, 10) === currentMonth;
+      const isActualCurrentMonth =
+        parseInt(year, 10) === actualCurrentYear && parseInt(month, 10) === actualCurrentMonth;
 
       return {
         month: formatMonthToKorean(item.month),
         value: item.discount / 10000, // 만원 단위로 변환 (16000 -> 1.6)
-        highlight: isCurrentMonth, // 현재 선택된 월을 하이라이트
+        highlight: isActualCurrentMonth, // 실제 현재 월만 하이라이트
       };
     });
-  }, [summaryData, currentYear, currentMonth]);
+  }, [summaryData]); // currentYear, currentMonth 의존성 제거
 
   /**
    * 평균 할인액 계산
