@@ -40,6 +40,7 @@ const CategoryDiscountList = ({
                     shouldBeTransparent(item.category) ? 'opacity-50' : 'opacity-100'
                   }`}
                   onClick={() => handleCardClick(item)}
+                  data-category-card
                   style={{
                     marginBottom: index === 2 ? '8px' : '4px', // 간격 좁히기
                     padding: '4px', // 그림자를 위한 여백
@@ -77,6 +78,7 @@ const CategoryDiscountList = ({
                         padding: '4px', // 그림자를 위한 여백
                       }}
                       onClick={() => handleCardClick(item)}
+                      data-category-card
                     >
                       <CategoryDiscountCard
                         category={item.category}
@@ -104,6 +106,7 @@ const CategoryDiscountList = ({
             <button
               className="flex items-center transition-all duration-300 ease-out hover:scale-105 relative z-20"
               onClick={onToggleCategories}
+              data-toggle-button
             >
               <span className="text-m font-semibold text-black mr-2">
                 {showAllCategories ? '접기' : '더보기'}

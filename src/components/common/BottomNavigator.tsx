@@ -19,9 +19,25 @@ const BottomNavigator = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 현재 경로에 따른 현재 탭 계산
   const getCurrentTab = () => {
-    const foundTab = tabs.find((tab) => tab.path === location.pathname);
+    const currentPath = location.pathname;
+
+    // 🚀 경로별 매칭 로직 개선
+    if (currentPath === '/') {
+      return 'home';
+    } else if (currentPath.startsWith('/map')) {
+      return 'map';
+    } else if (currentPath.startsWith('/story')) {
+      return 'story';
+    } else if (currentPath.startsWith('/junior')) {
+      return 'junior';
+    } else if (currentPath.startsWith('/my')) {
+      // 🚀 /my로 시작하는 모든 경로는 'my' 탭으로 인식
+      return 'my';
+    }
+
+    // 🚀 기타 경로는 현재 경로와 정확히 일치하는 탭 찾기
+    const foundTab = tabs.find((tab) => tab.path === currentPath);
     return foundTab?.id ?? 'home';
   };
 
