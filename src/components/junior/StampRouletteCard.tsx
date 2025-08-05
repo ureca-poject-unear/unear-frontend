@@ -129,7 +129,7 @@ const StampRouletteCard: React.FC<Props> = ({
               매장 리스트에서 원하는 매장을 선택해서 방문하세요
             </p>
             <p className="text-xs  font-light text-gray-500">
-              필수 매장 1개, 이벤트 매장 3개를 방문해야되요
+              필수 매장 1개, 이벤트 매장 3개를 방문해야 해요
             </p>
           </div>
         </div>

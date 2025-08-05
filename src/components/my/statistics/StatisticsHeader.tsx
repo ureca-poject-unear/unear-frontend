@@ -151,7 +151,7 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
     const isZeroDiscount = totalDiscountAmount === 0;
 
     return (
-      <div className="bg-white" ref={containerRef} onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white" ref={containerRef}>
         <div className="px-5 pt-4 pb-1">
           {isZeroDiscount ? (
             // 0원일 때: 아이콘과 "멤버십 혜택으로" 텍스트 숨김
@@ -184,13 +184,13 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
 
           {/* 월 네비게이션 */}
           <div className="flex items-center justify-center mb-4">
-            <button onClick={handlePrevMonth} disabled={!canMoveToPrev}>
+            <button onClick={handlePrevMonth} disabled={!canMoveToPrev} data-nav-button>
               <BackIcon className={`w-5 h-5 ${!canMoveToPrev ? 'text-gray-300' : 'text-black'}`} />
             </button>
             <span className="mx-2 pt-1 text-lm font-semibold text-black">
               {formatDateDisplay(currentYear, currentMonth)}
             </span>
-            <button onClick={handleNextMonth} disabled={!canMoveToNext}>
+            <button onClick={handleNextMonth} disabled={!canMoveToNext} data-nav-button>
               <BackIcon
                 className={`w-5 h-5 transform rotate-180 ${!canMoveToNext ? 'text-gray-300' : 'text-black'}`}
               />
@@ -217,6 +217,7 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
                     }
                     onClick={(e) => handleBarClick(e, bar)}
                     title={`${bar.categoryName}: ${bar.percentage.toFixed(1)}%`}
+                    data-progress-bar
                   />
                 ))}
               </div>
@@ -229,6 +230,7 @@ const StatisticsHeader = forwardRef<StatisticsHeaderRef, StatisticsHeaderProps>(
               <div
                 className="z-50 bg-white rounded-lg px-3 py-1 shadow-lg pointer-events-none"
                 style={getTooltipStyle()}
+                data-tooltip
               >
                 <p className="text-m font-regular text-black whitespace-nowrap">
                   {highlightedCategory.percentage}%

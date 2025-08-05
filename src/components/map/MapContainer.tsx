@@ -1,4 +1,4 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef, useState, useCallback } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { showToast } from '@/utils/toast';
 import type {
@@ -62,7 +62,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     const [isLocationShown, setIsLocationShown] = useState(false);
     const fetchPlacesInViewportRef = useRef<() => void>(() => {});
     const [mapInstance, setMapInstance] = useState<KakaoMap | null>(null);
-    const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
     const selectedPlaceIdRef = useRef<number | null>(null);
     const isSettingCenterRef = useRef(false);
     const clustererRef = useRef<KakaoMarkerClusterer | null>(null);
@@ -85,7 +84,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     }, [isLoadviewActive]);
 
     const clearSelectedMarker = () => {
-      setSelectedPlaceId(null);
       selectedPlaceIdRef.current = null;
       onMarkerDeselect?.();
     };
@@ -302,7 +300,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       }
     };
 
-    const renderCurrentLocation = (lat: number, lng: number) => {
+    const renderCurrentLocation = useCallback((lat: number, lng: number) => {
       const currentLatLng = new window.kakao.maps.LatLng(lat, lng);
       const map = mapInstanceRef.current;
       if (!map) return;
@@ -324,7 +322,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
       overlay.setMap(map);
       overlayRef.current = overlay;
-    };
+    }, []);
 
     const showCurrentLocation = () => {
       if (!navigator.geolocation) {
@@ -353,7 +351,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         clearSelectedMarker();
       },
       setSelectedMarker: (placeId) => {
-        setSelectedPlaceId(placeId);
         selectedPlaceIdRef.current = placeId;
       },
       setCenter: (lat, lng) => {
@@ -379,13 +376,16 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         }
       },
       fetchPlaces: () => {
-        fetchPlacesInViewportRef.current();
+        if (mapInstanceRef.current) {
+          renderMarkers();
+        } else {
+          console.log('지도가 아직 초기화되지 않음');
+        }
       },
       getBounds: () => {
         return mapInstanceRef.current?.getBounds() || null;
       },
       selectMarker: (placeId: number) => {
-        setSelectedPlaceId(placeId);
         selectedPlaceIdRef.current = placeId;
       },
       getCenter: () => {
@@ -400,7 +400,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       toggleLoadview,
     }));
 
-    const renderMarkers = async () => {
+    const renderMarkers = useCallback(async () => {
       const map = mapInstanceRef.current;
       const clusterer = clustererRef.current;
       if (!map || !clusterer) return;
@@ -409,26 +409,55 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
       const currentLevel = map.getLevel();
+
+      const storedIsBookmarkOnly = localStorage.getItem('isBookmarkOnly');
+      const storedCategoryCodes = localStorage.getItem('categoryCodes');
+      const storedBenefitCategories = localStorage.getItem('benefitCategories');
+
+      const currentIsBookmarkOnly = storedIsBookmarkOnly ? JSON.parse(storedIsBookmarkOnly) : false;
+      const currentCategoryCodes = storedCategoryCodes ? JSON.parse(storedCategoryCodes) : [];
+      const currentBenefitCategories = storedBenefitCategories
+        ? JSON.parse(storedBenefitCategories)
+        : [];
+
       try {
         const places = await getPlaces({
           swLat: sw.getLat(),
           swLng: sw.getLng(),
           neLat: ne.getLat(),
           neLng: ne.getLng(),
-          isFavorite: isBookmarkOnly,
-          categoryCodes,
-          benefitCategories,
+          isFavorite: currentIsBookmarkOnly,
+          categoryCodes: currentCategoryCodes,
+          benefitCategories: currentBenefitCategories,
         });
 
-        markerInstancesRef.current.forEach((m) => m.setMap(null));
-        clusterer.removeMarkers(markerInstancesRef.current);
-        clusterer.clear();
-        markerInstancesRef.current = [];
+        console.log(
+          '📍 API 응답 - 장소 개수:',
+          places.length,
+          '즐겨찾기 필터:',
+          currentIsBookmarkOnly
+        );
+
+        // 기존 마커들을 완전히 제거
+        if (markerInstancesRef.current.length > 0) {
+          markerInstancesRef.current.forEach((m) => {
+            if (m && m.setMap) {
+              m.setMap(null);
+            }
+          });
+          clusterer.removeMarkers(markerInstancesRef.current);
+          clusterer.clear();
+          markerInstancesRef.current = [];
+        }
 
         if (places.length === 0) {
           if (!isLocationShown && currentLocationRef.current) {
             renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
           }
+          // 지도를 다시 그리기
+          const center = map.getCenter();
+          map.setCenter(center);
+          console.log('🎯 즐겨찾기 필터 적용 - 마커 없음');
           return;
         }
 
@@ -460,7 +489,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
           if (markerElement) {
             markerElement.addEventListener('click', () => {
-              setSelectedPlaceId(place.placeId);
               selectedPlaceIdRef.current = place.placeId;
               onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
             });
@@ -475,7 +503,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               <PlaceNameLabel
                 placeName={place.placeName}
                 onClick={() => {
-                  setSelectedPlaceId(place.placeId);
                   selectedPlaceIdRef.current = place.placeId;
                   onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
                 }}
@@ -487,9 +514,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             const textElement = textEl.firstElementChild as HTMLElement;
 
             if (textElement) {
-              // 클릭 이벤트 리스너 추가
               textElement.addEventListener('click', () => {
-                setSelectedPlaceId(place.placeId);
                 selectedPlaceIdRef.current = place.placeId;
                 onMarkerClick(place.placeId, String(place.latitude), String(place.longitude));
               });
@@ -521,38 +546,69 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         console.log(currentLevel, '현재레벨');
         const currentZoom = mapInstanceRef.current?.getLevel?.();
 
-        if (places.length <= 3) {
-          newMarkers.forEach((marker) => marker.setMap(map));
-        } else if (currentZoom !== undefined && currentZoom <= 6) {
-          newMarkers.forEach((marker) => marker.setMap(map));
-        } else {
-          clusterer.addMarkers(newMarkers);
+        // 마커를 지도에 추가
+        try {
+          if (places.length <= 3) {
+            newMarkers.forEach((marker) => {
+              if (marker && marker.setMap) {
+                marker.setMap(map);
+              }
+            });
+          } else if (currentZoom !== undefined && currentZoom <= 6) {
+            newMarkers.forEach((marker) => {
+              if (marker && marker.setMap) {
+                marker.setMap(map);
+              }
+            });
+          } else {
+            clusterer.addMarkers(newMarkers);
+          }
+        } catch (error) {
+          console.error('마커 추가 중 오류:', error);
         }
 
         if (!isLocationShown && currentLocationRef.current) {
           renderCurrentLocation(currentLocationRef.current.lat, currentLocationRef.current.lng);
         }
+
+        // 마커 업데이트 후 지도 다시 그리기
+        const center = map.getCenter();
+        map.setCenter(center);
       } catch (error) {
         console.error('장소 가져오기 실패:', error);
       }
-    };
+    }, [isLocationShown, onMarkerClick]);
+
+    // 필터링 상태가 변경될 때마다 마커를 다시 렌더링
+    useEffect(() => {
+      if (mapInstanceRef.current) {
+        const storedIsBookmarkOnly = localStorage.getItem('isBookmarkOnly');
+        const storedCategoryCodes = localStorage.getItem('categoryCodes');
+        const storedBenefitCategories = localStorage.getItem('benefitCategories');
+
+        const currentIsBookmarkOnly = storedIsBookmarkOnly
+          ? JSON.parse(storedIsBookmarkOnly)
+          : false;
+        const currentCategoryCodes = storedCategoryCodes ? JSON.parse(storedCategoryCodes) : [];
+        const currentBenefitCategories = storedBenefitCategories
+          ? JSON.parse(storedBenefitCategories)
+          : [];
+
+        console.log('🎯 필터링 상태 변경 - 지도 마커 재렌더링:', {
+          isBookmarkOnly: currentIsBookmarkOnly,
+          categoryCodes: currentCategoryCodes,
+          benefitCategories: currentBenefitCategories,
+        });
+        renderMarkers();
+      }
+    }, [isBookmarkOnly, categoryCodes, benefitCategories, renderMarkers]);
 
     useEffect(() => {
       fetchPlacesInViewportRef.current = renderMarkers;
-    }, [
-      isBookmarkOnly,
-      categoryCodes,
-      benefitCategories,
-      isLocationShown,
-      onMarkerClick,
-      selectedPlaceId,
-    ]);
+    }, [renderMarkers]);
 
-    useEffect(() => {
-      if (mapInstanceRef.current) {
-        renderMarkers();
-      }
-    }, [selectedPlaceId]);
+    // selectedPlaceId가 변경될 때는 renderMarkers를 호출하지 않음
+    // 마커 선택 상태는 renderMarkers 내에서 처리됨
 
     useEffect(() => {
       if (!kakaoMapKey) {
@@ -684,11 +740,15 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             initializeRoadview();
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
-              fetchPlacesInViewportRef.current(); // 항상 최신 함수를 호출
+              if (!isSettingCenterRef.current) {
+                console.log('🔄 지도 idle 이벤트 - 마커 재렌더링');
+                renderMarkers();
+              }
             });
 
             // 지도 레벨 변경 이벤트 리스너 추가
             window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
+              console.log('🔍 지도 zoom 변경 - 마커 재렌더링');
               renderMarkers();
             });
 
@@ -726,7 +786,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       if (mapInstanceRef.current) {
         renderMarkers();
       }
-    }, [isBookmarkOnly, categoryCodes, benefitCategories]);
+    }, [isBookmarkOnly, categoryCodes, benefitCategories, renderMarkers]);
 
     useEffect(() => {
       if (shouldRestoreLocation && mapInstanceRef.current && currentLocationRef.current) {
@@ -734,6 +794,27 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         mapInstanceRef.current.setCenter(new window.kakao.maps.LatLng(lat, lng));
       }
     }, [shouldRestoreLocation]);
+
+    // 로컬스토리지 변경 감지
+    useEffect(() => {
+      const handleStorageChange = (e: StorageEvent) => {
+        if (
+          e.key === 'isBookmarkOnly' ||
+          e.key === 'categoryCodes' ||
+          e.key === 'benefitCategories'
+        ) {
+          console.log('📦 로컬스토리지 변경 감지:', e.key, e.newValue);
+          if (mapInstanceRef.current) {
+            renderMarkers();
+          }
+        }
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+      };
+    }, [renderMarkers]);
 
     return (
       <div ref={mapRef} className="w-full h-full absolute top-0 left-0 z-0">

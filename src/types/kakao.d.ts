@@ -11,10 +11,8 @@ export interface KakaoMap {
   getLevel(): number;
   getBounds(): KakaoMapBounds;
   getCenter(): KakaoLatLng;
-
-  // --- [수정] 아래 두 줄을 추가하여 오류를 해결합니다. ---
-  // [이유] KakaoMap 타입에 setDraggable과 setZoomable 메서드가 존재함을
-  //       TypeScript에 알려주어, MapContainer.tsx에서의 타입 오류를 해결합니다.
+  addOverlayMapTypeId(mapTypeId: string): void;
+  removeOverlayMapTypeId(mapTypeId: string): void;
   setDraggable(draggable: boolean): void;
   setZoomable(zoomable: boolean): void;
   setBounds(bounds: KakaoMapBounds): void;

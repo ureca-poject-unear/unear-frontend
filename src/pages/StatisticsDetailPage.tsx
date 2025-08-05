@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Header from '@/components/common/Header';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import {
@@ -56,6 +56,30 @@ const StatisticsDetailPage = () => {
   // 카테고리 하이라이트 관련
   const { highlightedCategory, highlightCategory, clearHighlight, shouldBeTransparent } =
     useCategoryHighlight();
+
+  // 전체 페이지 클릭 시 하이라이트 해제
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // 진행률 바, 카테고리 카드, 툴팁, 더보기 버튼, 네비게이션 버튼을 클릭한 경우가 아니라면 하이라이트 해제
+      const isProgressBar = target.closest('[data-progress-bar]');
+      const isCategoryCard = target.closest('[data-category-card]');
+      const isTooltip = target.closest('[data-tooltip]');
+      const isToggleButton = target.closest('[data-toggle-button]');
+      const isNavButton = target.closest('[data-nav-button]');
+
+      if (!isProgressBar && !isCategoryCard && !isTooltip && !isToggleButton && !isNavButton) {
+        clearHighlight();
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [clearHighlight]);
 
   // 카테고리 이름 매핑 함수
   const getCategoryName = (category: string): string => {
@@ -181,13 +205,6 @@ const StatisticsDetailPage = () => {
     }
   };
 
-  // 배경 클릭 시 하이라이트 해제
-  const handleBackgroundClick = (event: React.MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      clearHighlight();
-    }
-  };
-
   // 계산된 요약 데이터 (UsageDiscountSummary용) - API 데이터 사용
   const calculatedSummary = {
     usageAmount: statisticsDetail?.totalSpent || 0,
@@ -200,7 +217,7 @@ const StatisticsDetailPage = () => {
     <>
       <Header title="개인별 통계" onBack={handleBack} />
 
-      <div className="bg-background mb-3 relative" onClick={handleBackgroundClick}>
+      <div className="bg-background mb-3 relative">
         {/* 헤더 및 진행률 바 섹션 */}
         <StatisticsHeader
           ref={statisticsHeaderRef}
