@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import StoreTypeIcon from './StoreTypeIcon';
 import BookmarkStar from './BookmarkStar';
 import StoreStatus, { type StoreStatusType } from './StoreStatus';
@@ -27,15 +28,28 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
   className = '',
   isDarkMode = false,
 }) => {
-  const [isPhoneHovered, setIsPhoneHovered] = useState(false); // 상태 추가
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-
+  const [isPhoneHovered, setIsPhoneHovered] = useState(false);
+  const navigate = useNavigate();
   const handleBookmarkToggle = () => {
     onBookmarkToggle?.(store.id);
   };
 
   const handleLocationClick = () => {
-    console.log('위치보기버튼 클릭됨');
+    // React Router state를 통해 지도 페이지로 이동하면서 매장 정보 전달
+    const focusStoreData = {
+      placeId: store.placeId,
+      placeName: store.name,
+      searchKeyword: store.name,
+      latitude: store.latitude,
+      longitude: store.longitude,
+    };
+
+    navigate('/map', {
+      state: {
+        focusStore: focusStoreData,
+      },
+    });
   };
 
   const handlePhoneClick = () => {
@@ -113,7 +127,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
           <MiniLocationButton onClick={handleLocationClick} />
         </div>
 
-        {/* 전화 버튼 - 2 비율 */}
+        {/* 전화 버튼 - 2 비율 (간단한 div + className 사용) */}
         <div className="flex-[2]">
           <button
             onClick={handlePhoneClick}
@@ -140,3 +154,12 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
 };
 
 export default BookmarkCard;
+
+/*
+- 사용법
+  <BookmarkCard
+    store={{ ...sampleStore, isBookmarked }} // phoneNumber는 store 데이터에 포함
+    onBookmarkToggle={handleBookmarkToggle}
+    isDarkMode={false} // true 혹은 isDarkMode 생략시 라이트 모드
+  />
+*/
