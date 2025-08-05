@@ -30,7 +30,10 @@ export const useNotifications = (): UseNotificationsReturn => {
   } | null>(null);
 
   const notificationClientRef = useRef<NotificationClient | null>(null);
-  const { userInfo } = useAuthStore();
+  const { userInfo, getStoredAccessToken } = useAuthStore();
+
+  // 초기화 상태 추적
+  const isInitializedRef = useRef(false);
 
   // 결제 완료 알림 처리 (토스트)
   const handlePaymentSuccess = useCallback((data: PaymentSuccessData) => {
@@ -87,13 +90,25 @@ export const useNotifications = (): UseNotificationsReturn => {
   useEffect(() => {
     // 사용자가 로그인되어 있고 userId가 있을 때만 연결
     if (!userInfo?.userId) {
+      console.log('⏳ SSE 연결 대기: 사용자 정보 없음');
+      return;
+    }
+
+    // 이미 초기화되었으면 중복 실행 방지
+    if (isInitializedRef.current) {
+      console.log('⚠️ SSE 이미 초기화됨 - 중복 실행 방지');
       return;
     }
 
     console.log('🚀 알림 시스템 초기화 시작:', userInfo.userId);
+    isInitializedRef.current = true;
 
-    // NotificationClient 인스턴스 생성
-    notificationClientRef.current = new NotificationClient(userInfo.userId, API_BASE_URL);
+    // NotificationClient 인스턴스 생성 (getStoredAccessToken 함수 전달)
+    notificationClientRef.current = new NotificationClient(
+      userInfo.userId,
+      API_BASE_URL,
+      getStoredAccessToken
+    );
 
     // 이벤트 리스너 등록
     notificationClientRef.current.on('paymentSuccess', handlePaymentSuccess);
@@ -108,13 +123,11 @@ export const useNotifications = (): UseNotificationsReturn => {
         notificationClientRef.current.disconnect();
         notificationClientRef.current = null;
       }
+      isInitializedRef.current = false;
     };
   }, [
-    userInfo?.userId,
-    handlePaymentSuccess,
-    handleStampAdded,
-    handleStampCompleted,
-    handleConnectionStatusChanged,
+    userInfo?.userId, // userId만 의존성으로 설정
+    // getStoredAccessToken과 핸들러들은 제거 (무한 루프 방지)
   ]);
 
   return {

@@ -1,5 +1,5 @@
 /**
- * SSE 알림 클라이언트
+ * SSE 알림 클라이언트 (배포 서버 직접 요청)
  * 결제 완료, 스탬프 적립 등의 실시간 알림 처리
  */
 
@@ -56,10 +56,12 @@ export class NotificationClient {
   private reconnectAttempts = 0;
   private baseUrl: string;
   private eventListeners: Map<keyof NotificationEvents, Array<EventCallback<any>>> = new Map();
+  private getAccessToken: () => string | null;
 
-  constructor(userId: number, baseUrl: string) {
+  constructor(userId: number, baseUrl: string, getAccessToken: () => string | null) {
     this.userId = userId;
     this.baseUrl = baseUrl;
+    this.getAccessToken = getAccessToken;
     this.connect();
   }
 
@@ -97,12 +99,27 @@ export class NotificationClient {
   }
 
   /**
-   * SSE 연결 시작
+   * SSE 연결 시작 (배포 서버 직접 요청)
    */
   private connect(): void {
     try {
+      const accessToken = this.getAccessToken();
+
+      if (!accessToken) {
+        console.error('❌ 액세스 토큰이 없어 SSE 연결을 시작할 수 없습니다.');
+        this.updateConnectionStatus('failed');
+        return;
+      }
+
+      // 배포된 백엔드 서버로 직접 요청
+      const sseUrl = `${this.baseUrl}/notifications/subscribe/${this.userId}?token=${encodeURIComponent(accessToken)}`;
+
       console.log(`🔄 SSE 연결 시도: ${this.baseUrl}/notifications/subscribe/${this.userId}`);
-      this.eventSource = new EventSource(`${this.baseUrl}/notifications/subscribe/${this.userId}`);
+      console.log(`📡 실제 요청 URL: ${sseUrl}`);
+
+      // 일반 EventSource 사용 (쿼리 파라미터 방식)
+      this.eventSource = new EventSource(sseUrl);
+
       this.setupEventListeners();
       this.reconnectAttempts = 0; // 성공시 재연결 카운트 리셋
     } catch (error) {
@@ -122,8 +139,8 @@ export class NotificationClient {
       this.updateConnectionStatus('connected');
     };
 
-    this.eventSource.onerror = () => {
-      console.log('🔴 SSE 연결 끊어짐');
+    this.eventSource.onerror = (event) => {
+      console.log('🔴 SSE 연결 오류:', event);
       this.updateConnectionStatus('disconnected');
       this.handleReconnect();
     };
