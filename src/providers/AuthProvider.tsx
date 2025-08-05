@@ -54,6 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     performManualLogout,
     getStoredAccessToken,
     setStoredTokens,
+    setAuthInitialized,
   } = useAuthStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -110,10 +111,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (canRefresh) {
         await loadUserInfo();
         return true;
+      } else {
+        setAuthenticated(false);
+        return false;
       }
-
-      setAuthenticated(false);
-      return false;
     }
 
     try {
@@ -194,7 +195,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     await loadUserInfo();
-    
+
     // 사용자 정보 로드 후 환영 메시지 표시
     const { getUserDisplayName } = useAuthStore.getState();
     const userName = getUserDisplayName();
@@ -265,6 +266,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthenticated(false);
       } finally {
         setIsLoading(false);
+        setAuthInitialized(true);
       }
     };
 
