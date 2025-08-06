@@ -420,7 +420,7 @@ const EventBanner = () => {
             </div>
             <div className="bg-gray-100 rounded-lg p-4">
               <li className="text-s text-left font-regular text-[#333]">
-                이벤트 기간 : 2025년 7월 10일 - 7월 17일
+                이벤트 기간 : 2025년 8월 7일 - 8월 13일
               </li>
               <li className="text-s text-left font-regular text-[#333]">
                 스탬프는 매장별 1회만 가능합니다.

@@ -1,5 +1,8 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import Default from '../default';
+import OnboardingPage from '@/pages/OnboardingPage';
+import InitialPage from '@/pages/InitialPage';
+
 import MainPage from '@/pages/MainPage';
 import MembershipPage from '@/pages/MembershipPage';
 import MembershipDetailPage from '@/pages/MembershipDetailPage';
@@ -32,12 +35,15 @@ import ErrorBoundary from '@/components/error/ErrorBoundary';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 const router = createBrowserRouter([
+  { path: '/', element: <Navigate to="/initial" replace /> },
+  { path: '/initial', element: <InitialPage /> },
+  { path: '/onboarding', element: <OnboardingPage /> },
   {
     element: <Default />,
     children: [
       // 보호된 라우트들 (로그인 필요)
       {
-        path: '/',
+        path: '/main',
         element: (
           <ProtectedRoute>
             <MainPage />
