@@ -16,6 +16,7 @@ const Default = () => {
     pathname === '/login' || pathname === '/signup' || pathname === '/complete-profile';
 
   const isLoginPage = pathname === '/login';
+  const isOnboardingPage = pathname === '/onboarding';
 
   useScrollToTop();
 
@@ -29,11 +30,11 @@ const Default = () => {
         isAuthPage ? 'bg-white' : 'bg-background'
       }`}
     >
-      <main className={isMapPage || isLoginPage ? '' : 'pt-[40px] pb-[65px]'}>
+      <main className={isMapPage || isLoginPage || isOnboardingPage ? '' : 'pt-[40px] pb-[65px]'}>
         <Outlet />
       </main>
 
-      {!isAuthPage && <BottomNavigator />}
+      {!isAuthPage && !isOnboardingPage && <BottomNavigator />}
 
       {/* 개발 환경에서 연결 상태 표시 (옵션) */}
       {import.meta.env.DEV && !isAuthPage && (

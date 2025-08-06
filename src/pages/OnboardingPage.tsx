@@ -62,7 +62,7 @@ const OnboardingPage = () => {
   };
 
   return (
-    <div className="w-full max-w-[600px] min-h-screen mx-auto flex flex-col">
+    <div className="w-full max-w-[600px] bg-white mx-auto flex flex-col min-h-screen">
       {/* 로고 영역 */}
       <div className="w-full h-[40px] bg-white flex-shrink-0 mb-4">
         <div className="w-full max-w-[600px] pt-1 mx-auto px-5 h-full flex items-center justify-between">
@@ -70,7 +70,7 @@ const OnboardingPage = () => {
         </div>
       </div>
 
-      {/* 스와이퍼 영역 */}
+      {/* Swiper 영역 */}
       <div className="flex-1 flex flex-col justify-center">
         <Swiper
           modules={[Mousewheel]}
@@ -93,31 +93,34 @@ const OnboardingPage = () => {
             </SwiperSlide>
           ))}
         </Swiper>
+      </div>
 
+      {/* 인디케이터 + 버튼: 하단 고정 영역 */}
+      <div className="w-full px-5 pt-5 pb-6 bg-white flex flex-col items-center">
         {/* 페이지 인디케이터 */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mb-4">
           {contents.map((_, i) => (
             <div
               key={i}
-              className={`w-[7px] h-[7px] rounded-full mx-[5px] cursor-pointer transition-colors ${index === i ? 'bg-primary' : 'bg-gray-300'}`}
+              className={`w-[7px] h-[7px] rounded-full mx-[5px] cursor-pointer transition-colors ${
+                index === i ? 'bg-primary' : 'bg-gray-300'
+              }`}
               onClick={() => handleIndicatorClick(i)}
             />
           ))}
         </div>
 
         {/* 하단 버튼 */}
-        <div className="flex justify-center mt-4 px-5 h-[40px] items-center">
-          {index === contents.length - 1 ? (
-            <OnboardingButton text="시작하기" onClick={handleComplete} isActive={true} />
-          ) : (
-            <button
-              onClick={handleComplete}
-              className="text-gray-400 underline text-sm h-[40px] flex items-center"
-            >
-              건너뛰기
-            </button>
-          )}
-        </div>
+        {index === contents.length - 1 ? (
+          <OnboardingButton text="시작하기" onClick={handleComplete} isActive={true} />
+        ) : (
+          <button
+            onClick={handleComplete}
+            className="text-gray-400 underline text-sm h-[40px] flex items-center"
+          >
+            건너뛰기
+          </button>
+        )}
       </div>
     </div>
   );
