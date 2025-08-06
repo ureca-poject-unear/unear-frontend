@@ -8,7 +8,7 @@ import onboarding2 from '@/assets/onboarding/onboarding2.png';
 import onboarding3 from '@/assets/onboarding/onboarding3.png';
 import onboarding4 from '@/assets/onboarding/onboarding4.png';
 import onboarding5 from '@/assets/onboarding/onboarding5.png';
-import MiniButton from '@/components/common/MiniButton';
+import OnboardingButton from '@/components/common/OnboardingButton';
 import 'swiper/css';
 
 const OnboardingPage = () => {
@@ -106,11 +106,14 @@ const OnboardingPage = () => {
         </div>
 
         {/* 하단 버튼 */}
-        <div className="flex justify-center mt-4 px-5">
+        <div className="flex justify-center mt-4 px-5 h-[40px] items-center">
           {index === contents.length - 1 ? (
-            <MiniButton text="시작하기" onClick={handleComplete} isActive={true} />
+            <OnboardingButton text="시작하기" onClick={handleComplete} isActive={true} />
           ) : (
-            <button onClick={handleComplete} className="text-gray-400 underline text-sm">
+            <button
+              onClick={handleComplete}
+              className="text-gray-400 underline text-sm h-[40px] flex items-center"
+            >
               건너뛰기
             </button>
           )}
