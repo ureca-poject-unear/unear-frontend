@@ -37,7 +37,7 @@ const StoryDetailLayout = ({
       />
 
       {/* 컨텐츠 */}
-      <div className="relative z-30 mx-5 sm:mx-8 md:mx-12 flex flex-col flex-1 min-h-[calc(100vh-105px)]">
+      <div className="relative z-30 mx-5 flex flex-col flex-1 min-h-[calc(100vh-105px)]">
         {children}
       </div>
     </div>

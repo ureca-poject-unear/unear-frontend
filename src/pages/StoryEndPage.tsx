@@ -4,18 +4,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import StoryLayout from '@/components/story/StoryLayout';
 import StoryCardList from '@/components/story/StoryCardList';
 import StoryButton from '@/components/common/StoryButton';
-
-interface StoryType {
-  id: number;
-  title: string;
-  imageSrc: string;
-}
+import type { StoryItem } from '@/types/story';
 
 const StoryEndPage = () => {
   const [isAnimating, setIsAnimating] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const stories = location.state?.stories as StoryType[] | undefined;
+  const stories = location.state?.stories as StoryItem[] | undefined;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,6 +19,16 @@ const StoryEndPage = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  if (!stories || stories.length === 0) {
+    return (
+      <StoryLayout bgColorClass="bg-storybackground1">
+        <div className="flex items-center justify-center min-h-[calc(100vh-105px)] text-white">
+          스토리 데이터가 없습니다.
+        </div>
+      </StoryLayout>
+    );
+  }
 
   return (
     <StoryLayout bgColorClass={isAnimating ? 'bg-storybackground2' : 'bg-storybackground1'}>
@@ -55,7 +60,7 @@ const StoryEndPage = () => {
             앞으로의 선택도{'\n'}언제나 함께할게요
           </p>
 
-          {stories && <StoryCardList stories={stories} />}
+          <StoryCardList stories={stories} />
 
           <div className="flex flex-col gap-3 mt-4">
             <StoryButton text="다시 보기" onClick={() => navigate('/story/detail')} />
