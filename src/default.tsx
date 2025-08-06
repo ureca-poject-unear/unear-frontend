@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import BottomNavigator from '@/components/common/BottomNavigator';
-import StampNotificationModal from '@/components/common/StampNotificationModal';
+import StampAddedModal from '@/components/common/StampAddedModal';
+import StampCompletedModal from '@/components/common/StampCompletedModal';
 import { useLocation } from 'react-router-dom';
 import useScrollToTop from './hooks/useScrollToTop';
 import { useNotifications } from './hooks/useNotifications';
@@ -20,7 +21,15 @@ const Default = () => {
   useScrollToTop();
 
   // 전역 알림 시스템 초기화 (로그인된 사용자에게만)
-  const { connectionStatus, showStampModal, stampModalData, closeStampModal } = useNotifications();
+  const {
+    connectionStatus,
+    showStampAddedModal,
+    stampAddedModalData,
+    closeStampAddedModal,
+    showStampCompletedModal,
+    stampCompletedModalData,
+    closeStampCompletedModal,
+  } = useNotifications();
 
   return (
     <div
@@ -41,12 +50,18 @@ const Default = () => {
         </div>
       )}
 
+      {/* 스탬프 추가 모달 */}
+      <StampAddedModal
+        isOpen={showStampAddedModal}
+        message={stampAddedModalData?.message || ''}
+        onClose={closeStampAddedModal}
+      />
+
       {/* 스탬프 완료 모달 */}
-      <StampNotificationModal
-        isOpen={showStampModal}
-        storeName={stampModalData?.storeName || ''}
-        stampMessage={stampModalData?.message || ''}
-        onClose={closeStampModal}
+      <StampCompletedModal
+        isOpen={showStampCompletedModal}
+        message={stampCompletedModalData?.message || ''}
+        onClose={closeStampCompletedModal}
       />
     </div>
   );

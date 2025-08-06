@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth';
-import { showSuccessToast } from '@/utils/toast';
+import { showSuccessToast, showInfoToast } from '@/utils/toast';
 import {
   NotificationClient,
   type PaymentSuccessData,
@@ -13,18 +13,27 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UseNotificationsReturn {
   connectionStatus: ConnectionStatus;
-  showStampModal: boolean;
-  stampModalData: {
+  showStampAddedModal: boolean;
+  stampAddedModalData: {
+    message: string;
+  } | null;
+  closeStampAddedModal: () => void;
+  showStampCompletedModal: boolean;
+  stampCompletedModalData: {
     storeName: string;
     message: string;
   } | null;
-  closeStampModal: () => void;
+  closeStampCompletedModal: () => void;
 }
 
 export const useNotifications = (): UseNotificationsReturn => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
-  const [showStampModal, setShowStampModal] = useState(false);
-  const [stampModalData, setStampModalData] = useState<{
+  const [showStampAddedModal, setShowStampAddedModal] = useState(false);
+  const [stampAddedModalData, setStampAddedModalData] = useState<{
+    message: string;
+  } | null>(null);
+  const [showStampCompletedModal, setShowStampCompletedModal] = useState(false);
+  const [stampCompletedModalData, setStampCompletedModalData] = useState<{
     storeName: string;
     message: string;
   } | null>(null);
@@ -38,7 +47,7 @@ export const useNotifications = (): UseNotificationsReturn => {
   // 결제 완료 알림 처리 (토스트)
   const handlePaymentSuccess = useCallback((data: PaymentSuccessData) => {
     const message = `${data.relatedPlaceName}에서 결제가 완료되었습니다!`;
-    showSuccessToast(message);
+    showInfoToast(message);
 
     // 결제 완료 이벤트 발생 (다른 컴포넌트에서 처리 가능)
     window.dispatchEvent(
@@ -48,9 +57,12 @@ export const useNotifications = (): UseNotificationsReturn => {
     );
   }, []);
 
-  // 스탬프 추가 알림 처리 (토스트)
+  // 스탬프 추가 알림 처리 (모달)
   const handleStampAdded = useCallback((data: StampAddedData) => {
-    showSuccessToast(data.message);
+    setStampAddedModalData({
+      message: data.message,
+    });
+    setShowStampAddedModal(true);
 
     // 스탬프 추가 이벤트 발생
     window.dispatchEvent(
@@ -62,11 +74,11 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   // 스탬프 완료 알림 처리 (모달)
   const handleStampCompleted = useCallback((data: StampCompletedData) => {
-    setStampModalData({
+    setStampCompletedModalData({
       storeName: data.relatedPlaceName,
       message: data.message,
     });
-    setShowStampModal(true);
+    setShowStampCompletedModal(true);
 
     // 스탬프 완료 이벤트 발생
     window.dispatchEvent(
@@ -81,10 +93,16 @@ export const useNotifications = (): UseNotificationsReturn => {
     setConnectionStatus(data.status);
   }, []);
 
-  // 스탬프 모달 닫기
-  const closeStampModal = useCallback(() => {
-    setShowStampModal(false);
-    setStampModalData(null);
+  // 스탬프 추가 모달 닫기
+  const closeStampAddedModal = useCallback(() => {
+    setShowStampAddedModal(false);
+    setStampAddedModalData(null);
+  }, []);
+
+  // 스탬프 완료 모달 닫기
+  const closeStampCompletedModal = useCallback(() => {
+    setShowStampCompletedModal(false);
+    setStampCompletedModalData(null);
   }, []);
 
   useEffect(() => {
@@ -132,8 +150,11 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   return {
     connectionStatus,
-    showStampModal,
-    stampModalData,
-    closeStampModal,
+    showStampAddedModal,
+    stampAddedModalData,
+    closeStampAddedModal,
+    showStampCompletedModal,
+    stampCompletedModalData,
+    closeStampCompletedModal,
   };
 };
