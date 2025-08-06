@@ -141,6 +141,16 @@ export class NotificationClient {
 
     this.eventSource.onerror = (event) => {
       console.log('🔴 SSE 연결 오류:', event);
+      console.log('🔍 EventSource 상태:', this.eventSource?.readyState);
+      console.log('🔍 에러 타입:', event.type);
+      console.log('🔍 현재 시간:', new Date().toISOString());
+
+      // EventSource 상태 코드 해석
+      const readyState = this.eventSource?.readyState;
+      if (readyState === 0) console.log('📍 상태: CONNECTING');
+      else if (readyState === 1) console.log('📍 상태: OPEN');
+      else if (readyState === 2) console.log('📍 상태: CLOSED');
+
       this.updateConnectionStatus('disconnected');
       this.handleReconnect();
     };
@@ -202,12 +212,19 @@ export class NotificationClient {
       console.log(`🟡 재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
       this.updateConnectionStatus('reconnecting');
 
+      // 지수 백오프: 2수, 4초, 8초, 16초, 32초
+      const backoffDelay = Math.min(
+        this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
+        30000
+      );
+      console.log(`🕰️ ${backoffDelay}ms 후 재연결 시도`);
+
       setTimeout(() => {
         if (this.eventSource) {
           this.eventSource.close();
         }
         this.connect();
-      }, this.reconnectDelay);
+      }, backoffDelay);
     } else {
       console.error('❌ 최대 재연결 시도 횟수 초과');
       this.updateConnectionStatus('failed');
