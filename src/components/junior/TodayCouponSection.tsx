@@ -168,8 +168,8 @@ const TodayCouponSection: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-auto p-4 bg-white">
-      <div className="m-2 mb-4">
+    <div className="w-full h-auto p-5 bg-white">
+      <div className="mb-3">
         <p className="text-lm font-bold text-black">오늘의 선착순 쿠폰! (12시 초기화)</p>
       </div>
 

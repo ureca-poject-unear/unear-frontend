@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 interface UserInfo {
-  providerId: string;
+  providerId?: string;
   userId: number;
   email: string;
   username: string;

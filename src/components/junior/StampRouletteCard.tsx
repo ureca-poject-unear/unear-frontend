@@ -317,8 +317,8 @@ const StampRouletteCard: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full h-[400px] bg-white p-5">
-      <div className="m-2">
+    <div className="relative w-full h-[410px] bg-white px-5 pt-3">
+      <div className="pb-1">
         <p className="text-lm font-bold text-black">스탬프</p>
       </div>
       <div className="rounded-lg p-4 space-y-3 border-2 border-zinc-100">
@@ -389,7 +389,7 @@ const StampRouletteCard: React.FC<Props> = ({
           </div>
         </div>
       </div>
-      <div className="mt-2"></div>
+      <div className="mt-2 "></div>
       <div className="w-full h-59 rounded-xl bg-gray-50 flex flex-col justify-between p-4">
         <div className="flex justify-around items-start">
           {displayStamps.map((stamp, idx) => {
@@ -463,7 +463,7 @@ const StampRouletteCard: React.FC<Props> = ({
                   )}
                 </div>
                 <p
-                  className={`mt-1 font-semibold text-center z-10 ${
+                  className={`mt-[6px] font-semibold text-center z-10 ${
                     isFirst ? 'text-pink-500' : 'text-black'
                   } ${stamp.name.length > 6 ? 'text-[10px] whitespace-nowrap' : 'text-xs'}`}
                 >
@@ -480,11 +480,7 @@ const StampRouletteCard: React.FC<Props> = ({
             isActive={isButtonActive}
             // ✨ 룰렛 완료 시 시각적으로도 구분되도록 추가 props (MiniButton 컴포넌트가 지원하는 경우)
             disabled={
-              isRouletteCompleted ||
-              isProcessing ||
-              isSavingResult ||
-              isCheckingServer ||
-              isRouletteSpinning
+              isRouletteCompleted || isSavingResult || isCheckingServer || isRouletteSpinning
             }
           />
         </div>
