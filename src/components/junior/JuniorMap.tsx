@@ -12,13 +12,35 @@ const JuniorMap = forwardRef<MapActions>((props, ref) => {
         <p className="text-lm font-bold text-black">이번주니어 지역</p>
       </div>
 
-      {/* 지도 */}
-      <div className="relative h-[280px] w-full">
-        {/*
-          [수정] 부모로부터 받은 ref를 MapContainer 컴포넌트에 전달합니다.
-          (참고: MapContainer 컴포넌트도 forwardRef와 useImperativeHandle로 구현되어야 합니다.)
-        */}
-        <MapContainer ref={ref} />
+      {/* 지도 - 모바일 터치 스크롤 개선 */}
+      <div
+        className="relative h-[280px] w-full overflow-hidden"
+        style={{
+          touchAction: 'pan-y', // 세로 스크롤만 허용
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            pointerEvents: 'none', // 지도 상호작용 비활성화
+          }}
+        >
+          <MapContainer ref={ref} />
+        </div>
+
+        {/* 터치 스크롤을 위한 투명 오버레이 */}
+        <div
+          className="absolute inset-0 bg-transparent"
+          style={{
+            touchAction: 'pan-y',
+            pointerEvents: 'auto',
+            zIndex: 1,
+          }}
+          onTouchStart={(e) => {
+            // 터치 시작 시 기본 지도 동작 방지
+            e.preventDefault();
+          }}
+        />
       </div>
     </div>
   );
