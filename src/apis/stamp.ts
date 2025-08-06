@@ -6,6 +6,7 @@ export interface StampSlot {
   placeName: string;
   eventCode: 'REQUIRE' | 'GENERAL';
   stamped: boolean;
+  stampedDate?: string;
 }
 
 // [핵심 수정] 인터페이스의 속성 이름을 백엔드 DTO와 정확히 일치시킵니다.

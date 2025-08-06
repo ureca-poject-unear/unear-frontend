@@ -30,6 +30,7 @@ const JuniorPage = () => {
   // ✨ 이벤트 데이터 다시 로드하는 함수 (룰렛 완료 후 호출)
   const fetchEventData = async () => {
     const token = sessionStorage.getItem('temp_access_token');
+    setIsLoading(true);
     if (!token) {
       setError('로그인이 필요한 서비스입니다.');
       setIsLoading(false);
@@ -37,7 +38,6 @@ const JuniorPage = () => {
     }
 
     try {
-      setIsLoading(true);
       const [userInfo, stampStatus] = await Promise.all([
         getUserInfo(),
         getStampsStatus(currentEventId),
@@ -61,21 +61,27 @@ const JuniorPage = () => {
 
       setIsRouletteAvailable(stampStatus.rouletteAvailable);
 
-      const newStamps: Stamp[] = stampStatus.stamps.map((slot: StampSlot) => ({
+      const requiredSlot = stampStatus.stamps.find((slot) => slot.eventCode === 'REQUIRE');
+      const generalSlots = stampStatus.stamps.filter((slot) => slot.eventCode === 'GENERAL');
+
+      const requiredStamp: Stamp = requiredSlot
+        ? {
+            name: requiredSlot.stamped ? requiredSlot.placeName : '-',
+            isStamped: requiredSlot.stamped,
+            date: requiredSlot.stampedDate,
+          }
+        : {
+            name: '-', // 필수 매장 데이터가 없으면 빈칸 자리 할당
+            isStamped: false,
+          };
+
+      const generalStamps: Stamp[] = generalSlots.map((slot) => ({
         name: slot.stamped ? slot.placeName : '-',
         isStamped: slot.stamped,
+        date: slot.stampedDate,
       }));
 
-      const requiredStamp = newStamps.find((s) =>
-        stampStatus.stamps.find((slot) => slot.placeName === s.name && slot.eventCode === 'REQUIRE')
-      );
-      const generalStamps = newStamps.filter((s) =>
-        stampStatus.stamps.find((slot) => slot.placeName === s.name && slot.eventCode === 'GENERAL')
-      );
-
-      const finalStamps: Stamp[] = [];
-      if (requiredStamp) finalStamps.push(requiredStamp);
-      finalStamps.push(...generalStamps);
+      const finalStamps: Stamp[] = [requiredStamp, ...generalStamps];
 
       setStamps(finalStamps);
     } catch (err) {
