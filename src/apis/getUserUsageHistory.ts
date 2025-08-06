@@ -74,19 +74,34 @@ export const getUserUsageHistory = async (
   size: number = 3
 ): Promise<UsageHistoryPageResponse | null> => {
   try {
+    console.log('📊 사용자 이용 내역 조회 요청...', { page, size });
+
     const response = await axiosInstance.get<ApiResponse>('/users/me/usage-history', {
       params: { page, size },
       timeout: 10000, // 10초 타임아웃
     });
 
+    console.log('✅ 사용자 이용 내역 API 응답:', response.data);
+
     if (response.data.resultCode === 200 && response.data.data) {
       const historyData = response.data.data;
 
-      return historyData;
+      // 0원 결제 내역 필터링 적용
+      const filteredContent = historyData.content.filter(
+        (item) => item.originalAmount > 0 && item.totalDiscountAmount > 0
+      );
+
+      // 필터링된 content로 새 객체 반환
+      return {
+        ...historyData,
+        content: filteredContent,
+      };
     } else {
       throw new Error('이용 내역 정보를 가져올 수 없습니다.');
     }
   } catch (error: unknown) {
+    console.error('❌ 사용자 이용 내역 조회 실패:', error);
+
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
@@ -97,7 +112,7 @@ export const getUserUsageHistory = async (
       switch (status) {
         case 401:
           // 인증 오류는 AuthProvider에서 처리됨
-          showErrorToast('로그인이 필요합니다.');
+          console.warn('⚠️ 인증 오류 - 토큰 갱신 시도');
           break;
         case 404:
           showErrorToast('이용 내역 정보를 찾을 수 없습니다.');
@@ -123,6 +138,11 @@ export const getUserUsageHistory = async (
  * @returns 최근 이용 내역 3개 또는 null
  */
 export const getRecentUsageHistory = async (): Promise<UsageHistoryItem[]> => {
-  const response = await getUserUsageHistory(0, 3);
-  return response?.content || [];
+  // 0원 필터링 후 더 많이 가져와서 필터링 후 3개만 잘라서 리턴
+  const response = await getUserUsageHistory(0, 10);
+  const filtered =
+    response?.content.filter((item) => item.originalAmount > 0 && item.totalDiscountAmount > 0) ||
+    [];
+
+  return filtered.slice(0, 3);
 };
