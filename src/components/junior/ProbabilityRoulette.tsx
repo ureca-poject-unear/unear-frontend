@@ -60,7 +60,7 @@ const ProbabilityRoulette: React.FC<Props> = ({ onFinish }) => {
     // CSS transition 시간과 동일하게 설정
     setTimeout(() => {
       const finalResult = prizeData[selectedIndex];
-      // [핵심] 애니메이션 종료 후, 부모에게 결과값을 전달
+      // 애니메이션 종료 후, 부모에게 결과값을 전달
       onFinish(finalResult);
 
       // 스핀이 끝나면 UI 상태를 초기화할 수 있지만,

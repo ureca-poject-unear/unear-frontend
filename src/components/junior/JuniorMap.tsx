@@ -3,7 +3,7 @@
 import { forwardRef } from 'react';
 import MapContainer, { type MapActions } from '@/components/junior/MapContainer';
 
-// [수정] forwardRef를 사용하여 부모 컴포넌트로부터 ref를 전달받음
+// forwardRef를 사용하여 부모 컴포넌트로부터 ref를 전달받음
 const JuniorMap = forwardRef<MapActions>((props, ref) => {
   return (
     <div className="w-full p-4 bg-white">

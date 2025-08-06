@@ -31,6 +31,7 @@ export const getJuniorStores = async (): Promise<BookmarkStore[]> => {
     const transformedData = data.map(
       (store): BookmarkStore => ({
         id: store.storeId,
+        placeId: Number(store.storeId),
         name: store.storeName,
         address: store.fullAddress,
         hours: store.operatingHours,
