@@ -1,19 +1,22 @@
+import type { StoryItem } from '@/types/story';
 import StoryCard from '@/components/story/StoryCard';
 
-interface StoryType {
-  id: number;
-  imageSrc: string;
-  date?: string;
-}
-
 interface StoryCardListProps {
-  stories: StoryType[];
+  stories: StoryItem[];
   showDate?: boolean;
 }
 
+const S3_BASE_URL = 'https://unear-uploads.s3.ap-southeast-2.amazonaws.com/';
+
 export default function StoryCardList({ stories, showDate = false }: StoryCardListProps) {
-  // 카드들을 두 번 반복해 무한 슬라이드 효과를 줌
-  const repeatedStories = [...stories, ...stories];
+  // stories 배열을 돌며 imageUrl을 절대경로로 보정하여 imageSrc 필드 추가
+  const storiesWithFullUrl = stories.map((story) => ({
+    ...story,
+    imageSrc: story.imageUrl.startsWith('http') ? story.imageUrl : S3_BASE_URL + story.imageUrl,
+  }));
+
+  // 두 번 반복해서 무한 슬라이드 효과용 배열 생성
+  const repeatedStories = [...storiesWithFullUrl, ...storiesWithFullUrl];
 
   return (
     <div className="relative overflow-hidden w-full h-[260px] mb-8">

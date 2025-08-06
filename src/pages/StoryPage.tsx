@@ -1,14 +1,20 @@
+// src/pages/StoryPage.tsx
+
 import { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import StoryLayout from '@/components/story/StoryLayout';
 import BookNubiImage from '@/assets/story/bookNubi.png';
 import SearchNubiImage from '@/assets/story/searchNubi.png';
 import SparkleImage from '@/assets/story/sparkle.svg';
 import StoryButton from '@/components/common/StoryButton';
 import { useAuthStore } from '@/store/auth';
-import type { StoryDiagnosisParams } from '@/apis/getStoryDiagnosis';
 import { getStoryDiagnosis } from '@/apis/getStoryDiagnosis';
+import { getStoryByMonth } from '@/apis/getStoryByMonth';
+import type { StoryItem } from '@/types/story';
+
+const S3_BASE_URL = 'https://unear-uploads.s3.ap-southeast-2.amazonaws.com/';
 
 interface DiagnosisData {
   category: string;
@@ -24,6 +30,7 @@ const StoryPage = () => {
   const [diagnosisResult, setDiagnosisResult] = useState<{ type: string; comment: string } | null>(
     null
   );
+  const [storyData, setStoryData] = useState<StoryItem[] | null>(null);
 
   const navigate = useNavigate();
   const { userInfo, getUserDisplayName } = useAuthStore();
@@ -54,7 +61,7 @@ const StoryPage = () => {
     const fetchDiagnosisResult = async () => {
       try {
         if (!userInfo) return;
-        const params: StoryDiagnosisParams = {
+        const result = await getStoryDiagnosis({
           userId: userInfo.userId,
           username: userInfo.username,
           email: userInfo.email,
@@ -63,18 +70,33 @@ const StoryPage = () => {
           gender: userInfo.gender ?? '',
           membershipCode: userInfo.membershipCode,
           provider: userInfo.provider ?? '',
-          providerId: userInfo.provider ?? '',
-        };
-
-        const result = await getStoryDiagnosis(params);
+          providerId: userInfo.providerId ?? '',
+        });
         setDiagnosisResult(result);
       } catch (err) {
         console.error('진단 결과 로딩 실패', err);
       }
     };
 
+    const fetchStoryData = async () => {
+      try {
+        const targetMonth = dayjs().format('YYYY-MM');
+        const stories = await getStoryByMonth(targetMonth);
+        setStoryData(stories);
+
+        // ✅ 첫 번째 이미지 선행 로드
+        if (stories?.[0]?.imageUrl) {
+          const preloadImg = new Image();
+          preloadImg.src = S3_BASE_URL + stories[0].imageUrl;
+        }
+      } catch (err) {
+        console.error('스토리 데이터 로딩 실패', err);
+      }
+    };
+
     fetchDiagnosisMap();
     fetchDiagnosisResult();
+    fetchStoryData();
   }, [isStarted, userInfo]);
 
   useEffect(() => {
@@ -86,6 +108,7 @@ const StoryPage = () => {
           state: {
             diagnosisMap,
             diagnosisResult,
+            storyData,
           },
         });
       }, 2500);
@@ -97,7 +120,15 @@ const StoryPage = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isStarted, currentIndex, diagnosisMap, diagnosisResult, navigate, loadingTexts.length]);
+  }, [
+    isStarted,
+    currentIndex,
+    diagnosisMap,
+    diagnosisResult,
+    storyData,
+    navigate,
+    loadingTexts.length,
+  ]);
 
   return (
     <StoryLayout bgColorClass={isStarted ? 'bg-storybackground2' : 'bg-storybackground1'}>
