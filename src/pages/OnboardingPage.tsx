@@ -19,24 +19,24 @@ const OnboardingPage = () => {
   const contents = [
     {
       title: '내 주변 혜택, 한눈에',
-      subtitle1: '쿠폰부터 필터, 로드뷰까지',
-      subtitle2: '원하는 매장을 빠르게 찾아요',
+      subtitle1: '지도에서 마커를 눌러 매장 정보 보기',
+      subtitle2: '쿠폰 제공 매장을 직관적으로 확인해요',
       image: onboarding1,
     },
     {
       title: '혜택 매장을 지도로!',
-      subtitle1: '마커를 눌러 매장 정보 확인',
-      subtitle2: '내 주변 혜택을 쉽게 찾아요',
+      subtitle1: '검색, 필터, 즐겨찾기, 로드뷰까지',
+      subtitle2: '원하는 매장을 빠르고 쉽게 활용해보세요',
       image: onboarding2,
     },
     {
       title: '소비 습관, 스토리로',
-      subtitle1: 'AI가 그려주는 소비 일기',
+      subtitle1: 'AI가 그려주는 소비 일기 모음',
       subtitle2: '매달 나만의 감성적인 스토리가 생겨요',
       image: onboarding3,
     },
     {
-      title: '이번주, 유니어 미션!',
+      title: '이번주 유니어 미션!',
       subtitle1: '다양한 미션 및 이벤트 참여',
       subtitle2: '매주 새롭게 열리는 혜택이 기다려요',
       image: onboarding4,
