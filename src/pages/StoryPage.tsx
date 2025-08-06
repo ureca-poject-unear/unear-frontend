@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import StoryLayout from '@/components/story/StoryLayout';
 import BookNubiImage from '@/assets/story/bookNubi.png';
 import SearchNubiImage from '@/assets/story/searchNubi.png';
-import StoryButton from '@/components/common/StoryButton';
 import SparkleImage from '@/assets/story/sparkle.svg';
+import StoryButton from '@/components/common/StoryButton';
 import { useAuthStore } from '@/store/auth';
+import type { StoryDiagnosisParams } from '@/apis/getStoryDiagnosis';
+import { getStoryDiagnosis } from '@/apis/getStoryDiagnosis';
 
 interface DiagnosisData {
   category: string;
@@ -19,9 +21,12 @@ const StoryPage = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [diagnosisMap, setDiagnosisMap] = useState<Record<string, DiagnosisData>>({});
-  const navigate = useNavigate();
+  const [diagnosisResult, setDiagnosisResult] = useState<{ type: string; comment: string } | null>(
+    null
+  );
 
-  const { getUserDisplayName } = useAuthStore();
+  const navigate = useNavigate();
+  const { userInfo, getUserDisplayName } = useAuthStore();
   const userName = getUserDisplayName();
 
   const loadingTexts = useMemo(
@@ -46,8 +51,31 @@ const StoryPage = () => {
       }
     };
 
+    const fetchDiagnosisResult = async () => {
+      try {
+        if (!userInfo) return;
+        const params: StoryDiagnosisParams = {
+          userId: userInfo.userId,
+          username: userInfo.username,
+          email: userInfo.email,
+          tel: userInfo.tel ?? '',
+          birthdate: userInfo.birthdate ?? '',
+          gender: userInfo.gender ?? '',
+          membershipCode: userInfo.membershipCode,
+          provider: userInfo.provider ?? '',
+          providerId: userInfo.provider ?? '',
+        };
+
+        const result = await getStoryDiagnosis(params);
+        setDiagnosisResult(result);
+      } catch (err) {
+        console.error('진단 결과 로딩 실패', err);
+      }
+    };
+
     fetchDiagnosisMap();
-  }, [isStarted]);
+    fetchDiagnosisResult();
+  }, [isStarted, userInfo]);
 
   useEffect(() => {
     if (!isStarted) return;
@@ -57,6 +85,7 @@ const StoryPage = () => {
         navigate('/story/diagnosis', {
           state: {
             diagnosisMap,
+            diagnosisResult,
           },
         });
       }, 2500);
@@ -68,7 +97,7 @@ const StoryPage = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isStarted, currentIndex, diagnosisMap, navigate, loadingTexts.length]);
+  }, [isStarted, currentIndex, diagnosisMap, diagnosisResult, navigate, loadingTexts.length]);
 
   return (
     <StoryLayout bgColorClass={isStarted ? 'bg-storybackground2' : 'bg-storybackground1'}>
