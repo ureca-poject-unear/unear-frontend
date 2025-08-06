@@ -1,11 +1,9 @@
-import { useState } from 'react'; // 여기에 추가하세요
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '@/components/common/Header';
 import BookmarkCard from '@/components/common/BookmarkCard';
 import PointNubiImage from '@/assets/story/pointNubi.png';
 import StarBackgroundImage from '@/assets/story/starBackground.png';
-// 타입 임포트
-import type { CategoryType, StoreClassType, EventType } from '@/components/common/StoreTypeIcon';
 import type { BookmarkStore } from '@/types/bookmark';
 
 // 예시 매장 데이터

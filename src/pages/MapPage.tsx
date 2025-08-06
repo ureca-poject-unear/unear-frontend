@@ -306,7 +306,7 @@ const MapPage = () => {
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-65px)] bg-white">
+    <div className="relative w-full h-[calc(100dvh-65px)] bg-white">
       {/* 지도 영역 */}
       <MapContainer
         ref={mapRef}
