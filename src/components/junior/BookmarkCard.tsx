@@ -16,6 +16,7 @@ import PhoneButtonDark from '@/components/common/PhoneButtonDark';
 
 import TimeIcon from '@/assets/common/timeIcon.svg?react';
 import TimeWhiteIcon from '@/assets/common/timeWhiteIcon.svg?react';
+import LocationIcon from '@/assets/common/locationIcon.svg?react';
 import GiftIcon from '@/assets/map/giftIcon.svg?react';
 import CouponIcon from '@/assets/common/couponIcon.svg?react';
 import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
@@ -38,6 +39,7 @@ export interface StoreInfo {
   name: string;
   address: string;
   hours: string;
+  distance: string; // 거리 정보 추가
   latitude: number;
   longitude: number;
   category: CategoryType;
@@ -130,6 +132,10 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-[6px]">
+            <LocationIcon />
+            <span className={`font-regular text-sm ${subTextColor} relative top-px`}>
+              {store.distance}
+            </span>
             <IconTime />
             <span className={`font-regular text-sm ${subTextColor} relative top-px`}>
               {store.hours}
@@ -139,12 +145,16 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
         </div>
 
         <div className="mt-auto pt-2 flex gap-2">
-          <MiniLocationButton onClick={handleLocationClick} />
-          {isDarkMode ? (
-            <PhoneButtonDark onClick={handlePhoneClick} />
-          ) : (
-            <PhoneButton onClick={handlePhoneClick} />
-          )}
+          <div className="flex-[8]">
+            <MiniLocationButton onClick={handleLocationClick} />
+          </div>
+          <div className="flex-[2]">
+            {isDarkMode ? (
+              <PhoneButtonDark onClick={handlePhoneClick} />
+            ) : (
+              <PhoneButton onClick={handlePhoneClick} />
+            )}
+          </div>
         </div>
       </div>
 

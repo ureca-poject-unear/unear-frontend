@@ -11,6 +11,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { Place } from '@/types/map';
 import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
+import { getCurrentLocation, calculateDistance, formatDistance } from '@/utils/distanceUtils';
 
 // getPlaceDetail API가 반환하는 실제 데이터 구조에 맞춘 타입 정의
 interface StoreData {
@@ -43,6 +44,20 @@ const JuniorMarket = () => {
     const fetchSeoulEventStores = async () => {
       try {
         setIsLoading(true);
+
+        // 현재 위치 가져오기
+        const currentLocation = await getCurrentLocation();
+        let centerLatStr = '37.544581'; // 기본값 (서울시청)
+        let centerLngStr = '127.055961';
+
+        if (currentLocation) {
+          centerLatStr = currentLocation.lat.toString();
+          centerLngStr = currentLocation.lng.toString();
+          console.log('현재 위치 사용:', centerLatStr, centerLngStr);
+        } else {
+          console.warn('현재 위치를 가져올 수 없어 기본 위치를 사용합니다.');
+        }
+
         const seoulBounds = { swLat: 37.42, swLng: 126.73, neLat: 37.7, neLng: 127.2 };
         const allPlacesInSeoul: Place[] = await getPlaces(seoulBounds);
         const eventPlaces = allPlacesInSeoul.filter((p) => p.eventCode !== 'NONE');
@@ -52,9 +67,6 @@ const JuniorMarket = () => {
           setIsLoading(false);
           return;
         }
-
-        const centerLatStr = '37.544581';
-        const centerLngStr = '127.055961';
 
         const detailResults = await Promise.allSettled(
           eventPlaces.map(
@@ -72,11 +84,24 @@ const JuniorMarket = () => {
         const finalStoreInfo: StoreInfo[] = successfulDetails.map((detail) => {
           const originalPlace = eventPlaces.find((p: Place) => p.placeId === detail.placeId)!;
 
+          // 현재 위치가 있으면 직접 거리 계산, 없으면 API 응답 사용
+          let calculatedDistance = detail.distance;
+          if (currentLocation) {
+            const distanceKm = calculateDistance(
+              currentLocation.lat,
+              currentLocation.lng,
+              detail.latitude,
+              detail.longitude
+            );
+            calculatedDistance = formatDistance(distanceKm);
+          }
+
           return {
             id: String(detail.placeId),
             name: detail.name,
             address: detail.address,
             hours: detail.hours,
+            distance: calculatedDistance,
             latitude: detail.latitude,
             longitude: detail.longitude,
             isBookmarked: detail.isBookmarked,
@@ -90,11 +115,26 @@ const JuniorMarket = () => {
           };
         });
 
-        const sortedStores = finalStoreInfo.sort((a, b) => {
-          if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') return -1;
-          if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') return 1;
-          return 0;
-        });
+        // 현재 위치가 있으면 거리순 정렬, 없으면 기본 정렬 (REQUIRE 맨 위)
+        let sortedStores;
+        if (currentLocation) {
+          sortedStores = finalStoreInfo.sort((a, b) => {
+            // REQUIRE 이벤트가 있으면 맨 위
+            if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') return -1;
+            if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') return 1;
+
+            // 그 다음은 거리순
+            const distanceA = parseFloat(a.distance.replace('km', '').replace('m', '')) || 0;
+            const distanceB = parseFloat(b.distance.replace('km', '').replace('m', '')) || 0;
+            return distanceA - distanceB;
+          });
+        } else {
+          sortedStores = finalStoreInfo.sort((a, b) => {
+            if (a.event === 'REQUIRE' && b.event !== 'REQUIRE') return -1;
+            if (a.event !== 'REQUIRE' && b.event === 'REQUIRE') return 1;
+            return 0;
+          });
+        }
 
         setStores(sortedStores);
       } catch (err) {
@@ -197,7 +237,7 @@ const JuniorMarket = () => {
   }
 
   return (
-    <div className="w-full p-4 bg-white">
+    <div className="w-full px-5 py-2 bg-white">
       <div className="m-2 mb-4">
         <p className="text-lm font-bold text-black">이번주니어 매장</p>
       </div>

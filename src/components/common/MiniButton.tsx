@@ -20,11 +20,11 @@ export default function MiniButton({
 
   return (
     <div
-      className={`flex justify-center items-center overflow-hidden px-8 rounded-xl ${widthClass} ${heightClass} ${backgroundColorClass}`}
+      className={`flex justify-center py-[14px] items-center overflow-hidden px-8 rounded-xl ${widthClass} ${heightClass} ${backgroundColorClass}`}
       style={{ boxShadow: '0px 4px 16px 0 black/20' }}
     >
       <button
-        className="flex justify-center items-start flex-grow-0 flex-shrink-0 relative text-base font-bold text-center text-white"
+        className="flex justify-center pt-[2px] items-start flex-grow-0 flex-shrink-0 relative text-base font-bold text-center text-white"
         onClick={() => {
           if (isActive) {
             onClick();

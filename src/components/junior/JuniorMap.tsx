@@ -6,14 +6,14 @@ import MapContainer, { type MapActions } from '@/components/junior/MapContainer'
 // forwardRef를 사용하여 부모 컴포넌트로부터 ref를 전달받음
 const JuniorMap = forwardRef<MapActions>((props, ref) => {
   return (
-    <div className="w-full p-4 bg-white">
+    <div className="w-full p-5 bg-white">
       {/* 지도 위쪽 텍스트 */}
-      <div className="m-2 mb-4">
+      <div className="mb-3">
         <p className="text-lm font-bold text-black">이번주니어 지역</p>
       </div>
 
       {/* 지도 */}
-      <div className="relative h-[280px] w-full mb-4">
+      <div className="relative h-[280px] w-full">
         {/*
           [수정] 부모로부터 받은 ref를 MapContainer 컴포넌트에 전달합니다.
           (참고: MapContainer 컴포넌트도 forwardRef와 useImperativeHandle로 구현되어야 합니다.)
