@@ -36,3 +36,35 @@ export const sendRouletteResult = async (eventId: number, prizeName: string) => 
   // 성공 시 서버로부터 받은 데이터를 반환합니다.
   return responseData;
 };
+
+/**
+ * 특정 이벤트의 룰렛 참여 여부를 확인하는 API
+ * @param eventId - 확인할 이벤트 ID
+ * @returns Promise<boolean> - 참여 여부 (true: 이미 참여함, false: 참여 안함)
+ */
+export const checkRouletteParticipation = async (eventId: number): Promise<boolean> => {
+  try {
+    const token = sessionStorage.getItem('temp_access_token');
+    if (!token) {
+      throw new Error('로그인이 필요합니다.');
+    }
+
+    const response = await fetch(`/api/roulette/check/${eventId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 오류: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.hasParticipated || false;
+  } catch (error) {
+    console.error('룰렛 참여 상태 확인 오류:', error);
+    throw error;
+  }
+};

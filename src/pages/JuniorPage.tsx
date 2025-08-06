@@ -9,7 +9,6 @@ import JuniorMarket from '@/components/junior/JuniorMarket';
 import { getStampsStatus, type StampSlot } from '@/apis/stamp';
 import { getUserInfo } from '@/apis/user';
 
-// 스탬프 데이터 타입을 정의합니다.
 type Stamp = {
   name: string;
   isStamped: boolean;
@@ -24,7 +23,6 @@ const JuniorPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 현재 진행 중인 이벤트 ID
   const currentEventId = 2;
 
   useEffect(() => {
@@ -37,27 +35,22 @@ const JuniorPage = () => {
       }
       try {
         setIsLoading(true);
-        // 사용자 정보와 스탬프 상태를 동시에 API로 요청합니다.
         const [userInfo, stampStatus] = await Promise.all([
           getUserInfo(),
           getStampsStatus(currentEventId),
         ]);
 
-        // ✨ --- 가장 중요한 로직 --- ✨
-        // API 응답(userInfo)에서 rouletteResults 배열을 확인합니다.
-        // `some` 메서드를 사용해, 현재 이벤트 ID와 일치하고 `participated`가 true인 기록이 있는지 확인합니다.
+        // ✨ API 응답에서 현재 이벤트(eventId: 2)에 참여한 기록이 있는지 확인
         const hasParticipated =
           userInfo.rouletteResults?.some(
             (result) => result.event.unearEventId === currentEventId && result.participated
-          ) || false; // 기록이 없으면 false
+          ) || false;
 
-        // 확인된 참여 여부(true 또는 false)를 상태에 저장합니다.
+        // ✨ 확인된 참여 여부를 상태에 저장
         setInitialIsSpun(hasParticipated);
-        // ✨ --- 여기까지 --- ✨
 
         setIsRouletteAvailable(stampStatus.rouletteAvailable);
 
-        // 스탬프 데이터를 가공합니다.
         const newStamps: Stamp[] = stampStatus.stamps.map((slot: StampSlot) => ({
           name: slot.stamped ? slot.placeName : '-',
           isStamped: slot.stamped,
@@ -88,7 +81,7 @@ const JuniorPage = () => {
     };
 
     fetchEventData();
-  }, [currentEventId]); // currentEventId가 변경될 때마다 데이터를 다시 가져옵니다.
+  }, [currentEventId]);
 
   if (isLoading) {
     return (
@@ -122,7 +115,7 @@ const JuniorPage = () => {
       <div className="w-full max-w-[600px] mx-auto flex flex-col items-center">
         <EventBanner />
         <div className="flex flex-col gap-3 items-center w-full">
-          {/* ✨ 자식 컴포넌트에 `hasExistingResult` prop으로 참여 여부를 전달합니다. */}
+          {/* ✨ 자식 컴포넌트에 `hasExistingResult` prop으로 서버에서 확인한 참여 여부를 전달 */}
           <StampRouletteCard
             stamps={stamps}
             eventId={currentEventId}
