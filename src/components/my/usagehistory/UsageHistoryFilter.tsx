@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Mousewheel } from 'swiper/modules';
 import 'swiper/css';
 import CalendarIcon from '@/assets/my/calender.svg?react';
-import ArrowIcon from '@/assets/common/arrowUpIcon.svg?react';
+import ArrowIcon from '@/assets/common/arrowDownIcon.svg?react';
 import '../statistics/animations.css'; // 애니메이션 CSS 임포트
 import FilterButton from '@/components/common/FilterButton';
 
