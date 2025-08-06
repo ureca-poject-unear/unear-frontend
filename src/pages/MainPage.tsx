@@ -18,6 +18,7 @@ const MainPage = () => {
   const [isBarcodeSheetOpen, setIsBarcodeSheetOpen] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   const [isUserDataLoading, setIsUserDataLoading] = useState(true);
+
   const navigate = useNavigate();
 
   // Zustand 스토어에서 사용자 정보 가져오기

@@ -37,11 +37,8 @@ export type ConnectionStatus =
   | 'reconnecting'
   | 'failed';
 
-// 이벤트 타입 정의
 export interface NotificationEvents {
   paymentSuccess: PaymentSuccessData;
-  stampAdded: StampAddedData;
-  stampCompleted: StampCompletedData;
   connectionStatusChanged: { status: ConnectionStatus };
 }
 
@@ -55,8 +52,12 @@ export class NotificationClient {
   private maxReconnectAttempts = 5;
   private reconnectAttempts = 0;
   private baseUrl: string;
-  private eventListeners: Map<keyof NotificationEvents, Array<EventCallback<any>>> = new Map();
   private getAccessToken: () => string | null;
+
+  // any 없는 타입 안전한 리스너 객체
+  private eventListeners: {
+    [K in keyof NotificationEvents]?: Array<EventCallback<K>>;
+  } = {};
 
   constructor(userId: number, baseUrl: string, getAccessToken: () => string | null) {
     this.userId = userId;
@@ -69,19 +70,19 @@ export class NotificationClient {
    * 이벤트 리스너 등록
    */
   on<K extends keyof NotificationEvents>(event: K, callback: EventCallback<K>): void {
-    if (!this.eventListeners.has(event)) {
-      this.eventListeners.set(event, []);
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = [];
     }
-    this.eventListeners.get(event)?.push(callback as EventCallback<any>);
+    this.eventListeners[event]!.push(callback);
   }
 
   /**
    * 이벤트 리스너 제거
    */
   off<K extends keyof NotificationEvents>(event: K, callback: EventCallback<K>): void {
-    const listeners = this.eventListeners.get(event);
+    const listeners = this.eventListeners[event];
     if (listeners) {
-      const index = listeners.indexOf(callback as EventCallback<any>);
+      const index = listeners.indexOf(callback);
       if (index > -1) {
         listeners.splice(index, 1);
       }
@@ -92,9 +93,9 @@ export class NotificationClient {
    * 이벤트 발생
    */
   private emit<K extends keyof NotificationEvents>(event: K, data: NotificationEvents[K]): void {
-    const listeners = this.eventListeners.get(event);
+    const listeners = this.eventListeners[event];
     if (listeners) {
-      listeners.forEach((callback: EventCallback<any>) => callback(data));
+      listeners.forEach((callback) => callback(data));
     }
   }
 
@@ -111,7 +112,6 @@ export class NotificationClient {
         return;
       }
 
-      // 배포된 백엔드 서버로 직접 요청
       const sseUrl = `${this.baseUrl}/notifications/subscribe/${this.userId}?token=${encodeURIComponent(accessToken)}`;
 
       console.log(`🔄 SSE 연결 시도: ${this.baseUrl}/notifications/subscribe/${this.userId}`);
@@ -119,9 +119,7 @@ export class NotificationClient {
 
       this.updateConnectionStatus('connecting');
 
-      // 일반 EventSource 사용 (쿼리 파라미터 방식)
       this.eventSource = new EventSource(sseUrl);
-
       this.setupEventListeners();
       this.reconnectAttempts = 0; // 성공시 재연결 카운트 리셋
     } catch (error) {
@@ -140,13 +138,12 @@ export class NotificationClient {
       console.log('🟢 SSE 연결됨');
       console.log('📊 onopen 시점 EventSource 상태:', this.eventSource?.readyState);
 
-      // 연결 성공 후 5초 대기해서 상태 다시 확인
       setTimeout(() => {
         console.log('🕰️ 5초 후 EventSource 상태:', this.eventSource?.readyState);
         if (this.eventSource?.readyState === 1) {
           console.log('✅ 연결이 유지되고 있습니다!');
         } else {
-          console.log('❌ 연결이 끄어졌습니다.');
+          console.log('❌ 연결이 끊어졌습니다.');
         }
       }, 5000);
 
@@ -159,7 +156,6 @@ export class NotificationClient {
       console.log('🔍 에러 타입:', event.type);
       console.log('🔍 현재 시간:', new Date().toISOString());
 
-      // EventSource 상태 코드 해석
       const readyState = this.eventSource?.readyState;
       if (readyState === 0) console.log('📍 상태: CONNECTING');
       else if (readyState === 1) console.log('📍 상태: OPEN');
@@ -170,7 +166,7 @@ export class NotificationClient {
     };
 
     // 연결 확인 이벤트
-    this.eventSource.addEventListener('connect', (event) => {
+    this.eventSource.addEventListener('connect', (event: MessageEvent) => {
       try {
         console.log('🔗 초기 연결 이벤트 수신:', event.data);
         console.log('📊 connect 이벤트 시점 상태:', this.eventSource?.readyState);
@@ -180,46 +176,24 @@ export class NotificationClient {
     });
 
     // ping 이벤트 리스너 추가
-    this.eventSource.addEventListener('ping', (event) => {
+    this.eventSource.addEventListener('ping', (event: MessageEvent) => {
       console.log('🏓 ping 이벤트 수신:', event.data);
     });
 
     // 기본 메시지 수신 (이름 없는 이벤트)
-    this.eventSource.onmessage = (event) => {
+    this.eventSource.onmessage = (event: MessageEvent) => {
       console.log('📩 기본 메시지 수신:', event.data);
       console.log('📊 메시지 수신 시점 상태:', this.eventSource?.readyState);
     };
 
     // 결제 완료 알림
-    this.eventSource.addEventListener('payment-success', (event) => {
+    this.eventSource.addEventListener('payment-success', (event: MessageEvent) => {
       try {
         const data: PaymentSuccessData = JSON.parse(event.data);
         console.log('💳 결제 완료 알림:', data);
         this.emit('paymentSuccess', data);
       } catch (error) {
         console.error('결제 완료 알림 파싱 오류:', error);
-      }
-    });
-
-    // 스탬프 추가 알림
-    this.eventSource.addEventListener('stamp-added', (event) => {
-      try {
-        const data: StampAddedData = JSON.parse(event.data);
-        console.log('🏷️ 스탬프 추가 알림:', data);
-        this.emit('stampAdded', data);
-      } catch (error) {
-        console.error('스탬프 추가 알림 파싱 오류:', error);
-      }
-    });
-
-    // 스탬프 완료 알림
-    this.eventSource.addEventListener('stamp-completed', (event) => {
-      try {
-        const data: StampCompletedData = JSON.parse(event.data);
-        console.log('🎉 스탬프 완료 알림:', data);
-        this.emit('stampCompleted', data);
-      } catch (error) {
-        console.error('스탬프 완료 알림 파싱 오류:', error);
       }
     });
   }
@@ -233,7 +207,6 @@ export class NotificationClient {
       console.log(`🟡 재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
       this.updateConnectionStatus('reconnecting');
 
-      // 지수 백오프: 2수, 4초, 8초, 16초, 32초
       const backoffDelay = Math.min(
         this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
         30000
@@ -267,7 +240,10 @@ export class NotificationClient {
       this.eventSource.close();
       this.eventSource = null;
     }
-    this.eventListeners.clear();
+    // 모든 리스너 제거
+    Object.keys(this.eventListeners).forEach((key) => {
+      delete this.eventListeners[key as keyof NotificationEvents];
+    });
     console.log('🔌 SSE 연결 해제');
   }
 

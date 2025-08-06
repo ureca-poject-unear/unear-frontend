@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth';
-import { showSuccessToast, showInfoToast } from '@/utils/toast';
 import {
   NotificationClient,
   type PaymentSuccessData,
-  type StampAddedData,
-  type StampCompletedData,
   type ConnectionStatus,
 } from '@/utils/NotificationClient';
 
@@ -13,28 +10,23 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UseNotificationsReturn {
   connectionStatus: ConnectionStatus;
-  showStampAddedModal: boolean;
-  stampAddedModalData: {
-    message: string;
-  } | null;
-  closeStampAddedModal: () => void;
-  showStampCompletedModal: boolean;
-  stampCompletedModalData: {
+  showPaymentModal: boolean;
+  paymentModalData: {
     storeName: string;
+    discountAmount: number;
+    finalAmount: number;
     message: string;
   } | null;
-  closeStampCompletedModal: () => void;
+  closePaymentModal: () => void;
 }
 
 export const useNotifications = (): UseNotificationsReturn => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
-  const [showStampAddedModal, setShowStampAddedModal] = useState(false);
-  const [stampAddedModalData, setStampAddedModalData] = useState<{
-    message: string;
-  } | null>(null);
-  const [showStampCompletedModal, setShowStampCompletedModal] = useState(false);
-  const [stampCompletedModalData, setStampCompletedModalData] = useState<{
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentModalData, setPaymentModalData] = useState<{
     storeName: string;
+    discountAmount: number;
+    finalAmount: number;
     message: string;
   } | null>(null);
 
@@ -44,45 +36,19 @@ export const useNotifications = (): UseNotificationsReturn => {
   // 초기화 상태 추적
   const isInitializedRef = useRef(false);
 
-  // 결제 완료 알림 처리 (토스트)
+  // 결제 완료 알림 처리 (모달)
   const handlePaymentSuccess = useCallback((data: PaymentSuccessData) => {
-    const message = `${data.relatedPlaceName}에서 결제가 완료되었습니다!`;
-    showInfoToast(message);
+    setPaymentModalData({
+      storeName: data.relatedPlaceName,
+      discountAmount: data.discountAmount,
+      finalAmount: data.finalAmount,
+      message: data.message || '', // 빈 문자열일 수 있음
+    });
+    setShowPaymentModal(true);
 
     // 결제 완료 이벤트 발생 (다른 컴포넌트에서 처리 가능)
     window.dispatchEvent(
       new CustomEvent('paymentCompleted', {
-        detail: data,
-      })
-    );
-  }, []);
-
-  // 스탬프 추가 알림 처리 (모달)
-  const handleStampAdded = useCallback((data: StampAddedData) => {
-    setStampAddedModalData({
-      message: data.message,
-    });
-    setShowStampAddedModal(true);
-
-    // 스탬프 추가 이벤트 발생
-    window.dispatchEvent(
-      new CustomEvent('stampAdded', {
-        detail: data,
-      })
-    );
-  }, []);
-
-  // 스탬프 완료 알림 처리 (모달)
-  const handleStampCompleted = useCallback((data: StampCompletedData) => {
-    setStampCompletedModalData({
-      storeName: data.relatedPlaceName,
-      message: data.message,
-    });
-    setShowStampCompletedModal(true);
-
-    // 스탬프 완료 이벤트 발생
-    window.dispatchEvent(
-      new CustomEvent('stampCompleted', {
         detail: data,
       })
     );
@@ -93,16 +59,10 @@ export const useNotifications = (): UseNotificationsReturn => {
     setConnectionStatus(data.status);
   }, []);
 
-  // 스탬프 추가 모달 닫기
-  const closeStampAddedModal = useCallback(() => {
-    setShowStampAddedModal(false);
-    setStampAddedModalData(null);
-  }, []);
-
-  // 스탬프 완료 모달 닫기
-  const closeStampCompletedModal = useCallback(() => {
-    setShowStampCompletedModal(false);
-    setStampCompletedModalData(null);
+  // 결제 완료 모달 닫기
+  const closePaymentModal = useCallback(() => {
+    setShowPaymentModal(false);
+    setPaymentModalData(null);
   }, []);
 
   useEffect(() => {
@@ -128,10 +88,8 @@ export const useNotifications = (): UseNotificationsReturn => {
       getStoredAccessToken
     );
 
-    // 이벤트 리스너 등록
+    // 이벤트 리스너 등록 (결제 완료만)
     notificationClientRef.current.on('paymentSuccess', handlePaymentSuccess);
-    notificationClientRef.current.on('stampAdded', handleStampAdded);
-    notificationClientRef.current.on('stampCompleted', handleStampCompleted);
     notificationClientRef.current.on('connectionStatusChanged', handleConnectionStatusChanged);
 
     // 정리 함수
@@ -145,16 +103,12 @@ export const useNotifications = (): UseNotificationsReturn => {
     };
   }, [
     userInfo?.userId, // userId만 의존성으로 설정
-    // getStoredAccessToken과 핸들러들은 제거 (무한 루프 방지)
   ]);
 
   return {
     connectionStatus,
-    showStampAddedModal,
-    stampAddedModalData,
-    closeStampAddedModal,
-    showStampCompletedModal,
-    stampCompletedModalData,
-    closeStampCompletedModal,
+    showPaymentModal,
+    paymentModalData,
+    closePaymentModal,
   };
 };

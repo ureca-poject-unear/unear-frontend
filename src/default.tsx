@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import BottomNavigator from '@/components/common/BottomNavigator';
-import StampAddedModal from '@/components/common/StampAddedModal';
-import StampCompletedModal from '@/components/common/StampCompletedModal';
+import PaymentCompletedModal from '@/components/common/PaymentCompletedModal';
 import { useLocation } from 'react-router-dom';
 import useScrollToTop from './hooks/useScrollToTop';
 import { useNotifications } from './hooks/useNotifications';
@@ -21,15 +20,8 @@ const Default = () => {
   useScrollToTop();
 
   // 전역 알림 시스템 초기화 (로그인된 사용자에게만)
-  const {
-    connectionStatus,
-    showStampAddedModal,
-    stampAddedModalData,
-    closeStampAddedModal,
-    showStampCompletedModal,
-    stampCompletedModalData,
-    closeStampCompletedModal,
-  } = useNotifications();
+  const { connectionStatus, showPaymentModal, paymentModalData, closePaymentModal } =
+    useNotifications();
 
   return (
     <div
@@ -50,18 +42,14 @@ const Default = () => {
         </div>
       )}
 
-      {/* 스탬프 추가 모달 */}
-      <StampAddedModal
-        isOpen={showStampAddedModal}
-        message={stampAddedModalData?.message || ''}
-        onClose={closeStampAddedModal}
-      />
-
-      {/* 스탬프 완료 모달 */}
-      <StampCompletedModal
-        isOpen={showStampCompletedModal}
-        message={stampCompletedModalData?.message || ''}
-        onClose={closeStampCompletedModal}
+      {/* 결제 완료 모달 */}
+      <PaymentCompletedModal
+        isOpen={showPaymentModal}
+        storeName={paymentModalData?.storeName || ''}
+        discountAmount={paymentModalData?.discountAmount || 0}
+        finalAmount={paymentModalData?.finalAmount || 0}
+        message={paymentModalData?.message || ''}
+        onClose={closePaymentModal}
       />
     </div>
   );
