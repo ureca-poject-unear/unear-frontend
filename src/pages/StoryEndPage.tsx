@@ -11,6 +11,7 @@ const StoryEndPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const stories = location.state?.stories as StoryItem[] | undefined;
+  const diagnosis = location.state?.diagnosis;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -63,8 +64,14 @@ const StoryEndPage = () => {
           <StoryCardList stories={stories} />
 
           <div className="flex flex-col gap-3 mt-4">
-            <StoryButton text="다시 보기" onClick={() => navigate('/story/detail')} />
-            <StoryButton text="추천 매장" onClick={() => navigate('/story/recommend')} />
+            <StoryButton
+              text="다시 보기"
+              onClick={() => navigate('/story/detail', { state: { diagnosis } })}
+            />
+            <StoryButton
+              text="추천 매장"
+              onClick={() => navigate('/story/recommend', { state: { diagnosis } })}
+            />
           </div>
         </div>
       )}

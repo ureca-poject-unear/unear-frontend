@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 import StoryDetailLayout from '@/components/story/StoryDetailLayout';
@@ -16,7 +16,10 @@ import type { CategoryType, StoreClassType, EventType } from '@/components/commo
 
 export default function StoryDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const S3_BASE_URL = 'https://unear-uploads.s3.ap-southeast-2.amazonaws.com/';
+
+  const diagnosis = location.state?.diagnosis;
 
   const [stories, setStories] = useState<
     (StoryItem & {
@@ -29,7 +32,7 @@ export default function StoryDetailPage() {
   const [currentStory, setCurrentStory] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isLoading, setIsLoading] = useState(true); // ✅ 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(true);
 
   // 랜덤 storeClass 할당 함수
   const getRandomStoreClass = (): StoreClassType => {
@@ -65,7 +68,7 @@ export default function StoryDetailPage() {
   };
 
   const fetchData = async () => {
-    setIsLoading(true); // ✅ 로딩 시작
+    setIsLoading(true);
     const targetMonth = dayjs().subtract(1, 'month').format('YYYY-MM');
 
     try {
@@ -112,7 +115,7 @@ export default function StoryDetailPage() {
         setErrorMessage('스토리 조회 중 알 수 없는 오류가 발생했습니다.');
       }
     } finally {
-      setIsLoading(false); // ✅ 로딩 종료
+      setIsLoading(false);
     }
   };
 
@@ -136,9 +139,9 @@ export default function StoryDetailPage() {
       setProgress(0);
       setIsPlaying(true);
     } else {
-      navigate('/story/end', { state: { stories } });
+      navigate('/story/end', { state: { stories, diagnosis } });
     }
-  }, [progress, currentStory, stories, navigate]);
+  }, [progress, currentStory, stories, navigate, diagnosis]);
 
   const prevStory = () => {
     if (currentStory > 0) {
@@ -154,16 +157,16 @@ export default function StoryDetailPage() {
       setProgress(0);
       setIsPlaying(true);
     } else {
-      navigate('/story/end', { state: { stories } });
+      navigate('/story/end', { state: { stories, diagnosis } });
     }
   };
 
-  // ✅ 에러 우선 처리
+  // 에러 우선 처리
   if (errorMessage) {
     return <p className="text-center mt-10 text-m text-red-600">{errorMessage}</p>;
   }
 
-  // ✅ 로딩 중 처리
+  // 로딩 중 처리
   if (isLoading) {
     return (
       <div className="min-h-screen bg-storybackground1">
@@ -180,7 +183,7 @@ export default function StoryDetailPage() {
     );
   }
 
-  // ✅ 데이터 없음 처리
+  // 데이터 없음 처리
   if (stories.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

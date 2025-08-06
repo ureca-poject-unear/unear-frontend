@@ -1,3 +1,4 @@
+//StoryDiagnosisPage.tsx
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import StoryLayout from '@/components/story/StoryLayout';
@@ -49,7 +50,10 @@ const StoryDiagnosisPage = () => {
             </div>
 
             <div className="flex flex-col gap-3 mt-10">
-              <StoryButton text="소비 스토리 보기" onClick={() => navigate('/story/detail')} />
+              <StoryButton
+                text="소비 스토리 보기"
+                onClick={() => navigate('/story/detail', { state: { diagnosis } })}
+              />
               <StoryButton
                 text="추천 매장"
                 onClick={() => navigate('/story/recommend', { state: { diagnosis } })}
