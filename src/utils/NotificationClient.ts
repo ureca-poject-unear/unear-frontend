@@ -159,14 +159,21 @@ export class NotificationClient {
     this.eventSource.addEventListener('connect', (event) => {
       try {
         console.log('🔗 초기 연결 이벤트 수신:', event.data);
+        console.log('📊 connect 이벤트 시점 상태:', this.eventSource?.readyState);
       } catch (error) {
         console.error('연결 이벤트 파싱 오류:', error);
       }
     });
 
+    // ping 이벤트 리스너 추가
+    this.eventSource.addEventListener('ping', (event) => {
+      console.log('🏓 ping 이벤트 수신:', event.data);
+    });
+
     // 기본 메시지 수신 (이름 없는 이벤트)
     this.eventSource.onmessage = (event) => {
       console.log('📩 기본 메시지 수신:', event.data);
+      console.log('📊 메시지 수신 시점 상태:', this.eventSource?.readyState);
     };
 
     // 결제 완료 알림
