@@ -145,6 +145,20 @@ export class NotificationClient {
       this.handleReconnect();
     };
 
+    // 연결 확인 이벤트
+    this.eventSource.addEventListener('connect', (event) => {
+      try {
+        console.log('🔗 초기 연결 이벤트 수신:', event.data);
+      } catch (error) {
+        console.error('연결 이벤트 파싱 오류:', error);
+      }
+    });
+
+    // 기본 메시지 수신 (이름 없는 이벤트)
+    this.eventSource.onmessage = (event) => {
+      console.log('📩 기본 메시지 수신:', event.data);
+    };
+
     // 결제 완료 알림
     this.eventSource.addEventListener('payment-success', (event) => {
       try {
