@@ -124,9 +124,9 @@ const PaymentCompletedModal = ({
               </p>
 
               {/* 추가 메시지 (스탬프 관련) */}
-              {message && message.trim() !== '' && (
+              {message?.trim() ? (
                 <p className="text-sm text-primary font-medium leading-relaxed">{message}</p>
-              )}
+              ) : null}
             </div>
 
             {/* 확인 버튼 */}
