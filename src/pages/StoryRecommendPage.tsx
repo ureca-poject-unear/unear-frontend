@@ -1,90 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '@/components/common/Header';
 import BookmarkCard from '@/components/common/BookmarkCard';
 import PointNubiImage from '@/assets/story/pointNubi.png';
 import StarBackgroundImage from '@/assets/story/starBackground.png';
 import type { BookmarkStore } from '@/types/bookmark';
-
-// 예시 매장 데이터
-const sampleStores: BookmarkStore[] = [
-  {
-    id: '1',
-    placeId: 1,
-    name: '맛있는 햄버거 집',
-    address: '서울시 강남구 테헤란로 123',
-    distance: '500m',
-    hours: '10:00 - 22:00',
-    category: 'CAFE',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: false,
-    latitude: 37.5665,
-    longitude: 126.978,
-  },
-  {
-    id: '2',
-    placeId: 2,
-    name: '행복한 빵집',
-    address: '서울시 강남구 역삼동 456',
-    distance: '1.2km',
-    hours: '08:00 - 20:00',
-    category: 'BAKERY',
-    storeClass: 'FRANCHISE',
-    event: 'GENERAL',
-    isBookmarked: true,
-    latitude: 37.5,
-    longitude: 127.03,
-  },
-  {
-    id: '3',
-    placeId: 3,
-    name: '청담동 카페',
-    address: '서울시 강남구 청담동 789',
-    distance: '2.5km',
-    hours: '09:00 - 23:00',
-    category: 'CAFE',
-    storeClass: 'LOCAL',
-    event: 'REQUIRE',
-    isBookmarked: false,
-    latitude: 37.52,
-    longitude: 127.04,
-  },
-  {
-    id: '4',
-    placeId: 4,
-    name: '맛집 한식당',
-    address: '서울시 강남구 논현동 321',
-    distance: '1.8km',
-    hours: '11:00 - 21:00',
-    category: 'FOOD',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: false,
-    latitude: 37.51,
-    longitude: 127.02,
-  },
-  {
-    id: '5',
-    placeId: 5,
-    name: '신사동 베이커리',
-    address: '서울시 강남구 신사동 654',
-    distance: '3.0km',
-    hours: '07:00 - 19:00',
-    category: 'BAKERY',
-    storeClass: 'FRANCHISE',
-    event: 'NONE',
-    isBookmarked: true,
-    latitude: 37.53,
-    longitude: 127.035,
-  },
-];
+import { getRecommendedPlaces } from '@/apis/getStoryRecommend';
+import { useAuthStore } from '@/store/auth';
 
 const StoryRecommendPage = () => {
   const location = useLocation();
   const diagnosisLabel = location.state?.diagnosis?.label ?? '쩝쩝박사';
 
-  const [stores, setStores] = useState<BookmarkStore[]>(sampleStores);
+  const [stores, setStores] = useState<BookmarkStore[]>([]);
+  const user = useAuthStore((state) => state.userInfo);
 
   const handleBookmarkToggle = (storeId: string) => {
     setStores((prev: BookmarkStore[]) =>
@@ -94,6 +23,78 @@ const StoryRecommendPage = () => {
     );
   };
 
+  useEffect(() => {
+    const fetchRecommendedStores = async () => {
+      if (!user) return;
+
+      console.log('🔎 사용자 정보:', user);
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          console.log('📤 API 요청 바디:', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            user: {
+              userId: user.userId,
+              username: user.username,
+              email: user.email,
+              tel: user.tel ?? '',
+              birthdate: user.birthdate ?? '',
+              gender: user.gender ?? '',
+              membershipCode: user.membershipCode,
+              provider: user.provider ?? '',
+              providerId: user.providerId ?? '',
+            },
+          });
+
+          try {
+            console.log('📍 내 위치 좌표:', position.coords.latitude, position.coords.longitude);
+            const data = await getRecommendedPlaces({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              user: {
+                userId: user.userId,
+                username: user.username,
+                email: user.email,
+                tel: user.tel ?? '',
+                birthdate: user.birthdate ?? '',
+                gender: user.gender ?? '',
+                membershipCode: user.membershipCode,
+                provider: user.provider ?? '',
+                providerId: user.providerId ?? '',
+              },
+            });
+
+            console.log('추천 장소 API 응답:', data);
+            const storeList: BookmarkStore[] = data.map((item) => ({
+              id: String(item.placeId),
+              placeId: item.placeId,
+              name: item.placeName,
+              address: '',
+              distance: `${(item.distanceInMeters / 1000).toFixed(1)}km`,
+              hours: '',
+              category: 'CAFE',
+              storeClass: 'LOCAL',
+              event: 'NONE',
+              isBookmarked: false,
+              latitude: item.latitude,
+              longitude: item.longitude,
+            }));
+
+            setStores(storeList);
+          } catch (err) {
+            console.error('추천 매장 불러오기 실패:', err);
+          }
+        },
+        (error) => {
+          console.error('위치 정보를 가져오는 데 실패했습니다:', error);
+        }
+      );
+    };
+
+    fetchRecommendedStores();
+  }, [user]);
+
   return (
     <div className="overflow-hidden w-full h-full bg-storybackground1">
       <Header title="추천 매장" bgColor="bg-story" textColor="text-white" iconColor="text-white" />
@@ -101,9 +102,7 @@ const StoryRecommendPage = () => {
       {/* 배경 이미지 */}
       <div
         className="absolute inset-0 bg-center bg-no-repeat bg-cover -z-100 opacity-40"
-        style={{
-          backgroundImage: `url(${StarBackgroundImage})`,
-        }}
+        style={{ backgroundImage: `url(${StarBackgroundImage})` }}
       />
 
       {/* 컨텐츠 */}
@@ -112,7 +111,10 @@ const StoryRecommendPage = () => {
         <div className="flex items-center justify-between py-2 mb-6">
           <div>
             <p className="text-white text-lm font-bold mb-1">[{diagnosisLabel}]</p>
-            <p className="text-white text-m font-semibold mb-2">OOO님이 좋아할 만한 제휴처</p>
+            <p className="text-white text-m font-semibold mb-2">
+              {user?.username ?? '사용자'}님이 좋아할 만한 제휴처
+            </p>
+
             <p className="text-gray-300 text-sm font-regular">
               🔥내 주변 추천 매장을 확인해보세요🔥
             </p>
