@@ -1,10 +1,15 @@
+import type { CategoryType, StoreClassType, EventType } from '@/components/common/StoreTypeIcon';
+
 export interface StoryItem {
-  id: number;
-  title?: string;
   imageUrl: string;
   comment: string;
   date: string;
   storeName: string;
   amount: number;
-  logoUrl?: string;
+  logoUrl: string;
+
+  // 아래 세 가지가 누락되어 있었음
+  category: CategoryType;
+  storeClass: StoreClassType;
+  eventType: EventType;
 }

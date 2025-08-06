@@ -132,9 +132,9 @@ const StoryRecommendPage = () => {
   return (
     <StoryLayout headerTitle="추천 매장" bgColorClass="bg-storybackground1">
       {/* 컨텐츠 */}
-      <div className="flex flex-col items-center justify-between w-full h-full py-2.5">
-        {/* 상단 진단 결과 섹션 */}
-        <div className="fixed top-[65px] left-0 w-full z-30 px-5 py-2">
+      <div className="flex flex-col w-full h-full overflow-y-auto">
+        {/* 상단 진단 결과 영역 */}
+        <div className="sticky top-0 py-2">
           <div className="flex items-center justify-between w-full">
             <div className="flex flex-col">
               <p className="text-white text-lm font-bold mb-1">[{diagnosisLabel}]</p>
@@ -152,21 +152,21 @@ const StoryRecommendPage = () => {
         </div>
 
         {/* 추천 매장 리스트 */}
-        <div className="relative space-y-4 w-full h-full">
-          {loading && (
-            <div className="z-10 h-full flex items-center justify-center">
+        <div className="space-y-4 w-full pt-4 pb-6">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
               <LoadingSpinner size="lg" />
             </div>
+          ) : (
+            stores.map((store) => (
+              <BookmarkCard
+                key={store.id}
+                store={store}
+                onBookmarkToggle={handleBookmarkToggle}
+                isDarkMode={true}
+              />
+            ))
           )}
-
-          {stores.map((store) => (
-            <BookmarkCard
-              key={store.id}
-              store={store}
-              onBookmarkToggle={handleBookmarkToggle}
-              isDarkMode={true}
-            />
-          ))}
         </div>
       </div>
     </StoryLayout>
