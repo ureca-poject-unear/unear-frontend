@@ -512,10 +512,19 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                 marker.setMap(map);
               }
             });
-          } else if (clusterer) {
-            // clusterer가 null이 아닐 때만 사용
-            clusterer.addMarkers(newMarkers);
+          } else if (clusterer && clusterer.addMarkers) {
+            // clusterer가 null이 아니고 addMarkers 메서드가 있을 때만 사용
+            try {
+              clusterer.addMarkers(newMarkers);
+            } catch (error) {
+              newMarkers.forEach((marker) => {
+                if (marker && marker.setMap) {
+                  marker.setMap(map);
+                }
+              });
+            }
           } else {
+            // 클러스터러가 없거나 실패한 경우 개별 마커로 표시
             newMarkers.forEach((marker) => {
               if (marker && marker.setMap) {
                 marker.setMap(map);
@@ -601,13 +610,25 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             // MarkerClusterer 초기화를 안전하게 처리
             const initializeClusterer = (retryCount = 0) => {
               try {
-                // MarkerClusterer가 사용 가능한지 확인
-                if (!window.kakao.maps.MarkerClusterer) {
-                  if (retryCount < 5) {
-                    // 재시도 횟수를 5회로 증가
-                    setTimeout(() => initializeClusterer(retryCount + 1), 2000); // 대기 시간을 2초로 증가
+                // 지도가 완전히 로드되었는지 확인
+                if (!map || typeof map.getLevel !== 'function') {
+                  if (retryCount < 10) {
+                    setTimeout(() => initializeClusterer(retryCount + 1), 500);
                     return;
                   } else {
+                    console.warn('지도 로딩 실패: 최대 재시도 횟수 초과');
+                    clustererRef.current = null;
+                    return;
+                  }
+                }
+
+                // MarkerClusterer가 사용 가능한지 확인
+                if (!window.kakao.maps.MarkerClusterer) {
+                  if (retryCount < 10) {
+                    setTimeout(() => initializeClusterer(retryCount + 1), 500);
+                    return;
+                  } else {
+                    console.warn('MarkerClusterer가 아직 로드되지 않았습니다. 재시도 중...');
                     clustererRef.current = null;
                     return;
                   }
@@ -619,6 +640,23 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                   return;
                 }
 
+                // 지도 객체가 실제로 작동하는지 테스트
+                try {
+                  const testLevel = map.getLevel();
+                  const testCenter = map.getCenter();
+                  if (testLevel === undefined || !testCenter) {
+                    throw new Error('지도 객체가 아직 완전히 초기화되지 않았습니다.');
+                  }
+                } catch (error) {
+                  if (retryCount < 10) {
+                    setTimeout(() => initializeClusterer(retryCount + 1), 500);
+                    return;
+                  } else {
+                    console.warn('지도 초기화 실패: 최대 재시도 횟수 초과');
+                    clustererRef.current = null;
+                    return;
+                  }
+                }
                 const clusterer = new window.kakao.maps.MarkerClusterer({
                   map,
                   averageCenter: true,
@@ -712,16 +750,50 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                   }
                 );
               } catch (error) {
-                if (retryCount < 5) {
-                  setTimeout(() => initializeClusterer(retryCount + 1), 2000);
+                if (retryCount < 10) {
+                  setTimeout(() => initializeClusterer(retryCount + 1), 500);
                 } else {
+                  console.warn(
+                    'MarkerClusterer 초기화 실패: 최대 재시도 횟수 초과\n대안: 개별 마커 모드로 전환'
+                  );
                   clustererRef.current = null;
                 }
               }
             };
 
-            // MarkerClusterer 초기화 시작
-            initializeClusterer();
+            // 지도 로드 완료 이벤트를 기다린 후 MarkerClusterer 초기화
+            const waitForMapLoad = () => {
+              // 지도가 완전히 로드되었는지 확인하는 함수
+              const isMapReady = () => {
+                try {
+                  if (!map || typeof map.getLevel !== 'function') return false;
+                  const level = map.getLevel();
+                  const center = map.getCenter();
+                  return level !== undefined && center !== null;
+                } catch (error) {
+                  return false;
+                }
+              };
+
+              // 지도가 준비될 때까지 대기
+              const checkMapReady = (attempts = 0) => {
+                if (isMapReady()) {
+                  // 지도가 준비되면 클러스터러 초기화
+                  initializeClusterer();
+                } else if (attempts < 20) {
+                  // 최대 20번까지 시도 (10초)
+                  setTimeout(() => checkMapReady(attempts + 1), 500);
+                } else {
+                  console.warn('지도 로딩 시간 초과: 개별 마커 모드로 전환');
+                  clustererRef.current = null;
+                }
+              };
+
+              checkMapReady();
+            };
+
+            // 지도 로드 완료 대기 시작
+            waitForMapLoad();
 
             setMapInstance(map);
 
@@ -729,6 +801,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             // 로드뷰 초기화
             initializeRoadview();
+
+            // 지도 로드 완료 이벤트 리스너 추가
+            window.kakao.maps.event.addListener(map, 'tilesloaded', () => {
+              // 지도 타일이 로드되면 클러스터러 초기화 시도
+              if (!clustererRef.current) {
+                initializeClusterer();
+              }
+            });
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
               if (!isSettingCenterRef.current) {

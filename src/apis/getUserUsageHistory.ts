@@ -74,14 +74,12 @@ export const getUserUsageHistory = async (
   size: number = 3
 ): Promise<UsageHistoryPageResponse | null> => {
   try {
-    console.log('📊 사용자 이용 내역 조회 요청...', { page, size });
+    console.log('사용자 이용 내역 조회 요청...', { page, size });
 
     const response = await axiosInstance.get<ApiResponse>('/users/me/usage-history', {
       params: { page, size },
       timeout: 10000, // 10초 타임아웃
     });
-
-    console.log('✅ 사용자 이용 내역 API 응답:', response.data);
 
     if (response.data.resultCode === 200 && response.data.data) {
       const historyData = response.data.data;
