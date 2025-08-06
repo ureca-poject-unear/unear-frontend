@@ -1,8 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import Default from '../default';
-import OnboardingPage from '@/pages/OnboardingPage';
-import InitialPage from '@/pages/InitialPage';
-
 import MainPage from '@/pages/MainPage';
 import MembershipPage from '@/pages/MembershipPage';
 import MembershipDetailPage from '@/pages/MembershipDetailPage';
@@ -14,6 +11,7 @@ import StoryEndPage from '@/pages/StoryEndPage';
 import StoryRecommendPage from '@/pages/StoryRecommendPage';
 import JuniorPage from '@/pages/JuniorPage';
 import MyPage from '@/pages/MyPage';
+import OnboardingPage from '@/pages/OnboardingPage';
 import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
 import ChangePasswordPage from '@/pages/ChangePasswordPage';
@@ -32,18 +30,23 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import ErrorBoundary from '@/components/error/ErrorBoundary';
 
-import NotFoundPage from '@/pages/NotFoundPage';
-
 const router = createBrowserRouter([
-  { path: '/', element: <Navigate to="/initial" replace /> },
-  { path: '/initial', element: <InitialPage /> },
-  { path: '/onboarding', element: <OnboardingPage /> },
   {
     element: <Default />,
     children: [
+      // 기본 진입 시 온보딩 페이지로 리디렉션
+      {
+        path: '/',
+        element: <Navigate to="/onboarding" replace />,
+      },
+
+      {
+        path: '/onboarding',
+        element: <OnboardingPage />,
+      },
       // 보호된 라우트들 (로그인 필요)
       {
-        path: '/main',
+        path: '/',
         element: (
           <ProtectedRoute>
             <MainPage />
@@ -191,12 +194,6 @@ const router = createBrowserRouter([
 
       { path: '/login/oauth2/code/naver', element: <NaverAuthHandler /> },
     ],
-  },
-  {
-    // 2. NotFoundPage를 위한 라우트를 Default 레이아웃 밖으로 빼냅니다.
-    // 이렇게 하면 Default 레이아웃과 그 안의 BottomNavigator가 적용되지 않습니다.
-    path: '*',
-    element: <NotFoundPage />,
   },
 ]);
 
