@@ -74,8 +74,6 @@ export const getUserUsageHistory = async (
   size: number = 3
 ): Promise<UsageHistoryPageResponse | null> => {
   try {
-    console.log('사용자 이용 내역 조회 요청...', { page, size });
-
     const response = await axiosInstance.get<ApiResponse>('/users/me/usage-history', {
       params: { page, size },
       timeout: 10000, // 10초 타임아웃
@@ -98,8 +96,6 @@ export const getUserUsageHistory = async (
       throw new Error('이용 내역 정보를 가져올 수 없습니다.');
     }
   } catch (error: unknown) {
-    console.error('❌ 사용자 이용 내역 조회 실패:', error);
-
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
