@@ -62,7 +62,6 @@ const parseOperatingHours = (hours: string): { start: number; end: number } | nu
   }
 
   // 파싱할 수 없는 형식인 경우 24시간으로 처리
-  console.warn(`알 수 없는 영업시간 형식: ${hours}`);
   return { start: 0, end: 24 * 60 };
 };
 

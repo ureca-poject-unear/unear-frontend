@@ -30,8 +30,6 @@ export const getUserCouponDetail = async (
   userCouponId: number
 ): Promise<UserCouponDetail | null> => {
   try {
-    console.log(`📋 쿠폰 상세 정보 조회 요청: ${userCouponId}`);
-
     const response = await axiosInstance.get(`/coupons/me/${userCouponId}`, {
       timeout: 10000, // 10초 타임아웃
     });
@@ -39,14 +37,11 @@ export const getUserCouponDetail = async (
     const responseData = response.data as GetUserCouponDetailResponse;
 
     if (responseData.resultCode === 200 && responseData.data) {
-      console.log(`✅ 쿠폰 상세 정보 조회 성공:`, responseData.data);
       return responseData.data;
     } else {
       throw new Error('쿠폰 상세 정보를 가져올 수 없습니다.');
     }
   } catch (error: unknown) {
-    console.error(`❌ 쿠폰 상세 정보(${userCouponId}) 불러오기 실패:`, error);
-
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
@@ -59,7 +54,7 @@ export const getUserCouponDetail = async (
           showErrorToast('잘못된 쿠폰 ID입니다.');
           break;
         case 401:
-          console.warn('⚠️ 인증 오류 - 토큰 갱신 시도');
+          showErrorToast('로그인이 필요합니다.');
           break;
         case 403:
           showErrorToast('이 쿠폰에 접근할 권한이 없습니다.');

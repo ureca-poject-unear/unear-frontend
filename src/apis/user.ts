@@ -24,7 +24,6 @@ export const getUserInfo = async (): Promise<User> => {
     const response = await axiosInstance.get('/users/me');
     return response.data?.data;
   } catch (error) {
-    console.error('getUserInfo API 호출 오류:', error);
     throw new Error('사용자 정보를 불러오는 데 실패했습니다.');
   }
 };

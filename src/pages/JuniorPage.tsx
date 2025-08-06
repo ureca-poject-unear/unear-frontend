@@ -49,12 +49,6 @@ const JuniorPage = () => {
           (result) => result.event.unearEventId === currentEventId && result.participated
         ) || false;
 
-      console.log('룰렛 참여 상태 확인:', {
-        currentEventId,
-        rouletteResults: userInfo.rouletteResults,
-        hasParticipated,
-      });
-
       // ✨ 확인된 참여 여부를 상태에 저장
       setInitialIsSpun(hasParticipated);
       setIsAlreadyParticipated(hasParticipated); // ✨ 새로운 상태도 업데이트
@@ -86,7 +80,6 @@ const JuniorPage = () => {
       setStamps(finalStamps);
     } catch (err) {
       setError('데이터를 불러오는 데 실패했습니다.');
-      console.error('이벤트 데이터 로드 에러:', err);
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +91,6 @@ const JuniorPage = () => {
 
   // ✨ 룰렛 완료 후 데이터 다시 로드하는 핸들러
   const handleRouletteComplete = () => {
-    console.log('룰렛 완료 - 데이터 다시 로드');
     fetchEventData();
   };
 

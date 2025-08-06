@@ -25,15 +25,11 @@ export const getStampsStatus = async (eventId: number): Promise<StampStatusRespo
     const resultData = response.data?.data;
 
     if (!resultData) {
-      console.warn(`[API 경고] /stamps/events/${eventId}/me 응답의 data 필드가 비어있습니다.`);
-      // rouletteAvailable 로 수정
       return { stamps: [], rouletteAvailable: false };
     }
 
     return resultData;
   } catch (error) {
-    console.error(`[API 오류] /stamps/events/${eventId}/me 호출 중 오류 발생:`, error);
-    // rouletteAvailable 로 수정
     return { stamps: [], rouletteAvailable: false };
   }
 };

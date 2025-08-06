@@ -34,8 +34,6 @@ export const useManualLogout = (): UseManualLogoutReturn => {
       showSuccessToast('로그아웃되었습니다.');
       navigate('/login', { replace: true });
     } catch (error) {
-      console.error('로그아웃 실패:', error);
-
       // 백엔드 로그아웃 실패해도 프론트엔드는 로그아웃 처리
       performManualLogout();
       showErrorToast('로그아웃 중 오류가 발생했지만 로그아웃 처리되었습니다.');

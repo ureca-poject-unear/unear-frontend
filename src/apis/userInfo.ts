@@ -48,13 +48,9 @@ interface UpdateUserInfoRequest {
  */
 export const getUserInfo = async (): Promise<UserInfoApiResponse['data'] | null> => {
   try {
-    console.log('👤 사용자 정보 조회 요청...');
-
     const response = await axiosInstance.get('/users/me', {
       timeout: 10000, // 10초 타임아웃
     });
-
-    console.log('✅ /users/me API 응답:', response.data);
 
     if (response.data.resultCode === 200 && response.data.data) {
       const userInfo = response.data.data;
@@ -77,14 +73,11 @@ export const getUserInfo = async (): Promise<UserInfoApiResponse['data'] | null>
         updatedAt: userInfo.updatedAt,
       });
 
-      console.log('✅ 사용자 정보 조회 및 저장 성공:', userInfo);
       return userInfo;
     } else {
       throw new Error('사용자 정보를 가져올 수 없습니다.');
     }
   } catch (error: unknown) {
-    console.error('❌ 사용자 정보 조회 실패:', error);
-
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
@@ -95,7 +88,7 @@ export const getUserInfo = async (): Promise<UserInfoApiResponse['data'] | null>
       switch (status) {
         case 401:
           // 인증 오류는 AuthProvider에서 처리됨
-          console.warn('⚠️ 인증 오류 - 토큰 갱신 시도');
+          showErrorToast('로그인이 필요합니다.');
           break;
         case 404:
           showErrorToast('사용자 정보를 찾을 수 없습니다.');
@@ -125,8 +118,6 @@ export const updateUserInfo = async (
   updateData: UpdateUserInfoRequest
 ): Promise<UserInfoApiResponse['data'] | null> => {
   try {
-    console.log('👤 사용자 정보 업데이트 요청...', updateData);
-
     const response = await axiosInstance.put('/users/me', updateData, {
       timeout: 10000,
       headers: {
@@ -146,15 +137,12 @@ export const updateUserInfo = async (
         gender: updatedUserInfo.gender,
       });
 
-      console.log('✅ 사용자 정보 업데이트 성공:', updatedUserInfo);
       showSuccessToast('사용자 정보가 업데이트되었습니다.');
       return updatedUserInfo;
     } else {
       throw new Error('사용자 정보 업데이트에 실패했습니다.');
     }
   } catch (error: unknown) {
-    console.error('❌ 사용자 정보 업데이트 실패:', error);
-
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
@@ -167,7 +155,7 @@ export const updateUserInfo = async (
           showErrorToast(message || '잘못된 요청입니다.');
           break;
         case 401:
-          console.warn('⚠️ 인증 오류 - 토큰 갱신 시도');
+          showErrorToast('로그인이 필요합니다.');
           break;
         case 409:
           showErrorToast('이미 사용 중인 정보입니다.');
@@ -194,19 +182,14 @@ export const updateUserInfo = async (
  */
 export const initializeUserInfo = async (): Promise<boolean> => {
   try {
-    console.log('🔄 사용자 정보 초기화 시작...');
-
     const userInfo = await getUserInfo();
 
     if (userInfo) {
-      console.log('✅ 사용자 정보 초기화 완료');
       return true;
     } else {
-      console.warn('⚠️ 사용자 정보 초기화 실패');
       return false;
     }
   } catch (error) {
-    console.error('❌ 사용자 정보 초기화 중 오류:', error);
     return false;
   }
 };

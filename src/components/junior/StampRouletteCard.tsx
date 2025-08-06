@@ -51,7 +51,6 @@ const StampRouletteCard: React.FC<Props> = ({
     const checkServerStatus = async () => {
       // ✨ 서버에서 isAlreadyParticipated가 true로 왔으면 추가 확인 불필요
       if (isAlreadyParticipated) {
-        console.log('서버에서 이미 참여 상태 확인됨:', isAlreadyParticipated);
         setIsRouletteSpun(true);
         return;
       }
@@ -65,16 +64,12 @@ const StampRouletteCard: React.FC<Props> = ({
       setIsCheckingServer(true);
       try {
         const hasParticipated = await checkRouletteParticipation(eventId);
-        console.log('서버 상태 확인 결과:', hasParticipated);
-
         if (hasParticipated) {
           setIsRouletteSpun(true);
           // 부모 컴포넌트에도 알려서 상태 동기화
           onRouletteComplete?.();
         }
       } catch (error) {
-        console.warn('서버 상태 확인 실패:', error);
-        // 에러가 발생해도 기존 상태 유지
       } finally {
         setIsCheckingServer(false);
       }
@@ -122,16 +117,6 @@ const StampRouletteCard: React.FC<Props> = ({
   }
 
   const handleRouletteClick = async () => {
-    console.log('룰렛 버튼 클릭됨', {
-      isRouletteCompleted,
-      isButtonActive,
-      isCheckingServer,
-      hasAllStamps,
-      isRouletteEnabledByServer,
-      isRouletteSpinning,
-      isAlreadyParticipated, // ✨ 서버 참여 상태도 로그에 추가
-    });
-
     // ✨ 서버에서 이미 참여했다고 알려준 경우 즉시 차단
     if (isAlreadyParticipated) {
       showWarningToast('이미 룰렛에 참여하셨습니다.');
@@ -177,7 +162,6 @@ const StampRouletteCard: React.FC<Props> = ({
 
     // ✨ 버튼이 비활성화되어 있으면 실행하지 않음
     if (!isButtonActive) {
-      console.log('버튼이 비활성 상태입니다', { isButtonActive, isRouletteCompleted });
       return;
     }
 
@@ -187,12 +171,8 @@ const StampRouletteCard: React.FC<Props> = ({
       let hasParticipatedInServer = false;
 
       try {
-        console.log('룰렛 참여 상태 재확인 시작:', eventId);
         hasParticipatedInServer = await checkRouletteParticipation(eventId);
-        console.log('룰렛 참여 상태 재확인 결과:', hasParticipatedInServer);
       } catch (apiError) {
-        console.warn('룰렛 참여 확인 API 에러:', apiError);
-
         // ✨ GET 요청도 400 에러가 날 수 있으므로 더 관대하게 처리
         const errorMessage = apiError instanceof Error ? apiError.message : '';
         if (
@@ -210,7 +190,6 @@ const StampRouletteCard: React.FC<Props> = ({
 
       if (hasParticipatedInServer) {
         // 서버에서 이미 roulette_result_id가 존재하면 로컬 상태 업데이트 후 경고
-        console.log('이미 참여한 사용자 - 버튼 비활성화');
         setIsRouletteSpun(true);
         onRouletteComplete?.();
         showWarningToast('이미 룰렛에 참여하셨습니다.');
@@ -218,10 +197,8 @@ const StampRouletteCard: React.FC<Props> = ({
       }
 
       // roulette_result_id가 없으면 룰렛 모달 열기
-      console.log('룰렛 모달 열기');
       setIsModalOpen(true);
     } catch (error) {
-      console.error('룰렛 참여 상태 확인 오류:', error);
       showErrorToast('룰렛 상태를 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsProcessing(false);
@@ -231,11 +208,6 @@ const StampRouletteCard: React.FC<Props> = ({
   const handleRouletteFinish = async (prize: Prize) => {
     // ✨ 룰렛이 완료되었거나 이미 결과를 저장 중이면 중단
     if (isRouletteCompleted || isSavingResult || isRouletteSpinning) {
-      console.log('룰렛 결과 저장 중단:', {
-        isRouletteCompleted,
-        isSavingResult,
-        isRouletteSpinning,
-      });
       return;
     }
 
@@ -245,22 +217,17 @@ const StampRouletteCard: React.FC<Props> = ({
     setIsModalOpen(false);
 
     try {
-      console.log('룰렛 결과 저장 시작:', { eventId, prizeName: prize.prizeName });
-
       // ✨ 결과 저장 전에 한번 더 참여 상태 확인
       try {
         const hasParticipated = await checkRouletteParticipation(eventId);
         if (hasParticipated) {
-          console.log('결과 저장 중 중복 참여 감지');
           setIsRouletteSpun(true);
           onRouletteComplete?.();
           showWarningToast('이미 룰렛에 참여하셨습니다.');
           return;
         }
-      } catch (checkError) {
-        console.warn('결과 저장 전 참여 상태 확인 실패:', checkError);
-        // 확인 실패 시에도 저장 시도는 계속 진행
-      }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (checkError) {}
 
       await sendRouletteResult(eventId, prize.prizeName);
 
@@ -270,14 +237,11 @@ const StampRouletteCard: React.FC<Props> = ({
       onRouletteComplete?.();
       showSuccessToast(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨!`);
     } catch (error) {
-      console.error('룰렛 결과 저장 오류:', error);
-
       const errorMessage =
         error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
 
       // ✨ 특별한 에러 코드로 이미 참여한 경우 처리
       if (errorMessage === 'ALREADY_PARTICIPATED') {
-        console.log('이미 참여한 사용자 - 상태 업데이트');
         setIsRouletteSpun(true);
         onRouletteComplete?.();
         showWarningToast('이미 룰렛에 참여하셨습니다.');
@@ -288,17 +252,12 @@ const StampRouletteCard: React.FC<Props> = ({
         errorMessage.includes('참여')
       ) {
         // ✨ 이미 참여한 경우 로컬 상태 업데이트 및 부모에 알림
-        console.log('이미 참여한 사용자 감지 - 상태 업데이트');
         setIsRouletteSpun(true);
         onRouletteComplete?.();
         showWarningToast('이미 룰렛에 참여하셨습니다.');
       } else {
         // ✨ 다른 에러의 경우 사용자에게 알림
         showErrorToast(`룰렛 결과 저장 중 오류가 발생했습니다: ${errorMessage}`);
-
-        // ✨ 에러 발생 시 모달을 다시 열지 말고 상태만 초기화
-        // setIsModalOpen(true); // 이 줄 제거
-        console.log('룰렛 결과 저장 실패 - 다시 시도 가능하도록 상태 초기화');
       }
     } finally {
       setIsSavingResult(false);
@@ -311,7 +270,6 @@ const StampRouletteCard: React.FC<Props> = ({
     if (!isProcessing && !isSavingResult && !isRouletteSpinning) {
       setIsModalOpen(false);
     } else {
-      console.log('룰렛 진행 중이므로 모달을 닫을 수 없습니다.');
       showWarningToast('룰렛이 진행 중입니다. 잠시만 기다려주세요.');
     }
   };

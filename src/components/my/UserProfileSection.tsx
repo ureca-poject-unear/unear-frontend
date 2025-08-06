@@ -27,15 +27,12 @@ const UserProfileSection = ({
     try {
       await logout(); // AuthProvider의 logout 함수 직접 사용
       showSuccessToast('로그아웃 됐습니다');
-      console.log('로그아웃 실행 완료');
 
       // 토스트 메시지가 보이도록 약간의 지연 후 페이지 이동
       setTimeout(() => {
         navigate('/login', { replace: true });
       }, 500);
     } catch (error) {
-      console.error('로그아웃 오류:', error);
-      // 오류가 발생해도 로그인 페이지로 이동
       navigate('/login', { replace: true });
     }
   };

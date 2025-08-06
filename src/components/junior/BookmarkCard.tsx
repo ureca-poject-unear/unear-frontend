@@ -22,6 +22,7 @@ import CouponIcon from '@/assets/common/couponIcon.svg?react';
 import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
 import ArrowUpIcon from '@/assets/common/arrowUpIcon.svg?react';
 import DownloadIcon from '@/assets/common/downloadIcon.svg?react';
+import { showErrorToast } from '@/utils/toast';
 
 // 쿠폰 상세 정보를 위한 타입 정의
 export interface CouponInfo {
@@ -90,7 +91,7 @@ const BookmarkCard: React.FC<BookmarkCardProps> = ({
     if (store.phoneNumber) {
       window.location.href = `tel:${store.phoneNumber}`;
     } else {
-      console.warn('전화번호가 없습니다.');
+      showErrorToast('전화번호가 없습니다.');
     }
   };
 

@@ -29,7 +29,6 @@ const StoryDiagnosisPage = () => {
     if (matched) {
       setDiagnosis(matched);
     } else {
-      console.warn(':경고: 응답 타입이 diagnosisMap에 존재하지 않습니다:', diagnosisResult.type);
     }
   }, [diagnosisMap, diagnosisResult]);
 

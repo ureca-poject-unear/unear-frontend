@@ -18,8 +18,8 @@ interface UseMonthlyChartDataReturn {
  * 월별 할인액 차트 데이터를 관리하는 훅
  */
 const useMonthlyChartData = (
-  currentYear: number,
-  currentMonth: number
+  _currentYear: number,
+  _currentMonth: number
 ): UseMonthlyChartDataReturn => {
   const [summaryData, setSummaryData] = useState<MyStatisticsSummaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -115,7 +115,6 @@ const useMonthlyChartData = (
         setError('월별 차트 데이터를 불러올 수 없습니다.');
       }
     } catch (err) {
-      console.error('월별 차트 데이터 로드 실패:', err);
       setError('월별 차트 데이터 로드 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);

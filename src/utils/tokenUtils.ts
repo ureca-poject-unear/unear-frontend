@@ -37,7 +37,6 @@ export const decodeJwtToken = (token: string): JwtPayload | null => {
     const payload = JSON.parse(jsonPayload) as JwtPayload;
     return payload;
   } catch (error: unknown) {
-    console.error('토큰 디코딩 실패:', error);
     return null;
   }
 };

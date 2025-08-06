@@ -91,8 +91,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         showToast?.('서버 오류가 발생했습니다.');
         performManualLogout();
       } else if (axiosError.code === 'NETWORK_ERROR') {
-        console.warn('네트워크 에러로 인한 리프레시 실패 - 로그아웃하지 않음');
-        // 네트워크 에러는 로그아웃하지 않음
       } else {
         performManualLogout();
       }
@@ -142,7 +140,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return refreshSuccess;
       } else if (axiosError.code === 'NETWORK_ERROR') {
         // 네트워크 에러인 경우 현재 토큰이 있으면 인증된 것으로 간주
-        console.warn('네트워크 에러로 인한 인증 상태 확인 실패 - 기존 토큰 유지');
         setAccessToken(token);
         setAuthenticated(true);
         return true;
@@ -158,19 +155,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loadUserInfo = async (): Promise<void> => {
     try {
       await getUserInfo();
-    } catch (error) {
-      console.error('사용자 정보 로드 실패:', error);
-    }
+    } catch (error) {}
   };
 
   // 사용자 정보 강제 새로고침 (외부에서 호출 가능)
   const refreshUserInfo = async (): Promise<void> => {
     try {
-      console.log('🔄 사용자 정보 강제 새로고침 시작');
       await getUserInfo();
-      console.log('✅ 사용자 정보 강제 새로고침 완료');
     } catch (error) {
-      console.error('❌ 사용자 정보 강제 새로고침 실패:', error);
       throw error;
     }
   };
@@ -190,9 +182,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('auth-storage');
-    } catch (error) {
-      console.warn('기존 토큰 정리 실패:', error);
-    }
+    } catch (error) {}
 
     await loadUserInfo();
 
@@ -211,7 +201,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const axiosError = error as { code?: string };
       // 네트워크 에러가 아닌 경우에만 경고 출력
       if (axiosError.code !== 'NETWORK_ERROR') {
-        console.warn('서버 로그아웃 실패:', error);
       }
     }
 
@@ -244,9 +233,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               setAccessToken(parsed.state.accessToken);
               setStoredTokens(parsed.state.accessToken, parsed.state.refreshToken || null);
             }
-          } catch (e) {
-            console.warn('기존 auth storage 파싱 실패:', e);
-          }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (e) {}
           localStorage.removeItem('auth-storage');
         }
 
@@ -255,14 +243,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const isOAuthRedirect = currentPath.includes('/login/oauth2/code/');
 
         if (isOAuthRedirect) {
-          console.log('🔄 OAuth 리다이렉트 감지 - 초기 인증 확인 건너뜀');
           setAuthenticated(false); // 기본값으로 설정
         } else {
           // 일반 페이지 접근 시에만 인증 상태 확인
           await checkAuthStatus();
         }
       } catch (error) {
-        console.error('AuthProvider 초기화 실패:', error);
         setAuthenticated(false);
       } finally {
         setIsLoading(false);

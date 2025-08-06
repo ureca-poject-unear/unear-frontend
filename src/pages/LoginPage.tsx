@@ -67,8 +67,6 @@ const LoginPage = () => {
     const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/login`;
 
     try {
-      console.log('🔄 로그인 시도 중...', { email });
-
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,11 +74,6 @@ const LoginPage = () => {
       });
 
       const data = (await response.json()) as LoginResponse;
-      console.log('📨 로그인 응답:', {
-        status: response.status,
-        codeName: data.codeName,
-        hasAccessToken: !!data.data?.accessToken,
-      });
 
       if (!response.ok) {
         handleErrorResponse(data, response.status);
@@ -90,12 +83,8 @@ const LoginPage = () => {
       // 성공 응답 처리
       if (data.codeName === 'SUCCESS' || data.resultCode === 200) {
         if (data.data?.accessToken) {
-          console.log('✅ 로그인 성공 - 토큰 저장 중...');
-
           // AuthProvider의 login 함수 사용 (JWT 토큰 저장)
           await login(data.data.accessToken, data.data.refreshToken);
-
-          console.log('🎉 로그인 완료!');
 
           // 이전 페이지가 있으면 그곳으로, 없으면 메인 페이지로
           const locationState = location.state as LocationState | null;
@@ -104,23 +93,17 @@ const LoginPage = () => {
           setTimeout(() => {
             try {
               navigate(from, { replace: true });
-              console.log('✅ 페이지 이동 완료:', from);
             } catch (error) {
-              console.error('❌ navigate 오류:', error);
               window.location.href = from;
             }
           }, 100);
         } else {
-          console.error('❌ 응답에 accessToken이 없음:', data);
           throw new Error('서버에서 토큰을 받지 못했습니다.');
         }
       } else {
-        console.error('❌ 로그인 실패 - 응답 코드:', data.codeName || data.resultCode);
         handleErrorResponse(data, response.status);
       }
     } catch (error: unknown) {
-      console.error('❌ 로그인 네트워크 오류:', error);
-
       const loginError = error as LoginError;
 
       if (loginError.name === 'TypeError' && loginError.message?.includes('fetch')) {
@@ -183,7 +166,6 @@ const LoginPage = () => {
     }
 
     setErrorMessage(errorMessage);
-    console.error('🚨 로그인 에러 상세:', { statusCode, data, errorMessage });
   };
 
   const handleSignUp = (): void => {

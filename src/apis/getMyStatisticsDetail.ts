@@ -41,26 +41,19 @@ export const getMyStatisticsDetail = async (
   month: number
 ): Promise<MyStatisticsDetailResponse | null> => {
   try {
-    console.log('📊 개인별 통계 상세 조회 요청...', { year, month });
-
     const response = await axiosInstance.get<ApiResponse>('/users/me/statistics/detail', {
       params: { year, month },
       timeout: 10000, // 10초 타임아웃
     });
 
-    console.log('✅ 개인별 통계 상세 API 응답:', response.data);
-
     if (response.data.resultCode === 200 && response.data.data) {
       const detailData = response.data.data;
 
-      console.log('✅ 개인별 통계 상세 조회 성공:', detailData);
       return detailData;
     } else {
       throw new Error('통계 상세 정보를 가져올 수 없습니다.');
     }
   } catch (error: unknown) {
-    console.error('❌ 개인별 통계 상세 조회 실패:', error);
-
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
@@ -71,7 +64,7 @@ export const getMyStatisticsDetail = async (
       switch (status) {
         case 401:
           // 인증 오류는 AuthProvider에서 처리됨
-          console.warn('⚠️ 인증 오류 - 토큰 갱신 시도');
+          showErrorToast('로그인이 필요합니다.');
           break;
         case 404:
           showErrorToast('통계 상세 정보를 찾을 수 없습니다.');

@@ -10,7 +10,6 @@ const useBookmarkCount = () => {
         const favoritePlaces = await getFavoritePlaces();
         setBookmarkCount(favoritePlaces.length);
       } catch (error) {
-        console.error('즐겨찾기 개수 불러오기 실패:', error);
         setBookmarkCount(0);
       }
     };

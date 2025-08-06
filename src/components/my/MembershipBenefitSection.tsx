@@ -17,16 +17,12 @@ const MembershipBenefitSection = ({
   const handleCouponClick = () => {
     if (onCouponClick) {
       onCouponClick();
-    } else {
-      console.log('쿠폰 클릭');
     }
   };
 
   const handleBookmarkClick = () => {
     if (onBookmarkClick) {
       onBookmarkClick();
-    } else {
-      console.log('즐겨찾기 클릭');
     }
   };
 

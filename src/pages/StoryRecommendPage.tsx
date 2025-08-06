@@ -44,10 +44,7 @@ const StoryRecommendPage = () => {
           store.id === storeId ? { ...store, isBookmarked: !store.isBookmarked } : store
         )
       );
-    } catch (error) {
-      console.error('즐겨찾기 토글 실패:', error);
-      // 필요시 사용자에게 알림 등 추가 처리 가능
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -114,13 +111,11 @@ const StoryRecommendPage = () => {
 
             setStores(storeList);
           } catch (err) {
-            console.error('추천 매장 불러오기 실패:', err);
           } finally {
             setLoading(false);
           }
         },
-        (error) => {
-          console.error('위치 정보를 가져오는 데 실패했습니다:', error);
+        (_error) => {
           setLoading(false);
         }
       );

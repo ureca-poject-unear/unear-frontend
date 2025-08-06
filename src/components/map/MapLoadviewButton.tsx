@@ -28,7 +28,6 @@ const MapLoadviewButton = ({ onLoadviewToggle, isActive }: MapLoadviewButtonProp
         showToast('도로를 클릭하여 로드뷰를 확인하세요.');
       }
     } catch (error) {
-      console.error('로드뷰 토글 실패:', error);
       showToast('로드뷰 기능을 사용할 수 없습니다.');
     } finally {
       setIsLoading(false);

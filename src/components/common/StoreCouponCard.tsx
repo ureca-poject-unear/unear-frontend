@@ -13,6 +13,7 @@ import ArrowDownIcon from '@/assets/common/arrowDownIcon.svg?react';
 import ArrowUpIcon from '@/assets/common/arrowUpIcon.svg?react';
 import { Loader2 } from 'lucide-react';
 import { postDownloadCoupon } from '@/apis/postDownloadCoupon';
+import { showErrorToast, showToast } from '@/utils/toast';
 
 interface Coupon {
   id: string;
@@ -70,8 +71,8 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
     setDownloadingCoupons((prev) => new Set(prev).add(couponId));
 
     try {
-      const downloaded = await postDownloadCoupon(Number(couponId));
-      console.log('다운로드 완료:', downloaded);
+      const _downloaded = await postDownloadCoupon(Number(couponId));
+      showToast('쿠폰 다운로드 완료');
 
       // UI 상태 갱신
       setDownloadedCoupons((prev) => new Set(prev).add(couponId));
@@ -81,8 +82,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
 
       onCouponDownloaded?.();
     } catch (err) {
-      console.error('쿠폰 다운로드 실패:', err);
-      alert('쿠폰 다운로드에 실패했습니다.');
+      showErrorToast('쿠폰 다운로드에 실패했습니다.');
     } finally {
       setDownloadingCoupons((prev) => {
         const newSet = new Set(prev);
@@ -101,7 +101,7 @@ const StoreCouponCard: React.FC<StoreCouponCardProps> = ({
     if (store.latitude && store.longitude) {
       onLocationClick?.(store.latitude, store.longitude);
     } else {
-      console.warn('위치 정보가 없습니다.');
+      showErrorToast('위치 정보가 없습니다.');
     }
   };
 

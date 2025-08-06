@@ -113,7 +113,9 @@ export const StoreClassColors: Story = {
   render: () => (
     <div className="space-y-6 p-4">
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">프랜차이즈 (FRANCHISE) - 주황색</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">
+          프랜차이즈 (FRANCHISE) - 주황색
+        </h3>
         <div className="flex gap-4">
           <StoreTypeIcon category="CAFE" storeClass="FRANCHISE" event="NONE" size={50} />
           <StoreTypeIcon category="FOOD" storeClass="FRANCHISE" event="NONE" size={50} />
@@ -140,13 +142,17 @@ export const StoreClassColors: Story = {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-orange-500">팝업스토어 카테고리 - Store 아이콘</h3>
+        <h3 className="text-lg font-semibold mb-4 text-orange-500">
+          팝업스토어 카테고리 - Store 아이콘
+        </h3>
         <div className="flex gap-4">
           <StoreTypeIcon category="POPUP" storeClass="FRANCHISE" event="NONE" size={50} />
           <StoreTypeIcon category="POPUP" storeClass="BASIC" event="NONE" size={50} />
           <StoreTypeIcon category="POPUP" storeClass="LOCAL" event="NONE" size={50} />
         </div>
-        <p className="text-sm text-gray-600 mt-2">팝업스토어는 카테고리로 분류되어 Store 아이콘 사용</p>
+        <p className="text-sm text-gray-600 mt-2">
+          팝업스토어는 카테고리로 분류되어 Store 아이콘 사용
+        </p>
       </div>
     </div>
   ),
@@ -239,7 +245,9 @@ export const StatisticsMode: Story = {
           </div>
         ))}
       </div>
-      <p className="text-sm text-gray-600">통계 모드에서는 이벤트나 매장 구분과 관계없이 카테고리별 고유 색상을 사용합니다.</p>
+      <p className="text-sm text-gray-600">
+        통계 모드에서는 이벤트나 매장 구분과 관계없이 카테고리별 고유 색상을 사용합니다.
+      </p>
     </div>
   ),
   parameters: {

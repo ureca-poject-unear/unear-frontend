@@ -19,9 +19,7 @@ const MapActionButtons = ({ onEventClick, onBarcodeClick, onCouponClick }: Props
   // 이벤트 버튼 클릭 기록 확인
   useEffect(() => {
     const hasClickedEvent = localStorage.getItem('eventButtonClicked');
-    console.log('Event button clicked before:', hasClickedEvent);
     if (!hasClickedEvent) {
-      console.log('Setting tooltip to true');
       setShowTooltip(true);
     }
   }, []);

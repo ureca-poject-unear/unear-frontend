@@ -10,8 +10,6 @@ const AccountManagementSection = ({
   const handleChangePassword = () => {
     if (onChangePassword) {
       onChangePassword();
-    } else {
-      console.log('비밀번호 변경 클릭');
     }
   };
 

@@ -75,7 +75,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     // isLoadviewActive 상태가 변경될 때마다 로드뷰 도로 표시 상태 업데이트
     useEffect(() => {
-      console.log('isLoadviewActive useEffect 트리거됨:', isLoadviewActive);
       if (isLoadviewActive) {
         showLoadviewRoads();
       } else {
@@ -89,18 +88,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
     };
 
     const toggleLoadview = (isActive: boolean) => {
-      console.log('toggleLoadview 호출됨:', isActive);
       setIsLoadviewActive(isActive);
       isLoadviewActiveRef.current = isActive;
       onLoadviewStateChange?.(isActive);
-      console.log('isLoadviewActive 상태 업데이트됨:', isActive);
     };
 
     const showLoadviewRoads = () => {
       const map = mapInstanceRef.current;
       if (!map) return;
-
-      console.log('로드뷰 도로 표시 시작');
 
       // 기존 로드뷰 오버레이 제거
       clearLoadviewRoads();
@@ -108,19 +103,13 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       // 로드뷰 도로 오버레이 활성화
       try {
         map.addOverlayMapTypeId(window.kakao.maps.MapTypeId.ROADVIEW);
-        console.log('로드뷰 도로 오버레이 활성화 완료');
-      } catch (error) {
-        console.error('로드뷰 도로 오버레이 활성화 실패:', error);
-      }
+      } catch (error) {}
 
       showToast('지도에서 로드뷰 도로를 클릭하세요.');
     };
 
     const openLoadview = (lat: number, lng: number) => {
-      console.log('로드뷰 열기 시도:', lat, lng);
-
       if (!roadviewRef.current || !roadviewClientRef.current) {
-        console.log('로드뷰 객체가 없어서 초기화합니다.');
         initializeRoadview();
       }
 
@@ -141,25 +130,13 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
         // 로드뷰 화면 상태 설정
         onRoadviewStateChange?.(true);
-
-        console.log('로드뷰 컨테이너 표시됨');
-        console.log(
-          '로드뷰 컨테이너 크기:',
-          roadviewContainer.offsetWidth,
-          'x',
-          roadviewContainer.offsetHeight
-        );
-        console.log('로드뷰 컨테이너 스타일:', roadviewContainer.style.cssText);
       } else {
-        console.error('로드뷰 컨테이너를 찾을 수 없습니다.');
         return;
       }
 
       // 가장 가까운 로드뷰 파노ID 찾기
-      console.log('가장 가까운 로드뷰 파노ID 찾는 중...');
       if (roadviewClientRef.current) {
         roadviewClientRef.current.getNearestPanoId(position, 50, (panoId: string | null) => {
-          console.log('파노ID 결과:', panoId);
           if (panoId === null) {
             showToast('이 위치에서는 로드뷰를 사용할 수 없습니다.');
             if (roadviewContainer) {
@@ -169,7 +146,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             onRoadviewStateChange?.(false);
           } else {
             // 로드뷰 실행
-            console.log('로드뷰 실행 중...');
             if (roadviewRef.current) {
               roadviewRef.current.setPanoId(panoId, position);
 
@@ -177,15 +153,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               setTimeout(() => {
                 if (roadviewRef.current) {
                   roadviewRef.current.relayout();
-                  console.log('로드뷰 relayout 완료');
                 }
                 // 로드뷰가 성공적으로 로드된 후 닫기 버튼 표시
                 if (closeButtonRef.current) {
                   closeButtonRef.current.style.display = 'flex';
                 }
               }, 100);
-
-              console.log('로드뷰 실행 완료');
             }
           }
         });
@@ -205,19 +178,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       if (map) {
         try {
           map.removeOverlayMapTypeId(window.kakao.maps.MapTypeId.ROADVIEW);
-        } catch (error) {
-          console.log('로드뷰 도로 오버레이 제거 실패:', error);
-        }
+        } catch (error) {}
       }
     };
 
     const initializeRoadview = () => {
       if (!window.kakao || !window.kakao.maps) {
-        console.error('카카오맵 API가 로드되지 않았습니다.');
         return;
       }
-
-      console.log('로드뷰 초기화 시작');
 
       // 기존 로드뷰 컨테이너가 있다면 제거
       const existingContainer = document.getElementById('roadview-container');
@@ -285,19 +253,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       try {
         roadviewRef.current = new window.kakao.maps.Roadview(roadviewContainer);
         roadviewClientRef.current = new window.kakao.maps.RoadviewClient();
-        console.log('로드뷰 객체 생성 완료:', roadviewRef.current, roadviewClientRef.current);
 
         // 로드뷰가 로드되었는지 확인하는 이벤트 리스너 추가
-        window.kakao.maps.event.addListener(roadviewRef.current, 'init', () => {
-          console.log('로드뷰 초기화 완료');
-        });
+        window.kakao.maps.event.addListener(roadviewRef.current, 'init', () => {});
 
-        window.kakao.maps.event.addListener(roadviewRef.current, 'panorama_changed', () => {
-          console.log('로드뷰 파노라마 변경됨');
-        });
-      } catch (error) {
-        console.error('로드뷰 객체 생성 실패:', error);
-      }
+        window.kakao.maps.event.addListener(roadviewRef.current, 'panorama_changed', () => {});
+      } catch (error) {}
     };
 
     const renderCurrentLocation = useCallback((lat: number, lng: number) => {
@@ -338,10 +299,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           mapInstanceRef.current?.setCenter(new window.kakao.maps.LatLng(latitude, longitude));
           setIsLocationShown(true);
         },
-        (error) => {
-          console.error('위치 정보를 가져오지 못했습니다.', error);
-          alert('위치 정보를 가져오지 못했습니다.');
-        }
+        (_error) => {}
       );
     };
 
@@ -379,7 +337,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         if (mapInstanceRef.current) {
           renderMarkers();
         } else {
-          console.log('지도가 아직 초기화되지 않음');
         }
       },
       getBounds: () => {
@@ -404,11 +361,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       const map = mapInstanceRef.current;
       const clusterer = clustererRef.current;
       if (!map) return;
-
-      // clusterer가 없어도 마커 렌더링은 계속 진행
-      if (!clusterer) {
-        console.log('클러스터러가 없어서 개별 마커 모드로 동작합니다.');
-      }
 
       const bounds = map.getBounds();
       const sw = bounds.getSouthWest();
@@ -436,13 +388,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           benefitCategories: currentBenefitCategories,
         });
 
-        console.log(
-          '📍 API 응답 - 장소 개수:',
-          places.length,
-          '즐겨찾기 필터:',
-          currentIsBookmarkOnly
-        );
-
         // 기존 마커들을 완전히 제거
         if (markerInstancesRef.current.length > 0) {
           markerInstancesRef.current.forEach((m) => {
@@ -454,9 +399,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             try {
               clusterer.removeMarkers(markerInstancesRef.current);
               clusterer.clear();
-            } catch (error) {
-              console.warn('클러스터러에서 마커 제거 중 오류:', error);
-            }
+            } catch (error) {}
           }
           markerInstancesRef.current = [];
         }
@@ -468,7 +411,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           // 지도를 다시 그리기
           const center = map.getCenter();
           map.setCenter(center);
-          console.log('🎯 즐겨찾기 필터 적용 - 마커 없음');
           return;
         }
 
@@ -554,7 +496,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         });
 
         markerInstancesRef.current = newMarkers;
-        console.log(currentLevel, '현재레벨');
         const currentZoom = mapInstanceRef.current?.getLevel?.();
 
         // 마커를 지도에 추가
@@ -575,8 +516,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             // clusterer가 null이 아닐 때만 사용
             clusterer.addMarkers(newMarkers);
           } else {
-            // clusterer가 null이면 개별 마커로 표시
-            console.warn('클러스터러가 없어서 개별 마커로 표시합니다.');
             newMarkers.forEach((marker) => {
               if (marker && marker.setMap) {
                 marker.setMap(map);
@@ -584,7 +523,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
             });
           }
         } catch (error) {
-          console.error('마커 추가 중 오류:', error);
           // 에러 발생 시 개별 마커로 fallback
           newMarkers.forEach((marker) => {
             if (marker && marker.setMap) {
@@ -600,9 +538,7 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         // 마커 업데이트 후 지도 다시 그리기
         const center = map.getCenter();
         map.setCenter(center);
-      } catch (error) {
-        console.error('장소 가져오기 실패:', error);
-      }
+      } catch (error) {}
     }, [isLocationShown, onMarkerClick]);
 
     // 필터링 상태가 변경될 때마다 마커를 다시 렌더링
@@ -612,19 +548,14 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
         const storedCategoryCodes = localStorage.getItem('categoryCodes');
         const storedBenefitCategories = localStorage.getItem('benefitCategories');
 
-        const currentIsBookmarkOnly = storedIsBookmarkOnly
+        const _currentIsBookmarkOnly = storedIsBookmarkOnly
           ? JSON.parse(storedIsBookmarkOnly)
           : false;
-        const currentCategoryCodes = storedCategoryCodes ? JSON.parse(storedCategoryCodes) : [];
-        const currentBenefitCategories = storedBenefitCategories
+        const _currentCategoryCodes = storedCategoryCodes ? JSON.parse(storedCategoryCodes) : [];
+        const _currentBenefitCategories = storedBenefitCategories
           ? JSON.parse(storedBenefitCategories)
           : [];
 
-        console.log('🎯 필터링 상태 변경 - 지도 마커 재렌더링:', {
-          isBookmarkOnly: currentIsBookmarkOnly,
-          categoryCodes: currentCategoryCodes,
-          benefitCategories: currentBenefitCategories,
-        });
         renderMarkers();
       }
     }, [isBookmarkOnly, categoryCodes, benefitCategories, renderMarkers]);
@@ -638,7 +569,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
     useEffect(() => {
       if (!kakaoMapKey) {
-        console.error('Kakao Map API Key is missing');
         return;
       }
 
@@ -655,12 +585,9 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
       document.head.appendChild(script);
 
       script.onload = () => {
-        console.log('카카오맵 스크립트 로딩 완료');
-
         // 카카오맵 API가 완전히 로드되었는지 확인
         if (window.kakao && window.kakao.maps && typeof window.kakao.maps.load === 'function') {
           window.kakao.maps.load(() => {
-            console.log('카카오맵 API 로딩 완료');
             const container = mapRef.current;
             if (!container) return;
 
@@ -676,17 +603,11 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               try {
                 // MarkerClusterer가 사용 가능한지 확인
                 if (!window.kakao.maps.MarkerClusterer) {
-                  console.warn(
-                    'MarkerClusterer가 아직 로드되지 않았습니다. 재시도 중...',
-                    retryCount
-                  );
                   if (retryCount < 5) {
                     // 재시도 횟수를 5회로 증가
                     setTimeout(() => initializeClusterer(retryCount + 1), 2000); // 대기 시간을 2초로 증가
                     return;
                   } else {
-                    console.error('MarkerClusterer 초기화 실패: 최대 재시도 횟수 초과');
-                    console.log('대안: 개별 마커 모드로 전환');
                     clustererRef.current = null;
                     return;
                   }
@@ -694,10 +615,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
                 // MarkerClusterer 생성자 확인
                 if (typeof window.kakao.maps.MarkerClusterer !== 'function') {
-                  console.error(
-                    'MarkerClusterer가 함수가 아닙니다:',
-                    typeof window.kakao.maps.MarkerClusterer
-                  );
                   clustererRef.current = null;
                   return;
                 }
@@ -794,16 +711,10 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
                     map.setLevel(newLevel);
                   }
                 );
-
-                console.log('MarkerClusterer 초기화 성공');
               } catch (error) {
-                console.error('클러스터러 초기화 실패:', error);
                 if (retryCount < 5) {
-                  console.log(`클러스터러 재시도 중... (${retryCount + 1}/5)`);
                   setTimeout(() => initializeClusterer(retryCount + 1), 2000);
                 } else {
-                  console.error('클러스터러 초기화 최종 실패');
-                  console.log('대안: 개별 마커 모드로 전환');
                   clustererRef.current = null;
                 }
               }
@@ -821,14 +732,12 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             window.kakao.maps.event.addListener(map, 'idle', () => {
               if (!isSettingCenterRef.current) {
-                console.log('🔄 지도 idle 이벤트 - 마커 재렌더링');
                 renderMarkers();
               }
             });
 
             // 지도 레벨 변경 이벤트 리스너 추가
             window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
-              console.log('🔍 지도 zoom 변경 - 마커 재렌더링');
               renderMarkers();
             });
 
@@ -837,10 +746,8 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
               map,
               'click',
               (mouseEvent?: { latLng?: KakaoLatLng }) => {
-                console.log('지도 클릭됨, 로드뷰 모드:', isLoadviewActiveRef.current);
                 if (isLoadviewActiveRef.current && mouseEvent?.latLng) {
                   const position = mouseEvent.latLng;
-                  console.log('클릭한 위치:', position.getLat(), position.getLng());
                   openLoadview(position.getLat(), position.getLng());
                 }
               }
@@ -848,14 +755,10 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
 
             renderMarkers();
           });
-        } else {
-          console.error('카카오맵 API 로딩 실패');
         }
       };
 
-      script.onerror = () => {
-        console.error('카카오맵 스크립트 로딩 실패');
-      };
+      script.onerror = () => {};
 
       return () => {
         if (document.head.contains(script)) {
@@ -891,7 +794,6 @@ const MapContainer = forwardRef<MapContainerRef, MapContainerProps>(
           e.key === 'categoryCodes' ||
           e.key === 'benefitCategories'
         ) {
-          console.log('📦 로컬스토리지 변경 감지:', e.key, e.newValue);
           if (mapInstanceRef.current) {
             renderMarkers();
           }

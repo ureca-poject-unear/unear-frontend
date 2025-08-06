@@ -12,6 +12,7 @@ import type { Place } from '@/types/map';
 import type { CategoryType, EventType, StoreClassType } from '@/components/common/StoreTypeIcon';
 import type { StoreStatusType } from '@/components/common/StoreStatus';
 import { getCurrentLocation, calculateDistance, formatDistance } from '@/utils/distanceUtils';
+import { showErrorToast, showToast } from '@/utils/toast';
 
 // getPlaceDetail API가 반환하는 실제 데이터 구조에 맞춘 타입 정의
 interface StoreData {
@@ -53,9 +54,8 @@ const JuniorMarket = () => {
         if (currentLocation) {
           centerLatStr = currentLocation.lat.toString();
           centerLngStr = currentLocation.lng.toString();
-          console.log('현재 위치 사용:', centerLatStr, centerLngStr);
         } else {
-          console.warn('현재 위치를 가져올 수 없어 기본 위치를 사용합니다.');
+          showErrorToast('현재 위치를 가져올 수 없어 기본 위치를 사용합니다.');
         }
 
         const seoulBounds = { swLat: 37.42, swLng: 126.73, neLat: 37.7, neLng: 127.2 };
@@ -139,7 +139,6 @@ const JuniorMarket = () => {
         setStores(sortedStores);
       } catch (err) {
         setError('매장 정보를 불러오는 데 실패했습니다.');
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -173,8 +172,7 @@ const JuniorMarket = () => {
     try {
       await toggleFavorite(Number(storeId));
     } catch (err) {
-      console.error('즐겨찾기 변경 실패:', err);
-      alert('즐겨찾기 변경에 실패했습니다.');
+      showToast('즐겨찾기 변경 실패:');
       setStores((prevStores) =>
         prevStores.map((s) => (s.id === storeId ? { ...s, isBookmarked: previousIsBookmarked } : s))
       );
@@ -193,14 +191,13 @@ const JuniorMarket = () => {
     });
   };
 
-  const handleCouponDownload = async (storeId: string, couponTemplateId: string) => {
+  const handleCouponDownload = async (_storeId: string, couponTemplateId: string) => {
     setDownloadingCoupons((prev) => new Set(prev).add(couponTemplateId));
 
     try {
       await postDownloadCoupon(Number(couponTemplateId));
       setDownloadedCoupons((prev) => new Set(prev).add(couponTemplateId));
     } catch (err) {
-      console.error('쿠폰 다운로드 실패:', err);
       alert('쿠폰 다운로드에 실패했습니다.');
     } finally {
       setDownloadingCoupons((prev) => {

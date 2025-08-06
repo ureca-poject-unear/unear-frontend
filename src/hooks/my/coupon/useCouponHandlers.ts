@@ -36,7 +36,6 @@ const useCouponHandlers = (): CouponPageHandlers & {
         setIsModalOpen(true);
       }
     } catch (error) {
-      console.error('쿠폰 상세 정보 불러오기 실패:', error);
       showErrorToast('쿠폰 상세 정보를 불러오는데 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);

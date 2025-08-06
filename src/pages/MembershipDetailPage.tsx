@@ -69,7 +69,6 @@ export default function MembershipDetailPage() {
         const res = await getBenefitDetail(franchiseId);
         setBenefitData(res);
       } catch (error) {
-        console.error('❌ API 호출 실패:', error);
         setIsError(true);
       } finally {
         setIsLoading(false);

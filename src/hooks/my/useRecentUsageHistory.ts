@@ -96,7 +96,6 @@ const useRecentUsageHistory = (): UseRecentUsageHistoryReturn => {
         setApiData([]);
       }
     } catch (err) {
-      console.error('최근 이용 내역 로드 실패:', err);
       setError('이용 내역을 불러올 수 없습니다.');
       setApiData([]);
     } finally {

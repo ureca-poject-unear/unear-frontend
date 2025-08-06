@@ -5,6 +5,7 @@ type MiniButtonProps = {
   isActive?: boolean; // 버튼의 활성/비활성 상태를 나타내는 불리언 값 (선택적, 기본값은 false)
   widthClass?: string; // width  (선택)
   heightClass?: string; // height  (선택)
+  disabled?: boolean;
 };
 
 // MiniButton 컴포넌트를 정의합니다.
@@ -28,7 +29,6 @@ export default function MiniButton({
         onClick={() => {
           if (isActive) {
             onClick();
-            console.log(`${text}버튼이 클릭 되었습니다!`);
           }
         }}
         disabled={!isActive} // isActive가 false일 때 버튼을 비활성화합니다.

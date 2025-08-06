@@ -60,7 +60,6 @@ const CompleteProfilePage: React.FC = () => {
       const oauthInProgress = sessionStorage.getItem('oauth_redirect_in_progress');
 
       if (oauthInProgress) {
-        console.log('🔄 OAuth 리다이렉트에서 온 사용자 - 기본 정보만 로드');
         // 플래그 제거 (일회성)
         sessionStorage.removeItem('oauth_redirect_in_progress');
 
@@ -73,7 +72,6 @@ const CompleteProfilePage: React.FC = () => {
           setIsInitializing(false);
           return;
         } catch (error) {
-          console.error('API Error:', error);
           showErrorToast('오류가 발생했습니다. 다시 로그인해주세요.');
           navigate('/login', { replace: true });
           return;
@@ -86,7 +84,6 @@ const CompleteProfilePage: React.FC = () => {
         const result = response.data as MeApiResponse;
 
         if (result.data.isProfileComplete) {
-          console.log('✅ 이미 프로필 완성됨 - 메인으로 리다이렉트');
           navigate('/', { replace: true });
           return;
         }
@@ -95,7 +92,6 @@ const CompleteProfilePage: React.FC = () => {
         setForm((prev) => ({ ...prev, name: result.data.username }));
         setIsInitializing(false);
       } catch (error) {
-        console.error('API Error:', error);
         showErrorToast('오류가 발생했습니다. 다시 로그인해주세요.');
         navigate('/login', { replace: true });
       }
@@ -157,8 +153,6 @@ const CompleteProfilePage: React.FC = () => {
         gender: form.gender === '남자' ? 'M' : 'F',
       });
 
-      console.log('✅ 프로필 업데이트 API 성공');
-
       // 2. DB 업데이트 시간 확보 및 재시도 로직
       let retryCount = 0;
       const maxRetries = 5;
@@ -171,15 +165,8 @@ const CompleteProfilePage: React.FC = () => {
           const verifyResponse = await axiosInstance.get('/users/me');
           const userData = verifyResponse.data.data;
 
-          console.log(`🔍 업데이트 확인 시도 ${retryCount + 1}/${maxRetries}:`, {
-            isProfileComplete: userData.isProfileComplete,
-            username: userData.username,
-          });
-
           if (userData.isProfileComplete) {
             isUpdated = true;
-            console.log('✅ 프로필 완성 상태 확인됨');
-
             // 3. AuthProvider의 사용자 정보 강제 새로고침
             await refreshUserInfo();
 
@@ -192,22 +179,19 @@ const CompleteProfilePage: React.FC = () => {
             navigate('/', { replace: true });
             return;
           }
-        } catch (verifyError) {
-          console.warn(`⚠️ 업데이트 확인 중 오류 (시도 ${retryCount + 1}):`, verifyError);
-        }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (verifyError) {}
 
         retryCount++;
       }
 
       // 모든 재시도가 실패한 경우
       if (!isUpdated) {
-        console.error('❌ 프로필 업데이트 확인 실패 - 모든 재시도 완료');
         showErrorToast(
           '프로필 업데이트는 완료되었지만 확인에 시간이 걸리고 있습니다. 잠시 후 다시 시도해주세요.'
         );
       }
     } catch (error: unknown) {
-      console.error('Submit Error:', error);
       const apiError = error as {
         response?: {
           data?: {

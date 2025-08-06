@@ -47,7 +47,6 @@ export const getJuniorStores = async (): Promise<BookmarkStore[]> => {
 
     return transformedData;
   } catch (error) {
-    console.error('getJuniorStores API 호출 오류:', error);
     throw error;
   }
 };

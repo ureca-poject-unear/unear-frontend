@@ -34,8 +34,6 @@ const useBookmarkData = (): UseBookmarkDataReturn => {
       const currentLocation = await getCurrentLocation();
 
       if (!currentLocation) {
-        // 현재 위치를 가져올 수 없으면 백엔드에서 제공한 거리 사용
-        console.warn('현재 위치를 가져올 수 없어 백엔드 거리 정보를 사용합니다.');
         return favoritePlaces;
       }
 
@@ -61,7 +59,6 @@ const useBookmarkData = (): UseBookmarkDataReturn => {
         return a.distanceKm - b.distanceKm;
       });
     } catch (error) {
-      console.error('거리 계산 중 오류 발생:', error);
       return favoritePlaces;
     }
   };
@@ -84,7 +81,6 @@ const useBookmarkData = (): UseBookmarkDataReturn => {
         setBookmarks(convertedBookmarks);
         setDisplayedBookmarks(convertedBookmarks.slice(0, itemsPerPage));
       } catch (error) {
-        console.error('즐겨찾기 데이터 로드 실패:', error);
         // 에러 발생 시 빈 배열로 설정
         setBookmarks([]);
         setDisplayedBookmarks([]);

@@ -68,17 +68,14 @@ export const useNotifications = (): UseNotificationsReturn => {
   useEffect(() => {
     // 사용자가 로그인되어 있고 userId가 있을 때만 연결
     if (!userInfo?.userId) {
-      console.log('⏳ SSE 연결 대기: 사용자 정보 없음');
       return;
     }
 
     // 이미 초기화되었으면 중복 실행 방지
     if (isInitializedRef.current) {
-      console.log('⚠️ SSE 이미 초기화됨 - 중복 실행 방지');
       return;
     }
 
-    console.log('🚀 알림 시스템 초기화 시작:', userInfo.userId);
     isInitializedRef.current = true;
 
     // NotificationClient 인스턴스 생성 (getStoredAccessToken 함수 전달)
@@ -95,7 +92,6 @@ export const useNotifications = (): UseNotificationsReturn => {
     // 정리 함수
     return () => {
       if (notificationClientRef.current) {
-        console.log('🧹 알림 시스템 정리');
         notificationClientRef.current.disconnect();
         notificationClientRef.current = null;
       }

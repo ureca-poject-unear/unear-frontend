@@ -7,15 +7,12 @@ export async function getStoryByMonth(targetMonth: string): Promise<StoryItem[]>
       params: { targetMonth },
     });
 
-    console.log('[GET 스토리 응답 - 원본]', response.data);
-
     if (!Array.isArray(response.data)) {
       throw new Error('스토리 형식이 올바르지 않습니다.');
     }
 
     return response.data; // 빈 배열도 정상 데이터로 처리
   } catch (error: unknown) {
-    console.error('[GET 스토리 응답]', error);
     if (error instanceof Error) {
       throw error;
     }

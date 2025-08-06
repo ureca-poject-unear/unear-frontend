@@ -4,6 +4,7 @@ import type { KakaoMap, KakaoCustomOverlay, KakaoCircle } from '@/types/kakao';
 import type { Place } from '@/types/map';
 import { getPlaces } from '@/apis/getPlaces';
 import MapMarkerIcon from '@/components/common/MapMarkerIcon';
+import { showErrorToast } from '@/utils/toast';
 
 // MapActions 타입 정의 및 export
 export interface MapActions {
@@ -13,7 +14,7 @@ export interface MapActions {
   getMapBounds: () => { sw: { lat: number; lng: number }; ne: { lat: number; lng: number } } | null;
 }
 
-const MapContainer = forwardRef<MapActions>((props, ref) => {
+const MapContainer = forwardRef<MapActions>((_props, ref) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
 
@@ -39,7 +40,7 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
       const eventPlaces = fetchedPlaces.filter((p) => p.eventCode !== 'NONE');
       setPlaces(eventPlaces);
     } catch (error) {
-      console.error('지도 영역 내 장소 가져오기 실패:', error);
+      showErrorToast('지도 영역 내 장소 가져오기 실패');
     }
   };
 
@@ -81,7 +82,6 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
   // 1. 지도 초기화 Hook
   useEffect(() => {
     if (!kakaoMapKey) {
-      console.error('Kakao Map API Key is missing');
       return;
     }
     const initializeMap = () => {

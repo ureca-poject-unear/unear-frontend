@@ -224,7 +224,7 @@ const Roulette: React.FC<RouletteProps> = ({ prizeData }) => {
               })}
             </div>
             <div>
-              {[...Array(8)].map((n, index) => {
+              {[...Array(8)].map((_n, index) => {
                 return (
                   <Line
                     style={{

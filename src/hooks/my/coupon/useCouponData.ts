@@ -35,7 +35,6 @@ const useCouponData = () => {
 
         setCouponData(data);
       } catch (error) {
-        console.error('쿠폰 데이터 불러오기 실패:', error);
         // 에러 발생 시 빈 데이터로 설정
         setCouponData({
           expiringSoonCoupons: [],

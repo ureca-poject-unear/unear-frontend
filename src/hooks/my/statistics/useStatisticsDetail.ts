@@ -91,7 +91,6 @@ const useStatisticsDetail = (): UseStatisticsDetailReturn => {
         setError('통계 상세 데이터를 불러올 수 없습니다.');
       }
     } catch (err) {
-      console.error('통계 상세 데이터 로드 실패:', err);
       setError('통계 상세 데이터 로드 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
@@ -111,7 +110,6 @@ const useStatisticsDetail = (): UseStatisticsDetailReturn => {
   const changeMonth = async (year: number, month: number): Promise<void> => {
     // 유효한 범위 내에서만 변경 허용
     if (!isValidDateRange(year, month)) {
-      console.warn(`날짜 범위를 벗어났습니다: ${year}년 ${month}월`);
       return;
     }
 

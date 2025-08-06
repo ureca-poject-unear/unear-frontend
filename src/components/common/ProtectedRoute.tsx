@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { useAuthStore } from '@/store/auth';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { showWarningToast } from '@/utils/toast';
+import { showToast, showWarningToast } from '@/utils/toast';
 import { isTokenExpired, isTokenExpiringSoon } from '@/utils/tokenUtils';
 
 interface ProtectedRouteProps {
@@ -60,7 +60,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       const token = getStoredAccessToken();
       if (!token) {
-        console.warn('⚠️ ProtectedRoute: 저장된 토큰이 없음');
         return;
       }
 
@@ -72,25 +71,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       try {
         // 토큰이 만료되었는지 확인 (JWT 디코딩)
         if (isTokenExpired(token)) {
-          console.log('🔄 ProtectedRoute: 토큰이 만료됨 - 자동 갱신 시도');
           const refreshSuccess = await refreshAccessToken();
           if (!refreshSuccess) {
-            console.error('❌ ProtectedRoute: 토큰 갱신 실패');
             return; // 실패 시 AuthProvider에서 로그아웃 처리
           }
         }
         // 토큰이 곧 만료될 예정인지 확인 (5분 이내)
         else if (isTokenExpiringSoon(token, 300)) {
-          console.log('⚠️ ProtectedRoute: 토큰이 곧 만료됨 - 미리 갱신');
           showWarningToast('세션이 곧 만료됩니다. 자동으로 갱신합니다.');
           await refreshAccessToken();
         }
         // 토큰이 유효한 경우 추가 확인 생략
         else {
-          console.log('✅ ProtectedRoute: 토큰이 유효함');
         }
       } catch (error: unknown) {
-        console.error('❌ ProtectedRoute: 토큰 확인 실패:', error);
+        showToast('에러발생');
         // 에러 발생 시도 AuthProvider에서 처리됨
       } finally {
         setIsCheckingToken(false);
@@ -124,7 +119,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트 (OAuth 전환 중이 아닐 때만)
   if (!isAuthenticated && !isOAuthTransition) {
-    console.log('🚪 ProtectedRoute: 인증되지 않음 - 로그인 페이지로 이동');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -135,10 +129,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     // 디버깅을 위한 로그는 줄이고, 중요한 상황에서만 출력
     if (isProfileIncomplete && !isProfileExempt) {
-      console.log('⚠️ ProtectedRoute: 프로필 미완성 - 프로필 완성 페이지로 이동', {
-        pathname: location.pathname,
-        isProfileComplete: userInfo.isProfileComplete,
-      });
       return <Navigate to="/complete-profile" state={{ from: location }} replace />;
     }
   }

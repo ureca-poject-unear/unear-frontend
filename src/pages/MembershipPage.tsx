@@ -16,13 +16,9 @@ export default function MembershipPage() {
   useEffect(() => {
     const fetchFranchiseBenefits = async () => {
       try {
-        console.log(':위성_안테나: [MembershipPage] API 호출 시작');
         const res = await getFranchiseBenefits({ page: 0, size: 100 }); // 전체 조회
-        console.log(':메모: [MembershipPage] API 응답:', res);
-        console.log(':메모: [MembershipPage] 첫번째 아이템:', res.content[0]);
         setFranchiseList(res.content);
       } catch (error) {
-        console.error('프랜차이즈 혜택 불러오기 실패:', error);
       } finally {
         setLoading(false);
       }
@@ -54,9 +50,7 @@ export default function MembershipPage() {
       try {
         const res = await getFranchiseBenefits({ page: 0, size: 100 });
         setFranchiseList(res.content);
-      } catch (error) {
-        console.error('전체 목록 로드 실패:', error);
-      }
+      } catch (error) {}
       return;
     }
 
@@ -67,9 +61,7 @@ export default function MembershipPage() {
         franchiseName: keyword,
       });
       setFranchiseList(res.content);
-    } catch (error) {
-      console.error('검색 실패:', error);
-    }
+    } catch (error) {}
   };
 
   // 검색어 변경 시 실시간 처리

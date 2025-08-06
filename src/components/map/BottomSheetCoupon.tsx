@@ -48,9 +48,7 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
         setSelectedCoupon(detail);
         setIsModalOpen(true);
       }
-    } catch (err) {
-      console.error('쿠폰 상세 불러오기 실패', err);
-    }
+    } catch (err) {}
   };
 
   const handleBookmarkToggle = async (storeId: string, isBookmarked: boolean) => {
@@ -63,8 +61,6 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
     try {
       await toggleFavorite(Number(storeId));
     } catch (error) {
-      console.error('즐겨찾기 변경 실패:', error);
-      alert('즐겨찾기 변경에 실패했습니다.');
       setNearbyStores((prev) =>
         prev.map((store) =>
           String(store.placeId) === storeId ? { ...store, favorite: isBookmarked } : store
@@ -132,14 +128,13 @@ const BottomSheetCoupon = ({ isOpen, onClose, mapRef, onMarkerClick }: BottomShe
             setShouldRefreshNearby(false);
             setIsLoadingNearbyStores(false);
           },
-          (err) => {
-            console.error('위치 정보 실패:', err);
+          (_err) => {
             setLocationError(true);
             setIsLoadingNearbyStores(false);
           }
         );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
-        console.error('근처 매장 불러오기 실패:', e);
         setLocationError(true);
         setIsLoadingNearbyStores(false);
       }

@@ -181,7 +181,6 @@ const useApiUsageHistory = (): UseApiUsageHistoryReturn => {
 
         // 너무 많은 요쳴을 방지하기 위한 안전 장치 (10페이지 제한)
         if (currentPage >= 10) {
-          console.warn('데이터가 너무 많습니다. 최대 1만개만 로드합니다.');
           break;
         }
       }
@@ -189,13 +188,10 @@ const useApiUsageHistory = (): UseApiUsageHistoryReturn => {
       if (allItems.length > 0) {
         const transformedData = transformApiData(allItems);
         setAllData(transformedData);
-        console.log(`✅ 전체 이용 내역 로드 완료: ${transformedData.length}건`);
       } else {
         setAllData([]);
-        console.log('📊 이용 내역이 없습니다.');
       }
     } catch (err) {
-      console.error('❌ 이용 내역 로드 실패:', err);
       setError('이용 내역 로드 중 오류가 발생했습니다.');
       setAllData([]);
     } finally {
@@ -232,7 +228,6 @@ const useApiUsageHistory = (): UseApiUsageHistoryReturn => {
    */
   const handleFilterChange = useCallback(
     (category: string, period: string) => {
-      console.log(`🔍 필터 변경: 카테고리=${category}, 기간=${period}`);
       setFilter({ category, period });
       setCurrentDisplayCount(itemsPerPage); // 필터 변경 시 페이지 리셋
     },
@@ -249,15 +244,12 @@ const useApiUsageHistory = (): UseApiUsageHistoryReturn => {
 
     setCurrentDisplayCount((prev) => prev + itemsPerPage);
     setIsLoadingMore(false);
-
-    console.log(`📄 더보기: ${currentDisplayCount + itemsPerPage}건 표시`);
   }, [hasMoreItems, isLoadingMore, itemsPerPage, currentDisplayCount]);
 
   /**
    * 데이터 새로고침
    */
   const refreshData = useCallback(async (): Promise<void> => {
-    console.log('🔄 데이터 새로고침 시작...');
     setAllData([]);
     setCurrentDisplayCount(itemsPerPage); // 페이지 리셋
     await loadAllData();

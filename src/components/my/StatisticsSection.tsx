@@ -15,7 +15,6 @@ const StatisticsSection = ({
     if (onDetailClick) {
       onDetailClick();
     } else {
-      console.log('통계 자세히 보기 클릭');
     }
   };
 

@@ -82,7 +82,6 @@ export const getPlaceDetail = async (
   if (!data) {
     throw new Error('❌ 상세 정보 데이터가 없습니다 (data is null)');
   }
-  console.log('[getPlaceDetail] PlaceDetailResponse:', data);
 
   return convertToStoreData(data);
 };

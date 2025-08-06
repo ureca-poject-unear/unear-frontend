@@ -87,7 +87,6 @@ const useMyPageData = (): UseMyPageDataReturn => {
         // TODO: 다른 API 호출 (쿠폰 카운트 등)
       ]);
     } catch (error) {
-      console.error('데이터 새로고침 실패:', error);
     } finally {
       setManualRefreshLoading(false);
     }

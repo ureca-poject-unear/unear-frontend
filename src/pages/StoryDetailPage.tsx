@@ -76,7 +76,6 @@ export default function StoryDetailPage() {
         (error.message.includes('ALREADY_EXISTS_STORY') ||
           error.message.includes('이미 이번달에 생성된 스토리가 존재합니다'))
       ) {
-        console.log('[INFO] 이번 달 스토리 이미 존재, 바로 GET 호출');
       } else if (error instanceof Error) {
         setErrorMessage(error.message);
         setIsLoading(false);

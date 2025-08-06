@@ -131,9 +131,7 @@ const MapPage = () => {
                 String(focusStore.longitude)
               );
             }, 600);
-          } catch (error) {
-            console.error('지도 중심 이동 실패:', error);
-          }
+          } catch (error) {}
         };
 
         setTimeout(() => {
@@ -201,7 +199,6 @@ const MapPage = () => {
               showInfoToast(`'${focusStore.placeName}' 매장을 찾을 수 없습니다.`);
             }
           } catch (error) {
-            console.error('북마크 위치 검색 실패:', error);
             showInfoToast('매장 검색 중 오류가 발생했습니다.');
           }
         };
@@ -214,7 +211,6 @@ const MapPage = () => {
 
   useEffect(() => {
     const handleRefreshStores = () => {
-      console.log('🔄 [refreshMapStores] 이벤트 수신됨 - 지도 재요청');
       mapRef.current?.fetchPlaces();
     };
 
@@ -269,40 +265,31 @@ const MapPage = () => {
         northEastLongitude: neLng,
       });
 
-      console.log('🔍 검색 결과:', results);
       if (results.length === 0) {
         showInfoToast(`주변에 '${keyword}' 에 대한 검색 결과가 없습니다.`);
         return;
       }
 
       setSearchResults(results);
-    } catch (e) {
-      console.error('검색 중 오류:', e);
-    }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {}
   };
 
-  const handleMarkerClick = async (placeId: number, storeLat: string, storeLng: string) => {
+  const handleMarkerClick = async (placeId: number, _storeLat: string, _storeLng: string) => {
     try {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           const userLat = pos.coords.latitude.toString();
           const userLng = pos.coords.longitude.toString();
 
-          console.log('🧍 사용자 위치:', userLat, userLng);
-          console.log('📍 마커 위치:', storeLat, storeLng);
-
           const storeDetail = await getPlaceDetail(placeId, userLat, userLng);
           setUserLocation({ latitude: userLat, longitude: userLng });
           setSelectedStore(storeDetail);
           setIsBottomSheetOpen(true);
         },
-        (err) => {
-          console.error('❌ 사용자 위치 가져오기 실패:', err);
-        }
+        (_err) => {}
       );
-    } catch (error) {
-      console.error('상세 정보 불러오기 실패:', error);
-    }
+    } catch (error) {}
   };
 
   return (
@@ -349,7 +336,6 @@ const MapPage = () => {
           onToggleFilter={() => setIsFilterOpen(true)}
           onToggleBookmark={() => {
             const newValue = !isBookmarkOnly;
-            console.log('⭐ 즐겨찾기 토글:', { from: isBookmarkOnly, to: newValue });
             setIsBookmarkOnly(newValue);
 
             // 즉시 지도 마커를 다시 렌더링
@@ -428,15 +414,9 @@ const MapPage = () => {
           }}
           currentLat={String(currentLat)}
           currentLng={String(currentLng)}
-          onBookmarkToggle={(placeId) => {
-            console.log('Bookmark toggled:', placeId);
-          }}
-          onCouponDownloaded={() => {
-            console.log('Coupon downloaded');
-          }}
-          onCouponClick={(userCouponId, brand) => {
-            console.log('Coupon clicked:', userCouponId, brand);
-          }}
+          onBookmarkToggle={(_placeId) => {}}
+          onCouponDownloaded={() => {}}
+          onCouponClick={(_userCouponId, _brand) => {}}
           mapRef={mapRef}
           onMarkerClick={handleMarkerClick}
         />

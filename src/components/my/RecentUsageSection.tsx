@@ -19,7 +19,6 @@ const RecentUsageSection = ({
     if (onDetailClick) {
       onDetailClick();
     } else {
-      console.log('최근 이용 내역 자세히 보기 클릭');
     }
   };
 

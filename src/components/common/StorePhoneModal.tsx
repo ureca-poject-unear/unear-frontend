@@ -5,6 +5,7 @@ import CallButton from './CallButton';
 import CopyIcon from '@/assets/my/copy.svg?react';
 import type { BookmarkStore } from '@/types/bookmark';
 import { getOperatingStatus } from '@/utils/operatingHours';
+import { showErrorToast } from '@/utils/toast';
 
 interface StorePhoneModalProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
-      console.error('전화번호 복사 실패:', err);
+      showErrorToast('전화번호 복사 실패:');
     }
   };
 
@@ -43,12 +44,7 @@ const StorePhoneModal: React.FC<StorePhoneModalProps> = ({ isOpen, onClose, stor
     }
     window.location.href = `tel:${phoneNumber}`;
   };
-
-  const handleLocationView = () => {
-    console.log('위치 보기 클릭됨');
-    // 위치 보기 로직 구현
-  };
-
+  const handleLocationView = () => {};
   // 실시간 영업 상태 계산
   const operatingStatus = getOperatingStatus(store.hours);
 

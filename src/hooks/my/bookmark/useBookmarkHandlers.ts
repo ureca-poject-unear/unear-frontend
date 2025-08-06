@@ -50,12 +50,7 @@ const useBookmarkHandlers = ({
 
       setBookmarks(updateBookmarkState);
       setDisplayedBookmarks(updateBookmarkState);
-
-      console.log(`즐겨찾기 ${actualState ? '추가' : '제거'} 성공:`, storeId);
-    } catch (error) {
-      console.error('즐겨찾기 토글 실패:', error);
-      // 에러 발생 시 상태 유지
-    }
+    } catch (error) {}
   };
 
   // 더 많은 데이터 로드

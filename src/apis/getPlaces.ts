@@ -32,16 +32,11 @@ export const getPlaces = async ({
         benefitCategory: benefitCategories,
       },
     });
-    const places = res.data?.data || [];
 
     // 데이터 콘솔 출력
-    console.log('[getPlaces] 가져온 장소 데이터:', places);
 
     return res.data?.data || [];
   } catch (error) {
-    console.error('장소 가져오기 실패:', error);
-    console.log('[getPlaces] categoryCodes:', categoryCodes);
-    console.log('[getPlaces] benefitCategories:', benefitCategories);
     throw error;
   }
 };
@@ -84,8 +79,6 @@ export const getPlacesForSearch = async ({
 
     return res.data?.data || [];
   } catch (error) {
-    console.error('🔍 검색 API 실패:', error);
-    console.log('[getPlacesForSearch] keyword:', keyword);
     throw error;
   }
 };

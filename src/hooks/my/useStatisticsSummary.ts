@@ -82,7 +82,6 @@ const useStatisticsSummary = (): UseStatisticsSummaryReturn => {
         setError('통계 데이터를 불러올 수 없습니다.');
       }
     } catch (err) {
-      console.error('통계 데이터 로드 실패:', err);
       setError('통계 데이터 로드 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);

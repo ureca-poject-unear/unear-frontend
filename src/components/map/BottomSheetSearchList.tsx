@@ -55,7 +55,6 @@ const BottomSheetSearchList = ({
         const detailData = await Promise.all(promises);
         setStoreList(detailData);
       } catch (err) {
-        console.error('검색 상세 불러오기 실패:', err);
       } finally {
         setIsLoading(false);
       }
@@ -71,10 +70,7 @@ const BottomSheetSearchList = ({
       setSelectedCoupon(detail);
       setIsModalOpen(true);
       onCouponClick(userCouponId, brand);
-    } catch (err) {
-      console.error('쿠폰 상세 조회 실패:', err);
-      alert('쿠폰 정보를 불러오지 못했습니다.');
-    }
+    } catch (err) {}
   };
 
   const handleCouponDownloaded = async (placeId: number) => {
@@ -83,9 +79,7 @@ const BottomSheetSearchList = ({
       setStoreList((prev) => prev.map((store) => (store.placeId === placeId ? updated : store)));
 
       onCouponDownloaded();
-    } catch (err) {
-      console.error('다운로드 후 매장 재조회 실패:', err);
-    }
+    } catch (err) {}
   };
 
   const handleBookmarkToggle = async (placeId: number) => {
@@ -108,9 +102,6 @@ const BottomSheetSearchList = ({
         window.dispatchEvent(new Event('refreshMapStores'));
       }
     } catch (err) {
-      console.error('즐겨찾기 변경 실패:', err);
-      alert('즐겨찾기 변경에 실패했습니다.');
-
       setStoreList((prevList) =>
         prevList.map((store) =>
           store.placeId === placeId ? { ...store, isBookmarked: prev } : store
@@ -175,7 +166,6 @@ const BottomSheetSearchList = ({
                   }}
                   onLocationClick={(lat, lng) => {
                     if (!mapRef?.current) {
-                      console.warn('mapRef is not available');
                       return;
                     }
                     mapRef.current.setCenter(lat, lng);

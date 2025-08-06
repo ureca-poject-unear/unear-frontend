@@ -63,8 +63,6 @@ const TodayCouponSection: React.FC = () => {
         throw new Error(result.message || '쿠폰 상태 확인에 실패했습니다.');
       }
     } catch (error) {
-      console.error('쿠폰 상태 확인 중 오류 발생:', error);
-      // 에러 발생 시의 기본 상태 설정
       setCoupons([
         {
           id: 326,
@@ -148,7 +146,6 @@ const TodayCouponSection: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('쿠폰 다운로드 중 오류 발생:', error);
       setMessage('네트워크 오류가 발생했습니다.');
     } finally {
       setDownloadingCoupons((prev) => {

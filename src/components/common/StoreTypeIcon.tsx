@@ -78,8 +78,6 @@ const StoreTypeIcon: React.FC<StoreTypeIconProps> = ({
   const getIconComponent = () => {
     const IconComponent = categoryIconMap[category];
     if (!IconComponent) {
-      console.error(`카테고리 ${category}에 대한 아이콘을 찾을 수 없습니다.`);
-      // 기본 아이콘으로 폴백
       return StoreIcon;
     }
     return IconComponent;

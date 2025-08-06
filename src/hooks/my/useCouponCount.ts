@@ -10,7 +10,6 @@ const useCouponCount = () => {
         const { count } = await getUserCoupons();
         setCouponCount(count);
       } catch (error) {
-        console.error('쿠폰 개수 불러오기 실패:', error);
         setCouponCount(0);
       }
     };

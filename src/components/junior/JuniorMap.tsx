@@ -4,7 +4,7 @@ import { forwardRef } from 'react';
 import MapContainer, { type MapActions } from '@/components/junior/MapContainer';
 
 // forwardRef를 사용하여 부모 컴포넌트로부터 ref를 전달받음
-const JuniorMap = forwardRef<MapActions>((props, ref) => {
+const JuniorMap = forwardRef<MapActions>((_props, ref) => {
   return (
     <div className="w-full p-5 bg-white">
       {/* 지도 위쪽 텍스트 */}

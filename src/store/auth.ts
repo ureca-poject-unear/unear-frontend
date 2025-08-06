@@ -103,9 +103,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         get().setAccessToken(storedToken);
         return storedToken;
       }
-    } catch (error) {
-      console.warn('AccessToken 조회 실패:', error);
-    }
+    } catch (error) {}
     return null;
   },
 
@@ -123,9 +121,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (refreshToken && refreshToken !== 'httponly-cookie') {
         localStorage.setItem('refresh_token', refreshToken);
       }
-    } catch (error) {
-      console.error('토큰 저장 실패:', error);
-    }
+    } catch (error) {}
   },
 
   // 모든 토큰 삭제
@@ -135,9 +131,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('accessToken'); // 기존 토큰 정리
       localStorage.removeItem('auth-storage'); // Zustand persist 정리
-    } catch (error) {
-      console.error('토큰 정리 실패:', error);
-    }
+    } catch (error) {}
   },
 
   // 사용자 정보 유틸리티

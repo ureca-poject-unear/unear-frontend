@@ -74,26 +74,19 @@ export const getUserUsageHistory = async (
   size: number = 3
 ): Promise<UsageHistoryPageResponse | null> => {
   try {
-    console.log('📊 사용자 이용 내역 조회 요청...', { page, size });
-
     const response = await axiosInstance.get<ApiResponse>('/users/me/usage-history', {
       params: { page, size },
       timeout: 10000, // 10초 타임아웃
     });
 
-    console.log('✅ 사용자 이용 내역 API 응답:', response.data);
-
     if (response.data.resultCode === 200 && response.data.data) {
       const historyData = response.data.data;
 
-      console.log('✅ 사용자 이용 내역 조회 성공:', historyData);
       return historyData;
     } else {
       throw new Error('이용 내역 정보를 가져올 수 없습니다.');
     }
   } catch (error: unknown) {
-    console.error('❌ 사용자 이용 내역 조회 실패:', error);
-
     const axiosError = error as AxiosError;
 
     // 세분화된 에러 처리
@@ -104,7 +97,7 @@ export const getUserUsageHistory = async (
       switch (status) {
         case 401:
           // 인증 오류는 AuthProvider에서 처리됨
-          console.warn('⚠️ 인증 오류 - 토큰 갱신 시도');
+          showErrorToast('로그인이 필요합니다.');
           break;
         case 404:
           showErrorToast('이용 내역 정보를 찾을 수 없습니다.');

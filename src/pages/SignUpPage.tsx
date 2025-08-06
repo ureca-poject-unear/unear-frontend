@@ -146,7 +146,6 @@ const SignUpPage = () => {
 
       showSuccessToast('인증번호가 전송되었습니다.');
     } catch (error: unknown) {
-      console.error('이메일 인증번호 전송 실패:', error);
       const apiError = error as ApiErrorResponse;
 
       // 상태 코드가 400이고 응답에 "이미 가입된 이메일"이 포함된 경우
@@ -192,7 +191,6 @@ const SignUpPage = () => {
 
       showSuccessToast('이메일 인증이 완료되었습니다!');
     } catch (error: unknown) {
-      console.error('이메일 인증 실패:', error);
       const apiError = error as ApiErrorResponse;
       setVerificationCodeError(true);
       showErrorToast(apiError.response?.data?.message || '인증번호가 올바르지 않습니다.');
@@ -275,7 +273,6 @@ const SignUpPage = () => {
         showErrorToast(result.message || '회원가입에 실패했습니다.');
       }
     } catch (error: unknown) {
-      console.error('회원가입 실패:', error);
       const apiError = error as ApiErrorResponse;
 
       if (

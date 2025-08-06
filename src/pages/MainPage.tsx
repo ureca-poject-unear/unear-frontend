@@ -30,16 +30,12 @@ const MainPage = () => {
       try {
         // userInfo가 없거나 기본값인 경우 API 호출
         if (!userInfo || getUserDisplayName() === '유니어') {
-          console.log('🔄 사용자 정보 로딩 시작...');
           await getUserInfo();
 
           // 잠시 대기 (상태 업데이트 시간 확보)
           await new Promise((resolve) => setTimeout(resolve, 300));
         }
-
-        console.log('✅ 사용자 정보 로드 완료');
       } catch (error) {
-        console.error('❌ 사용자 정보 로드 실패:', error);
       } finally {
         setIsUserDataLoading(false);
       }

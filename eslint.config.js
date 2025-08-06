@@ -1,4 +1,3 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from 'eslint-plugin-storybook';
 import js from '@eslint/js';
 import globals from 'globals';
@@ -10,8 +9,10 @@ import tseslint from 'typescript-eslint';
 
 export default [
   { ignores: ['dist'] },
+
   // ESLint와 Prettier 충돌 방지
   prettierConfig,
+
   // JavaScript/JSX 파일 설정
   {
     files: ['**/*.{js,jsx}'],
@@ -37,11 +38,14 @@ export default [
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
-  // TypeScript 파일 설정 추가
+
+  // TypeScript 파일 기본 recommended 설정 병합
   ...tseslint.configs.recommended.map((config) => ({
     ...config,
     files: ['**/*.{ts,tsx}'],
   })),
+
+  // TypeScript 별도의 상세 설정 (no-unused-vars 규칙 조정 포함)
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -60,12 +64,27 @@ export default [
     },
     rules: {
       'prettier/prettier': 'error',
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+
+      // 기본 ESLint no-unused-vars는 꺼서 중복 경고 방지
+      'no-unused-vars': 'off',
+
+      // 타입스크립트 no-unused-vars 설정
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^[A-Z_]', // 변수명 대문자 혹은 _ 시작 무시
+          args: 'all',
+          argsIgnorePattern: '^_', // 함수 인자 중 _로 시작 무시
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^(error|err)$', // catch(error), catch(err) 만 unused 무시
+        },
+      ],
+
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      // TypeScript import type 허용
       '@typescript-eslint/consistent-type-imports': 'error',
     },
   },
+
   // Storybook 설정
   ...storybook.configs['flat/recommended'],
 ];

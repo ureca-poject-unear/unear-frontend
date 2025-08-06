@@ -36,7 +36,6 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
   mapRef,
   userLocation,
 }) => {
-  console.log('store 데이터 확인:', store);
   const [downloadedCoupons, setDownloadedCoupons] = useState<Set<string>>(new Set());
   const [downloadingCoupons, setDownloadingCoupons] = useState<Set<string>>(new Set());
   const [isExpanded, setIsExpanded] = useState(false);
@@ -61,8 +60,6 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
         setLocalStore(updated);
       }
     } catch (err) {
-      console.error('쿠폰 다운로드 실패:', err);
-      alert('쿠폰 다운로드에 실패했습니다.');
     } finally {
       setDownloadingCoupons((prev) => {
         const newSet = new Set(prev);
@@ -83,12 +80,9 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
     try {
       const detail = await getUserCouponDetail(userCouponId);
       if (detail) {
-        console.log('📦 쿠폰 상세 정보:', detail);
         setSelectedCoupon(detail);
       }
-    } catch (error) {
-      console.error('❌ 쿠폰 상세 정보 요청 중 오류 발생:', error);
-    }
+    } catch (error) {}
   };
 
   const handleBookmarkToggle = async () => {
@@ -103,8 +97,6 @@ const BottomSheetLocationDetail: React.FC<BottomSheetLocationDetailProps> = ({
         window.dispatchEvent(new Event('refreshMapStores'));
       }
     } catch (err) {
-      console.error('즐겨찾기 변경 실패:', err);
-      alert('즐겨찾기 변경에 실패했습니다.');
       setIsBookmarked(prev);
     }
   };

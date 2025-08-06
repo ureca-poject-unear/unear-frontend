@@ -32,21 +32,13 @@ const KakaoCallback: React.FC = () => {
         const accessToken = searchParams.get('accessToken');
         const refreshToken = searchParams.get('refreshToken'); // 혹시 있다면
 
-        console.log('🔍 Kakao OAuth 토큰 확인:', {
-          accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : null,
-          refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : null,
-        });
-
         if (!accessToken) {
           throw new Error('로그인에 실패했습니다. 토큰이 제공되지 않았습니다.');
         }
 
         // 2. AuthProvider의 login 함수를 사용하여 토큰을 저장하고 사용자 정보를 자동 로드
         setLoadingMessage('사용자 정보를 불러오는 중...');
-        console.log('🔄 로그인 처리 및 사용자 정보 로드 중...');
         await login(accessToken, refreshToken || undefined);
-
-        console.log('✅ 로그인 및 사용자 정보 로드 완료');
 
         // 3. 인증 상태 확인 (네트워크 에러 시 간단한 대기 후 진행)
         setLoadingMessage('인증 상태 확인 중...');
@@ -61,33 +53,25 @@ const KakaoCallback: React.FC = () => {
           const userResponse = await axiosInstance.get('/users/me');
           const userData = userResponse.data.data;
 
-          console.log('🔍 직접 API로 사용자 정보 확인:', {
-            isProfileComplete: userData.isProfileComplete,
-            username: userData.username,
-          });
-
           // OAuth 리다이렉트 진행 중 플래그 설정 (CompleteProfilePage에서 깜빡임 방지용)
           sessionStorage.setItem('oauth_redirect_in_progress', 'true');
 
           // 프로필 완성 여부에 따라 즉시 분기 (중복 확인 없이 단순 분기)
           if (userData.isProfileComplete === true) {
-            console.log('✅ 프로필 완성됨 - 메인페이지로 즉시 이동');
             setLoadingMessage('메인 페이지로 이동 중...');
             navigate('/', { replace: true });
           } else {
-            console.log('⚠️ 프로필 미완성 - 완성 페이지로 이동');
             setLoadingMessage('추가 정보 입력 페이지로 이동 중...');
             // CompleteProfilePage는 미완성 사용자만 온다고 가정하므로 재확인 불필요
             navigate('/complete-profile', { replace: true });
           }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (apiError) {
-          console.error('❌ 프로필 상태 확인 실패:', apiError);
           // API 실패 시 기본적으로 완성 페이지로 이동
           sessionStorage.setItem('oauth_redirect_in_progress', 'true');
           navigate('/complete-profile', { replace: true });
         }
       } catch (error: unknown) {
-        console.error('❌ 카카오 로그인 처리 중 오류:', error);
         setHasError(true);
         setLoadingMessage('로그인 처리 중 오류가 발생했습니다.');
 
@@ -106,10 +90,6 @@ const KakaoCallback: React.FC = () => {
 
         if (axiosError.response) {
           // 서버 응답 에러
-          console.error('서버 응답 에러:', {
-            status: axiosError.response.status,
-            data: axiosError.response.data,
-          });
 
           if (axiosError.response.status === 401) {
             errorMessage = '인증에 실패했습니다. 토큰이 유효하지 않습니다.';
@@ -121,8 +101,6 @@ const KakaoCallback: React.FC = () => {
             errorMessage = `서버 오류 (${axiosError.response.status}): ${axiosError.response.data?.message || '알 수 없는 오류'}`;
           }
         } else if (axiosError.request) {
-          // 네트워크 에러
-          console.error('네트워크 에러:', axiosError.request);
           errorMessage = '네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.';
         } else {
           // 기타 에러

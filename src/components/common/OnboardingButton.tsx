@@ -26,7 +26,6 @@ export default function OnboardingButton({
         onClick={() => {
           if (isActive) {
             onClick();
-            console.log(`${text}버튼이 클릭 되었습니다!`);
           }
         }}
         disabled={!isActive}

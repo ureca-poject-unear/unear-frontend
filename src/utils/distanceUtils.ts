@@ -64,7 +64,6 @@ export const formatDistance = (distanceKm: number | null): string => {
 export const getCurrentLocation = (): Promise<{ lat: number; lng: number } | null> => {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      console.warn('브라우저가 위치 정보를 지원하지 않습니다.');
       resolve(null);
       return;
     }
@@ -76,8 +75,7 @@ export const getCurrentLocation = (): Promise<{ lat: number; lng: number } | nul
           lng: position.coords.longitude,
         });
       },
-      (error) => {
-        console.error('위치 정보를 가져올 수 없습니다:', error);
+      (_error) => {
         resolve(null);
       },
       {

@@ -53,9 +53,7 @@ const StoryPage = () => {
         const res = await fetch('/data/diagnosisMap.json');
         const data = await res.json();
         setDiagnosisMap(data);
-      } catch (err) {
-        console.error('diagnosisMap 로딩 실패', err);
-      }
+      } catch (err) {}
     };
 
     const fetchDiagnosisResult = async () => {
@@ -73,9 +71,7 @@ const StoryPage = () => {
           providerId: userInfo.providerId ?? '',
         });
         setDiagnosisResult(result);
-      } catch (err) {
-        console.error('진단 결과 로딩 실패', err);
-      }
+      } catch (err) {}
     };
 
     const fetchStoryData = async () => {
@@ -89,9 +85,7 @@ const StoryPage = () => {
           const preloadImg = new Image();
           preloadImg.src = S3_BASE_URL + stories[0].imageUrl;
         }
-      } catch (err) {
-        console.error('스토리 데이터 로딩 실패', err);
-      }
+      } catch (err) {}
     };
 
     fetchDiagnosisMap();

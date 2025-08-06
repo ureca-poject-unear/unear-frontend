@@ -84,10 +84,8 @@ export const convertFavoritePlaceToBookmarkStore = (
 ): BookmarkStore => {
   // 타입 유효성 검증
   if (!isValidCategoryType(favoritePlace.categoryCode)) {
-    console.warn(`⚠️ Invalid categoryCode: ${favoritePlace.categoryCode}, using FOOD as default`);
   }
   if (!isValidStoreClassType(favoritePlace.markerCode)) {
-    console.warn(`⚠️ Invalid markerCode: ${favoritePlace.markerCode}, using FRANCHISE as default`);
   }
 
   return {
