@@ -99,7 +99,13 @@ declare global {
         LatLng: new (lat: number, lng: number) => KakaoLatLng;
         Map: new (
           container: HTMLElement,
-          options: { center: KakaoLatLng; level: number }
+          options: {
+            center: KakaoLatLng;
+            level: number;
+            draggable?: boolean;
+            scrollwheel?: boolean;
+            disableDoubleClickZoom?: boolean;
+          }
         ) => KakaoMap;
         Marker: new (options: {
           position: KakaoLatLng;
@@ -111,6 +117,7 @@ declare global {
           content: Node;
           yAnchor?: number;
           zIndex?: number;
+          clickable?: boolean;
         }) => KakaoCustomOverlay;
         Circle: new (options: {
           center: KakaoLatLng;

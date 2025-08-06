@@ -62,6 +62,7 @@ export const getUserInfo = async (): Promise<UserInfoApiResponse['data'] | null>
       // Zustand 스토어에 사용자 정보 저장
       const { setUserInfo } = useAuthStore.getState();
       setUserInfo({
+        providerId: userInfo.provider,
         userId: userInfo.userId,
         email: userInfo.email,
         username: userInfo.username,
@@ -208,30 +209,4 @@ export const initializeUserInfo = async (): Promise<boolean> => {
     console.error('❌ 사용자 정보 초기화 중 오류:', error);
     return false;
   }
-};
-
-/**
- * 임시: 더미 사용자 정보를 설정합니다 (개발용)
- * 실제 서버가 준비되기 전까지 사용
- */
-export const setDummyUserInfo = (): void => {
-  const { setUserInfo } = useAuthStore.getState();
-
-  const dummyUserInfo = {
-    userId: 54,
-    email: 'rlawnstj901@gmail.com',
-    username: '김준서',
-    membershipCode: 'BASIC' as const,
-    gender: 'M' as const,
-    birthdate: '2000-05-06T00:00:00',
-    tel: '11111',
-    barcodeNumber: '4aa45cfab6e14783',
-    provider: 'GOOGLE' as const,
-    isProfileComplete: true,
-    createdAt: '2025-07-25T00:41:32.176072',
-    updatedAt: '2025-07-25T00:41:58.655776',
-  };
-
-  setUserInfo(dummyUserInfo);
-  console.log('🧪 더미 사용자 정보 설정 완료:', dummyUserInfo);
 };
