@@ -4,7 +4,11 @@ import MiniButton from '@/components/common/MiniButton';
 import CommonModal from '@/components/common/CommonModal';
 import type { Prize } from '@/components/junior/ProbabilityRoulette';
 import ProbabilityRoulette from '@/components/junior/ProbabilityRoulette';
-import { sendRouletteResult, checkRouletteParticipation } from '@/apis/roulette';
+import {
+  sendRouletteResult,
+  checkRouletteParticipation,
+  skipRouletteParticipationCheck,
+} from '@/apis/roulette';
 import { showSuccessToast, showErrorToast, showWarningToast } from '@/utils/toast';
 
 type Stamp = {
@@ -18,6 +22,7 @@ type Props = {
   eventId: number;
   hasExistingResult: boolean;
   isRouletteEnabledByServer: boolean;
+  isAlreadyParticipated?: boolean; // ✨ 서버에서 받아온 참여 상태
   onRouletteComplete?: () => void; // 룰렛 완료 후 부모 컴포넌트에 알리기 위한 콜백
 };
 
@@ -26,20 +31,62 @@ const StampRouletteCard: React.FC<Props> = ({
   eventId,
   hasExistingResult,
   isRouletteEnabledByServer,
+  isAlreadyParticipated = false, // ✨ 서버에서 받아온 참여 상태 기본값
   onRouletteComplete,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // ✨ 서버에서 받아온 참여 상태를 기반으로 상태 관리 (sessionStorage 제거)
-  const [isRouletteSpun, setIsRouletteSpun] = useState(hasExistingResult);
+  // ✨ 서버에서 받아온 참여 상태를 우선적으로 사용
+  const [isRouletteSpun, setIsRouletteSpun] = useState(hasExistingResult || isAlreadyParticipated);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSavingResult, setIsSavingResult] = useState(false);
+  const [isCheckingServer, setIsCheckingServer] = useState(false); // 서버 상태 확인 중
+
+  // ✨ 룰렛 돌리는 중 상태 추가 - 룰렛이 돌고 있을 때 중복 실행 방지
+  const [isRouletteSpinning, setIsRouletteSpinning] = useState(false);
+
+  // ✨ 컴포넌트 마운트 시 서버에서 룰렛 상태 확인
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      // ✨ 서버에서 isAlreadyParticipated가 true로 왔으면 추가 확인 불필요
+      if (isAlreadyParticipated) {
+        console.log('서버에서 이미 참여 상태 확인됨:', isAlreadyParticipated);
+        setIsRouletteSpun(true);
+        return;
+      }
+
+      // 이미 hasExistingResult가 true면 서버 확인 생략
+      if (hasExistingResult) {
+        setIsRouletteSpun(true);
+        return;
+      }
+
+      setIsCheckingServer(true);
+      try {
+        const hasParticipated = await checkRouletteParticipation(eventId);
+        console.log('서버 상태 확인 결과:', hasParticipated);
+
+        if (hasParticipated) {
+          setIsRouletteSpun(true);
+          // 부모 컴포넌트에도 알려서 상태 동기화
+          onRouletteComplete?.();
+        }
+      } catch (error) {
+        console.warn('서버 상태 확인 실패:', error);
+        // 에러가 발생해도 기존 상태 유지
+      } finally {
+        setIsCheckingServer(false);
+      }
+    };
+
+    checkServerStatus();
+  }, [eventId, hasExistingResult, isAlreadyParticipated, onRouletteComplete]);
 
   // ✨ 서버에서 받아온 참여 상태가 변경되면 로컬 상태도 동기화
   useEffect(() => {
-    setIsRouletteSpun(hasExistingResult);
-  }, [hasExistingResult]);
+    setIsRouletteSpun(hasExistingResult || isAlreadyParticipated);
+  }, [hasExistingResult, isAlreadyParticipated]);
 
   const displayStamps: Stamp[] = [...stamps];
   while (displayStamps.length < 4) {
@@ -48,31 +95,67 @@ const StampRouletteCard: React.FC<Props> = ({
 
   const hasAllStamps = stamps.filter((stamp) => stamp.isStamped).length >= 4;
   const isRouletteCompleted = isRouletteSpun;
+
+  // ✨ 룰렛 완료 시 버튼을 완전히 비활성화 + 서버 확인 중일 때도 비활성화
   const isButtonActive =
     isRouletteEnabledByServer &&
-    !isRouletteCompleted &&
+    !isRouletteCompleted && // 룰렛 완료 시 비활성화
     !isProcessing &&
     !isSavingResult &&
+    !isCheckingServer && // 서버 상태 확인 중일 때도 비활성화
+    !isRouletteSpinning && // 룰렛 돌리는 중일 때도 비활성화
     hasAllStamps;
 
   let buttonText = '룰렛 돌리기';
-  if (isProcessing) {
+  if (isCheckingServer) {
     buttonText = '상태 확인 중...';
-  } else if (isSavingResult) {
+  } else if (isProcessing) {
+    buttonText = '상태 확인 중...';
+  } else if (isSavingResult || isRouletteSpinning) {
     buttonText = '결과 저장 중...';
   } else if (isRouletteCompleted) {
-    buttonText = '참여 완료';
+    buttonText = '참여 완료'; // 완료된 경우 텍스트 변경
   } else if (!isRouletteEnabledByServer) {
-    buttonText = '스탬프를 모두 모아보아요';
+    buttonText = '룰렛 준비중';
   } else if (!hasAllStamps) {
-    buttonText = '스탬프를 모두 모아보아요';
+    buttonText = '스탬프를 모아주세요';
   }
 
   const handleRouletteClick = async () => {
+    console.log('룰렛 버튼 클릭됨', {
+      isRouletteCompleted,
+      isButtonActive,
+      isCheckingServer,
+      hasAllStamps,
+      isRouletteEnabledByServer,
+      isRouletteSpinning,
+      isAlreadyParticipated, // ✨ 서버 참여 상태도 로그에 추가
+    });
+
+    // ✨ 서버에서 이미 참여했다고 알려준 경우 즉시 차단
+    if (isAlreadyParticipated) {
+      showWarningToast('이미 룰렛에 참여하셨습니다.');
+      return;
+    }
+
+    // ✨ 룰렛 완료 상태일 때 클릭 차단
     if (isRouletteCompleted) {
       showWarningToast('이미 룰렛에 참여하셨습니다.');
       return;
     }
+
+    // ✨ 룰렛이 돌고 있을 때 클릭 차단
+    if (isRouletteSpinning) {
+      showWarningToast('룰렛이 진행 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
+
+    // ✨ 서버 상태 확인 중일 때 클릭 차단
+    if (isCheckingServer) {
+      showWarningToast('룰렛 상태를 확인 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
+
     if (isProcessing) {
       showWarningToast('처리 중입니다. 잠시만 기다려주세요.');
       return;
@@ -92,96 +175,144 @@ const StampRouletteCard: React.FC<Props> = ({
       return;
     }
 
+    // ✨ 버튼이 비활성화되어 있으면 실행하지 않음
     if (!isButtonActive) {
+      console.log('버튼이 비활성 상태입니다', { isButtonActive, isRouletteCompleted });
       return;
     }
 
-    const handleRouletteClick = async () => {
-      if (isRouletteCompleted) {
+    // ✨ 룰렛 모달을 열기 전에 서버에서 roulette_result_id 존재 여부 재확인
+    setIsProcessing(true);
+    try {
+      let hasParticipatedInServer = false;
+
+      try {
+        console.log('룰렛 참여 상태 재확인 시작:', eventId);
+        hasParticipatedInServer = await checkRouletteParticipation(eventId);
+        console.log('룰렛 참여 상태 재확인 결과:', hasParticipatedInServer);
+      } catch (apiError) {
+        console.warn('룰렛 참여 확인 API 에러:', apiError);
+
+        // ✨ GET 요청도 400 에러가 날 수 있으므로 더 관대하게 처리
+        const errorMessage = apiError instanceof Error ? apiError.message : '';
+        if (
+          errorMessage.includes('이미') ||
+          errorMessage.includes('already') ||
+          errorMessage.includes('participated')
+        ) {
+          // 이미 참여했다는 응답인 경우
+          hasParticipatedInServer = true;
+        } else {
+          // 다른 API 에러인 경우 스킵하고 룰렛 진행
+          hasParticipatedInServer = skipRouletteParticipationCheck();
+        }
+      }
+
+      if (hasParticipatedInServer) {
+        // 서버에서 이미 roulette_result_id가 존재하면 로컬 상태 업데이트 후 경고
+        console.log('이미 참여한 사용자 - 버튼 비활성화');
+        setIsRouletteSpun(true);
+        onRouletteComplete?.();
         showWarningToast('이미 룰렛에 참여하셨습니다.');
         return;
       }
-      if (isProcessing) {
-        showWarningToast('처리 중입니다. 잠시만 기다려주세요.');
-        return;
-      }
-      if (!isRouletteEnabledByServer) {
-        showWarningToast('룰렛이 아직 활성화되지 않았습니다.');
-        return;
-      }
-      if (!hasAllStamps) {
-        showWarningToast('스탬프 4개를 모두 모아야 룰렛에 참여할 수 있습니다.');
-        return;
-      }
-      const token = sessionStorage.getItem('temp_access_token');
-      if (!token) {
-        showErrorToast('룰렛을 돌리려면 로그인이 필요합니다.');
-        navigate('/login');
-        return;
-      }
 
-      if (!isButtonActive) {
-        return;
-      }
+      // roulette_result_id가 없으면 룰렛 모달 열기
+      console.log('룰렛 모달 열기');
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('룰렛 참여 상태 확인 오류:', error);
+      showErrorToast('룰렛 상태를 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-      // ✨ 룰렛 모달을 열기 전에 서버에서 roulette_result_id 존재 여부 확인
-      setIsProcessing(true);
+  const handleRouletteFinish = async (prize: Prize) => {
+    // ✨ 룰렛이 완료되었거나 이미 결과를 저장 중이면 중단
+    if (isRouletteCompleted || isSavingResult || isRouletteSpinning) {
+      console.log('룰렛 결과 저장 중단:', {
+        isRouletteCompleted,
+        isSavingResult,
+        isRouletteSpinning,
+      });
+      return;
+    }
+
+    // ✨ 룰렛 돌리는 중 상태 활성화
+    setIsRouletteSpinning(true);
+    setIsSavingResult(true);
+    setIsModalOpen(false);
+
+    try {
+      console.log('룰렛 결과 저장 시작:', { eventId, prizeName: prize.prizeName });
+
+      // ✨ 결과 저장 전에 한번 더 참여 상태 확인
       try {
-        const hasParticipatedInServer = await checkRouletteParticipation(eventId);
-
-        if (hasParticipatedInServer) {
-          // 서버에서 이미 roulette_result_id가 존재하면 로컬 상태 업데이트 후 경고
+        const hasParticipated = await checkRouletteParticipation(eventId);
+        if (hasParticipated) {
+          console.log('결과 저장 중 중복 참여 감지');
           setIsRouletteSpun(true);
           onRouletteComplete?.();
           showWarningToast('이미 룰렛에 참여하셨습니다.');
           return;
         }
-
-        // roulette_result_id가 없으면 룰렛 모달 열기
-        setIsModalOpen(true);
-      } catch (error) {
-        console.error('룰렛 참여 상태 확인 오류:', error);
-        showErrorToast('룰렛 상태를 확인하는 중 오류가 발생했습니다. 다시 시도해주세요.');
-      } finally {
-        setIsProcessing(false);
+      } catch (checkError) {
+        console.warn('결과 저장 전 참여 상태 확인 실패:', checkError);
+        // 확인 실패 시에도 저장 시도는 계속 진행
       }
-    };
-  };
 
-  const handleRouletteFinish = async (prize: Prize) => {
-    if (isRouletteCompleted || isSavingResult) return;
-
-    setIsSavingResult(true);
-    setIsModalOpen(false);
-
-    try {
       await sendRouletteResult(eventId, prize.prizeName);
-      // ✨ 서버에 저장 성공 시 로컬 상태만 업데이트 (sessionStorage 제거)
+
+      // ✨ 서버에 저장 성공 시 로컬 상태 업데이트
       setIsRouletteSpun(true);
       // ✨ 부모 컴포넌트에 룰렛 완료를 알려서 서버 데이터를 다시 가져오도록 함
       onRouletteComplete?.();
       showSuccessToast(`축하합니다! '${prize.prizeName.replace('\n', ' ')}'에 당첨!`);
     } catch (error) {
       console.error('룰렛 결과 저장 오류:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : '룰렛 결과 저장 중 오류가 발생했습니다.';
 
-      if (errorMessage.includes('이미') || errorMessage.includes('already')) {
+      const errorMessage =
+        error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+
+      // ✨ 특별한 에러 코드로 이미 참여한 경우 처리
+      if (errorMessage === 'ALREADY_PARTICIPATED') {
+        console.log('이미 참여한 사용자 - 상태 업데이트');
+        setIsRouletteSpun(true);
+        onRouletteComplete?.();
+        showWarningToast('이미 룰렛에 참여하셨습니다.');
+      } else if (
+        errorMessage.includes('이미') ||
+        errorMessage.includes('already') ||
+        errorMessage.includes('participated') ||
+        errorMessage.includes('참여')
+      ) {
         // ✨ 이미 참여한 경우 로컬 상태 업데이트 및 부모에 알림
+        console.log('이미 참여한 사용자 감지 - 상태 업데이트');
         setIsRouletteSpun(true);
         onRouletteComplete?.();
         showWarningToast('이미 룰렛에 참여하셨습니다.');
       } else {
-        showErrorToast(errorMessage);
+        // ✨ 다른 에러의 경우 사용자에게 알림
+        showErrorToast(`룰렛 결과 저장 중 오류가 발생했습니다: ${errorMessage}`);
+
+        // ✨ 에러 발생 시 모달을 다시 열지 말고 상태만 초기화
+        // setIsModalOpen(true); // 이 줄 제거
+        console.log('룰렛 결과 저장 실패 - 다시 시도 가능하도록 상태 초기화');
       }
     } finally {
       setIsSavingResult(false);
+      setIsRouletteSpinning(false); // ✨ 룰렛 돌리는 중 상태 해제
     }
   };
 
   const handleModalClose = () => {
-    if (!isProcessing && !isSavingResult) {
+    // ✨ 룰렛이 돌고 있거나 결과를 저장 중일 때는 모달을 닫을 수 없도록 함
+    if (!isProcessing && !isSavingResult && !isRouletteSpinning) {
       setIsModalOpen(false);
+    } else {
+      console.log('룰렛 진행 중이므로 모달을 닫을 수 없습니다.');
+      showWarningToast('룰렛이 진행 중입니다. 잠시만 기다려주세요.');
     }
   };
 
@@ -343,7 +474,19 @@ const StampRouletteCard: React.FC<Props> = ({
           })}
         </div>
         <div className="flex justify-center mt-2">
-          <MiniButton text={buttonText} onClick={handleRouletteClick} isActive={isButtonActive} />
+          <MiniButton
+            text={buttonText}
+            onClick={handleRouletteClick}
+            isActive={isButtonActive}
+            // ✨ 룰렛 완료 시 시각적으로도 구분되도록 추가 props (MiniButton 컴포넌트가 지원하는 경우)
+            disabled={
+              isRouletteCompleted ||
+              isProcessing ||
+              isSavingResult ||
+              isCheckingServer ||
+              isRouletteSpinning
+            }
+          />
         </div>
       </div>
       <CommonModal
