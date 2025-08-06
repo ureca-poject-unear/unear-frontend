@@ -117,6 +117,8 @@ export class NotificationClient {
       console.log(`🔄 SSE 연결 시도: ${this.baseUrl}/notifications/subscribe/${this.userId}`);
       console.log(`📡 실제 요청 URL: ${sseUrl}`);
 
+      this.updateConnectionStatus('connecting');
+
       // 일반 EventSource 사용 (쿼리 파라미터 방식)
       this.eventSource = new EventSource(sseUrl);
 
@@ -136,6 +138,18 @@ export class NotificationClient {
 
     this.eventSource.onopen = () => {
       console.log('🟢 SSE 연결됨');
+      console.log('📊 onopen 시점 EventSource 상태:', this.eventSource?.readyState);
+
+      // 연결 성공 후 5초 대기해서 상태 다시 확인
+      setTimeout(() => {
+        console.log('🕰️ 5초 후 EventSource 상태:', this.eventSource?.readyState);
+        if (this.eventSource?.readyState === 1) {
+          console.log('✅ 연결이 유지되고 있습니다!');
+        } else {
+          console.log('❌ 연결이 끄어졌습니다.');
+        }
+      }, 5000);
+
       this.updateConnectionStatus('connected');
     };
 
