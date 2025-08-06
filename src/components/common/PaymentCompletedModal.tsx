@@ -40,6 +40,14 @@ const PaymentCompletedModal = ({
 
   if (!isOpen) return null;
 
+  const stripQuotes = (str: string) => {
+    if (!str) return '';
+    return str
+      .replace(/"/g, '') // 모든 따옴표 제거
+      .replace(/\\/g, '') // 모든 백슬래시 제거
+      .trim(); // 앞뒤 공백 제거
+  };
+
   // 금액 포맷팅 함수
   const formatAmount = (amount: number) => {
     return amount.toLocaleString('ko-KR');
@@ -95,7 +103,7 @@ const PaymentCompletedModal = ({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">가게명</span>
-                    <span className="font-medium text-black">{storeName}</span>
+                    <span className="font-medium text-black">{stripQuotes(storeName)}</span>
                   </div>
 
                   {discountAmount > 0 && (
@@ -124,8 +132,10 @@ const PaymentCompletedModal = ({
               </p>
 
               {/* 추가 메시지 (스탬프 관련) */}
-              {message?.trim() ? (
-                <p className="text-sm text-primary font-medium leading-relaxed">{message}</p>
+              {stripQuotes(message) ? (
+                <p className="text-sm text-primary font-medium leading-relaxed">
+                  {stripQuotes(message)}
+                </p>
               ) : null}
             </div>
 
