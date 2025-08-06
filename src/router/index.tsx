@@ -32,6 +32,8 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import ErrorBoundary from '@/components/error/ErrorBoundary';
 
+import NotFoundPage from '@/pages/NotFoundPage';
+
 const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/initial" replace /> },
   { path: '/initial', element: <InitialPage /> },
@@ -189,6 +191,12 @@ const router = createBrowserRouter([
 
       { path: '/login/oauth2/code/naver', element: <NaverAuthHandler /> },
     ],
+  },
+  {
+    // 2. NotFoundPage를 위한 라우트를 Default 레이아웃 밖으로 빼냅니다.
+    // 이렇게 하면 Default 레이아웃과 그 안의 BottomNavigator가 적용되지 않습니다.
+    path: '*',
+    element: <NotFoundPage />,
   },
 ]);
 

@@ -88,7 +88,6 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
       const container = mapRef.current;
       if (!container) return;
 
-      // [수정] 지도 생성자 옵션에 확대/축소 관련 설정을 추가합니다.
       const mapInstance = new window.kakao.maps.Map(container, {
         center: new window.kakao.maps.LatLng(37.544581, 127.055961),
         level: 6,
@@ -139,7 +138,6 @@ const MapContainer = forwardRef<MapActions>((props, ref) => {
 
     window.addEventListener('resize', handleResize);
 
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
       window.removeEventListener('resize', handleResize);
     };
