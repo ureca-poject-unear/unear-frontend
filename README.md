@@ -152,7 +152,7 @@ unear-frontend/
 
 ## 🎯 주요 기능 소개
 
-### 🏠 6.1 메인 페이지 (MainPage)
+### 🏠 1. 메인 페이지 (MainPage)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/acf23b55-0d7b-48bc-ac95-ec1c3084c01d" alt="유니어_메인화면" height="400"/>
@@ -171,7 +171,7 @@ unear-frontend/
 
 ---
 
-### 🗺️ 6.2 지도 기반 매장 검색 (MapPage)
+### 🗺️ 2. 지도 기반 매장 검색 (MapPage)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/8db915e7-7b34-4250-8c98-b77ef5f0d3f3" alt="지도_페이지_1" height="400" style="margin-right: 10px;"/>
@@ -191,7 +191,7 @@ unear-frontend/
 
 ---
 
-### 📖 6.3 개인화된 스토리 (StoryPage)
+### 📖 3. 개인화된 스토리 (StoryPage)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/0763ab0b-b952-4819-ada2-56346c4d2236" alt="스토리페이지" height="400"/>
@@ -209,7 +209,7 @@ unear-frontend/
 
 ---
 
-### 🎯 6.4 주니어 스탬프 이벤트 (JuniorPage)
+### 🎯 4. 주니어 스탬프 이벤트 (JuniorPage)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/a6d0d086-3a7e-4893-b134-48fea65ab863" alt="이번주니어" height="400"/>
@@ -228,7 +228,7 @@ unear-frontend/
 
 ---
 
-### 👤 6.5 마이페이지 (MyPage)
+### 👤 5. 마이페이지 (MyPage)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/7cb0f32d-148b-4525-a5a8-25f451c47c89" alt="마이페이지1" height="400" style="margin-right: 10px;"/>
@@ -255,7 +255,7 @@ unear-frontend/
 
 ---
 
-### 💳 6.6 멤버십 시스템 (MembershipPage)
+### 💳 6. 멤버십 시스템 (MembershipPage)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/8a765210-170b-4229-a5ef-ef6317a0a249" alt="유니어_맴버십혜택" height="400"/>
@@ -267,7 +267,7 @@ unear-frontend/
 
 ---
 
-### 🔐 6.7 인증 시스템 (Auth)
+### 🔐 7. 인증 시스템 (Auth)
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/4fc2a792-7822-488d-99f0-64ec3ad42bdd" alt="로그인 페이지" height="400"/>
@@ -281,7 +281,7 @@ unear-frontend/
 
 ---
 
-### 🧩 6.8 공통 컴포넌트 (components/common)
+### 🧩 8. 공통 컴포넌트 (components/common)
 
 | 컴포넌트              | 설명               |
 | --------------------- | ------------------ |
@@ -318,7 +318,6 @@ unear-frontend/
 
 ![React Router](https://img.shields.io/badge/React_Router-7.6.3-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-5.0.6-FF6B6B?style=for-the-badge)
-![TanStack Query](https://img.shields.io/badge/TanStack_Query-5.83.0-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
 
 ### Communication & API
 
@@ -384,7 +383,7 @@ unear-frontend/
 | -------------------- | -------------------------------------------------------------------- |
 | 📱 **반응형 디자인** | 모바일 퍼스트 접근 방식 (최대 너비 600px), 사용자 친화적 UI/UX 설계  |
 | 🎯 **사용자 경험**   | 직관적인 인터페이스, 큰 버튼과 명확한 텍스트로 접근성 향상           |
-| ⚡ **성능 최적화**   | Vite 기반 빠른 개발 환경, TanStack Query를 통한 효율적인 데이터 캐싱 |
+| ⚡ **성능 최적화**   | Vite 기반 빠른 개발 환경 |
 | 🔧 **개발 환경**     | TypeScript로 타입 안전성 확보, ESLint + Prettier 코드 품질 관리      |
 | 🔐 **보안 & 인증**   | JWT 기반 토큰 인증, 소셜 로그인 지원, 보호된 라우트 관리             |
 
