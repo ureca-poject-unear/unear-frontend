@@ -162,7 +162,7 @@ unear-frontend/
 - **특징**: 개인화된 콘텐츠, 반응형 디자인, 실시간 데이터 업데이트
 
 ### 6.2 지도 기반 매장 검색 (MapPage)
-![지도 페이지]![유레카_2기_융합_7조_예선발표자료 (6)](https://github.com/user-attachments/assets/8db915e7-7b34-4250-8c98-b77ef5f0d3f3)
+!![유레카_2기_융합_7조_예선발표자료 (6)](https://github.com/user-attachments/assets/8db915e7-7b34-4250-8c98-b77ef5f0d3f3)
 ![유레카_2기_융합_7조_예선발표자료 (8)](https://github.com/user-attachments/assets/29374bf0-15a8-416e-8189-081785942a50)
 
 
@@ -175,7 +175,8 @@ unear-frontend/
 - **특징**: 실시간 위치 추적, 제휴처 진입 시 자동 팝업 알림, 카테고리별 필터링, 즐겨찾기 기능
 
 ### 6.3 개인화된 스토리 (StoryPage)
-![스토리 페이지]
+![스토리페이지](https://github.com/user-attachments/assets/0763ab0b-b952-4819-ada2-56346c4d2236)
+
 
 - **주요 기능**: 개인 맞춤형 할인 혜택 스토리 제공
 - **핵심 컴포넌트**:
@@ -185,7 +186,7 @@ unear-frontend/
 - **특징**: 월별 개인화 스토리, AI 기반 추천, 인터랙티브 카드, 진단 시스템 연계
 
 ### 6.4 주니어 스탬프 이벤트 (JuniorPage)
-![주니어 페이지]![이번주니어](https://github.com/user-attachments/assets/a6d0d086-3a7e-4893-b134-48fea65ab863)
+![이번주니어](https://github.com/user-attachments/assets/a6d0d086-3a7e-4893-b134-48fea65ab863)
 
 
 - **주요 기능**: 방문 인증을 통한 스탬프 적립 및 룰렛 이벤트 시스템
@@ -197,7 +198,7 @@ unear-frontend/
 - **특징**: 방문 인증 스탬프 시스템, 확률 기반 보상, 일일 한정 이벤트, 애니메이션 효과
 
 ### 6.5 마이페이지 (MyPage)
-![마이페이지]![마이페이지1](https://github.com/user-attachments/assets/7cb0f32d-148b-4525-a5a8-25f451c47c89)
+![마이페이지1](https://github.com/user-attachments/assets/7cb0f32d-148b-4525-a5a8-25f451c47c89)
 ![마이페이지2](https://github.com/user-attachments/assets/a6323572-8484-48a4-b7a8-f5a871d3bc12)
 
 
@@ -215,14 +216,14 @@ unear-frontend/
 - **특징**: 실시간 통계 차트, 쿠폰 상태 관리, 즐겨찾기 매장 관리
 
 ### 6.6 멤버십 시스템 (MembershipPage)
-![멤버십 페이지]<img width="381" height="840" alt="유니어_맴버십혜택" src="https://github.com/user-attachments/assets/8a765210-170b-4229-a5ef-ef6317a0a249" />
+<img width="381" height="840" alt="유니어_맴버십혜택" src="https://github.com/user-attachments/assets/8a765210-170b-4229-a5ef-ef6317a0a249" />
 
 
 - **주요 기능**: 브랜드별 멤버십 혜택 조회 및 관리
 - **특징**: 브랜드별 할인율 정보, 카테고리 필터링, 혜택 상세 정보
 
 ### 6.7 인증 시스템 (Auth)
-![로그인 페이지]<img width="391" height="835" alt="로그인 페이지" src="https://github.com/user-attachments/assets/4fc2a792-7822-488d-99f0-64ec3ad42bdd" />
+<img width="391" height="835" alt="로그인 페이지" src="https://github.com/user-attachments/assets/4fc2a792-7822-488d-99f0-64ec3ad42bdd" />
 
 
 - **주요 기능**: 소셜 로그인 및 회원 관리, 방문/결제 인증 시스템
