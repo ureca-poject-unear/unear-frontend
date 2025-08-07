@@ -129,45 +129,16 @@ unear-frontend/
 
 ### 📋 개발 환경 설정
 
-<table>
-<tr>
-<td>
-
-#### 1️⃣ **Node.js 설치**
-
-```bash
-# Node.js 18.0.0 이상 버전 필요
-node --version
-```
-
-#### 2️⃣ **의존성 설치**
-
-```bash
-npm install
-```
-
-</td>
-<td>
-
-#### 3️⃣ **환경 변수 설정**
-
-```bash
-# .env 파일 생성
-VITE_API_BASE_URL=백엔드 서버 URL
-VITE_KAKAO_MAP_API_KEY=카카오 지도 API 키
-VITE_GOOGLE_CLIENT_ID=구글 클라이언트 ID
-```
-
-#### 4️⃣ **개발 서버 실행**
-
-```bash
-npm run dev
-# 🌐 http://localhost:4000
-```
-
-</td>
-</tr>
-</table>
+| 단계                    | 명령어 / 파일                                              | 설명                                     |
+|------------------------|----------------------------------------------------------|----------------------------------------|
+| **1️⃣ Node.js 버전 확인**   | `node --version`                                         | Node.js 18.0.0 이상 필요               |
+| **2️⃣ 의존성 설치**         | `npm install`                                            | 프로젝트 의존성 설치                    |
+| **3️⃣ 환경 변수 설정**      | `.env` 파일 생성 후 아래 내용 추가<br><br>VITE_API_BASE_URL=백엔드 서버 URL<br>VITE_KAKAO_MAP_API_KEY=카카오 지도 API 키<br>VITE_GOOGLE_CLIENT_ID=구글 클라이언트 ID | 환경 변수 등록                         |
+| **4️⃣ 개발 서버 실행**      | `npm run dev`                                            | 개발 서버 실행 <br>🌐 http://localhost:4000 |
+| **5️⃣ 프로덕션 빌드**       | `npm run build`                                          | 프로덕션 빌드 생성                     |
+| **6️⃣ 빌드 미리보기**       | `npm run preview`                                        | 빌드 결과물 미리보기                    |
+| **7️⃣ 코드 포맷팅**         | `npm run format`                                         | 코드 포맷팅                            |
+| **8️⃣ 코드 검사**           | `npm run lint`                                           | 코드 린트(검사)                         |
 
 ### 🛠️ 추가 명령어
 
@@ -379,72 +350,31 @@ npm run dev
 
 ## 👥 팀원 소개
 
+<div align="center">
+
 | ![@1seyoung](https://github.com/1seyoung.png) | ![@lbk00](https://github.com/lbk00.png) | ![@tjdqls3607](https://github.com/tjdqls3607.png) | ![@khwww](https://github.com/khwww.png) | ![@KimJunSeo289](https://github.com/KimJunSeo289.png) | ![@alex8396](https://github.com/alex8396.png) | ![@Hongjunior](https://github.com/Hongjunior.png) |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| 한세영 | 이본규 | 정성빈 | 김현우 | 김준서 | 임재찬 | 홍석준 |
+| **한세영** | **이본규** | **정성빈** | **김현우** | **김준서** | **임재찬** | **홍석준** |
 | [@1seyoung](https://github.com/1seyoung) | [@lbk00](https://github.com/lbk00) | [@tjdqls3607](https://github.com/tjdqls3607) | [@khwww](https://github.com/khwww) | [@KimJunSeo289](https://github.com/KimJunSeo289) | [@alex8396](https://github.com/alex8396) | [@Hongjunior](https://github.com/Hongjunior) |
-| **BE 팀장** | **테크리더** | BE | **FE 팀장** | **FE 개발자** | **FE 개발자** | **FE 개발자** |
+| ![BE 팀장](https://img.shields.io/badge/BE-팀장-FF6B6B?style=flat-square) | ![테크리더](https://img.shields.io/badge/테크-리더-4ECDC4?style=flat-square) | ![Backend](https://img.shields.io/badge/Backend-개발자-45B7D1?style=flat-square) | ![FE 팀장](https://img.shields.io/badge/FE-팀장-96CEB4?style=flat-square) | ![Frontend](https://img.shields.io/badge/Frontend-개발자-FFEAA7?style=flat-square) | ![Frontend](https://img.shields.io/badge/Frontend-개발자-FFEAA7?style=flat-square) | ![Frontend](https://img.shields.io/badge/Frontend-개발자-FFEAA7?style=flat-square) |
+
+</div>
+
 ### 🎯 역할 분담
 
-<table>
-<tr>
-<td width="50%">
+<div align="center">
 
-#### 🔧 Backend Team
+| 팀 | 이름 | 역할 | 담당 업무 |
+|:--:|:--:|:--:|:--|
+| **🔧 Backend** | **한세영 (BE 팀장)** | DevOps & Backend Lead | • DevOps, 포스기 기능 개발<br>• 알림 시스템 구축, Airflow<br>• 포스기 프론트 개발, 데이터 샘플링<br>• RAG 추천 |
+| **🔧 Backend** | **이본규 (테크리더)** | Tech Lead & Database | • ERD 설계, DB 관리<br>• OAuth 연동, 유저 서버 개발<br>• Log-consumer 구축, Airflow 설계<br>• 관리자 대시보드 시각화 |
+| **🔧 Backend** | **정성빈** | QA & API Development | • QA 담당, 어드민 서버 개발<br>• 이번주니어 API 개발<br>• 대시보드 프론트 개발, 커뮤니케이션<br>• 소비스토리 및 제휴처 추천 API 개발 |
+| **💻 Frontend** | **김현우 (FE 팀장)** | Frontend Lead & Architecture | • 공통 컴포넌트 개발<br>• 지도 페이지 개발<br>• PWA 구축, 검색 엔진 최적화 |
+| **💻 Frontend** | **김준서** | Frontend Developer | • 공통 컴포넌트 개발<br>• 메인 페이지 개발, 마이 페이지 개발<br>• 알림 시스템 연동 |
+| **💻 Frontend** | **임재찬** | Frontend Developer | • 공통 컴포넌트 개발<br>• 로그인/회원가입 페이지 개발<br>• 이번주니어 페이지 개발 |
+| **💻 Frontend** | **홍석준** | Frontend Developer | • 공통 컴포넌트 개발<br>• 스토리 페이지 개발<br>• 온보딩/혜택 안내 페이지 개발 |
 
-**👨‍💼 한세영 (BE 팀장)**
-
-- DevOps, 포스기 기능 개발
-- 알림 시스템 구축, Airflow
-- 포스기 프론트 개발, 데이터 샘플링
-- RAG 추천
-
-**👨‍💻 이본규 (테크리더)**
-
-- ERD 설계, DB 관리
-- OAuth 연동, 유저 서버 개발
-- Log-consumer 구축, Airflow 설계
-- 관리자 대시보드 시각화
-
-**👨‍💻 정성빈**
-
-- QA 담당, 어드민 서버 개발
-- 이번주니어 API 개발
-- 대시보드 프론트 개발, 커뮤니케이션
-- 소비스토리 및 제휴처 추천 API 개발
-
-</td>
-<td width="50%">
-
-#### 💻 Frontend Team
-
-**👨‍💼 김현우 (FE 팀장)**
-
-- 공통 컴포넌트 개발
-- 지도 페이지 개발
-- PWA 구축, 검색 엔진 최적화
-
-**👨‍💻 김준서 (FE 개발자)**
-
-- 공통 컴포넌트 개발
-- 메인 페이지 개발, 마이 페이지 개발
-- 알림 시스템 연동
-
-**👨‍💻 임재찬 (FE 개발자)**
-
-- 공통 컴포넌트 개발
-- 로그인/회원가입 페이지 개발
-- 이번주니어 페이지 개발
-
-**👨‍💻 홍석준 (FE 개발자)**
-
-- 공통 컴포넌트 개발
-- 스토리 페이지 개발
-- 온보딩/혜택 안내 페이지 개발
-
-</td>
-</tr>
-</table>
+</div>
 
 ---
 
